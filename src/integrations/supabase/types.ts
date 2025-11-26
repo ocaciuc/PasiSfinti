@@ -14,16 +14,323 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      candle_purchases: {
+        Row: {
+          amount: number | null
+          created_at: string
+          expires_at: string
+          id: string
+          lit_at: string
+          payment_status: string | null
+          purpose: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          lit_at?: string
+          payment_status?: string | null
+          purpose?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          lit_at?: string
+          payment_status?: string | null
+          purpose?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      past_pilgrimages: {
+        Row: {
+          created_at: string
+          id: string
+          impressions: string | null
+          period: string
+          place: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          impressions?: string | null
+          period: string
+          place: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          impressions?: string | null
+          period?: string
+          place?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pilgrimages: {
+        Row: {
+          city: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          location: string
+          map_url: string | null
+          participant_count: number | null
+          start_date: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          map_url?: string | null
+          participant_count?: number | null
+          start_date: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          map_url?: string | null
+          participant_count?: number | null
+          start_date?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          likes_count: number | null
+          pilgrimage_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          pilgrimage_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          pilgrimage_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "pilgrimages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          first_name: string
+          id: string
+          last_name: string
+          parish: string | null
+          religion: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          first_name: string
+          id?: string
+          last_name: string
+          parish?: string | null
+          religion?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          parish?: string | null
+          religion?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pilgrimages: {
+        Row: {
+          id: string
+          joined_at: string
+          pilgrimage_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          pilgrimage_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          pilgrimage_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_pilgrimages_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "pilgrimages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +457,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
