@@ -192,20 +192,20 @@
 ---
 
 ## PHASE 4: PILGRIMAGES INTEGRATION
-**Priority: HIGH | Status: NOT STARTED**
+**Priority: HIGH | Status: IN PROGRESS**
 
 ### 4.1 Pilgrimages List Page
-- [ ] Fetch pilgrimages from database instead of hardcoded data
-- [ ] Implement filtering by type (local/national/all)
+- [x] Fetch pilgrimages from database instead of hardcoded data
+- [x] Implement filtering by type (local/national/all)
 - [ ] Add search functionality (by title, location)
 - [ ] Implement filters:
   - [ ] By date range
   - [ ] By location/city
   - [ ] By type (local/national)
-- [ ] Show participant count from database
-- [ ] Add loading states
-- [ ] Add error handling
-- [ ] Add empty state if no pilgrimages found
+- [x] Show participant count from database
+- [x] Add loading states
+- [x] Add error handling
+- [x] Add empty state if no pilgrimages found
 
 ### 4.2 Pilgrimage Detail Page
 - [ ] Fetch pilgrimage details from database by ID
