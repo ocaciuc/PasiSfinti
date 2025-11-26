@@ -1,0 +1,172 @@
+Pasi de Pelerin - prompt
+
+
+# ⭐ **Lovable Prompt — App Name: *Pași de Pelerin***
+
+---
+
+**Build a mobile app called “Pași de Pelerin” — a community platform for Romanian Orthodox pilgrims.**
+The app connects pilgrims, shares real-time information during major pelerinaje, and offers a dedicated space for spiritual discussion.
+
+---
+
+## 📌 **Core Purpose of the App**
+
+Create a simple and sacred digital space where pilgrims can:
+
+* discover upcoming pilgrimages
+* connect with other pilgrims
+* share experiences, questions, tips
+* follow the Orthodox calendar
+* join discussions for each pilgrimage
+
+The overall feeling must be **warm, spiritual, trustworthy, and community-centered**.
+
+---
+
+## 🎨 **Brand Identity (Use in UI style)**
+
+**Name:** Pași de Pelerin
+**English brand version:** Steps of the Pilgrim
+**Brand personality:** warm, communal, sacred, calm
+**Primary colors:**
+
+* Wine Purple (#4A2760)
+* Earth Gold (#C7A44A)
+* Soft Clay (#C9B49A)
+* Stone Grey (#A9A9A9)
+* White (#FFFFFF)
+
+**Design principles:**
+
+* simple and sacred
+* thin lines, elegant icons
+* soft glows (golden hue)
+* imagery that evokes pilgrimage paths, candles, and community
+* avoid flashy gradients or modern neon colors
+* edges should feel soft, rounded, welcoming
+
+---
+
+## 🧱 **App Structure**
+
+### **1. Onboarding**
+
+Create a multi-step onboarding where users fill in:
+
+* First Name
+* Last Name
+* Age
+* Religion (auto-set to Orthodox but editable)
+* City
+* Parish
+* Profile photo upload
+* Past pilgrimages (list input: place, period, impressions)
+
+At the end of onboarding, create a profile page automatically.
+
+---
+
+### **2. Main Menu**
+
+Tabs or menu items for:
+
+* Pelerinaje Ocazionale
+* Pelerinaje Naționale
+* Aprinde o Lumânare (virtual candle purchase or donation)
+* Înscrie-te la un pelerinaj
+* Profilul Meu
+* Dashboard
+
+---
+
+### **3. Dashboard (Home Screen)**
+
+Dashboard should show:
+
+* Orthodox calendar widget
+* If user bought a virtual candle → show a glowing candle animation (soft, subtle, not kitschy)
+* If no candle purchased → show “News about the next major pilgrimage”
+* Quick access buttons: “Upcoming Pilgrimages”, “Join a Pilgrimage”, “Community Discussions”
+
+---
+
+### **4. Pilgrimage Pages**
+
+For each pilgrimage (local or national), include:
+
+* Description
+* Date and location
+* Map
+* Registration button
+* Section for community posts
+* Users registered for that pilgrimage can write questions, share info, comment, etc.
+* The page should feel like a gentle social wall (similar to a pilgrimage-specific forum)
+
+---
+
+### **5. Community Features**
+
+Inside each pilgrimage page:
+
+* a wall with posts
+* comments
+* likes (use a candle icon instead of a heart)
+* sorting (Newest / Most Helpful)
+* tool to report “real-time queue length”, “toilet locations”, “crowd density” shared by other pilgrims
+
+---
+
+### **6. Virtual Candle (“Aprinde o Lumânare”)**
+
+* Donation or symbolic purchase
+* Show candle animation in dashboard
+* Candle burns for 24 hours (visual timer)
+* Keep design very respectful, soft glow
+
+---
+
+### **7. User Profile**
+
+Profile should include:
+
+* photo
+* personal details
+* parish
+* past pilgrimages (with impressions)
+* future pilgrimages they joined
+
+---
+
+## 🎤 **Tone of Texts in App**
+
+Use a **calm, respectful, spiritual** tone in all interface text.
+Avoid slang or modern aggressive copywriting.
+Example:
+
+* “Welcome on your journey.”
+* “May your steps be guided.”
+* “Join fellow pilgrims on this sacred path.”
+
+---
+
+## 🧭 **Navigation Style**
+
+* bottom navigation bar with 4–5 main sections
+* soft rounded cards
+* gentle shadows (very light)
+* icons inspired by footsteps, candles, paths, crosses (minimal)
+
+---
+
+## 🎯 **Final Goal**
+
+Generate a functional MVP where users can:
+
+* create a pilgrim profile
+* browse pilgrimages
+* join a pilgrimage
+* interact in pilgrimage-specific discussions
+* follow the Orthodox calendar
+* light a virtual candle
+* feel welcomed into a peaceful spiritual community
