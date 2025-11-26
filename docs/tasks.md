@@ -255,41 +255,41 @@
 ---
 
 ## PHASE 5: DASHBOARD INTEGRATION
-**Priority: HIGH | Status: NOT STARTED**
+**Priority: HIGH | Status: COMPLETED**
 
 ### 5.1 Dashboard Data Integration
-- [ ] Fetch user's active candle from `candle_purchases` (if expires_at > now)
-- [ ] Display candle animation and timer if active
-- [ ] Fetch next major pilgrimage if no candle active
-- [ ] Display upcoming pilgrimages user has joined
-- [ ] Add real-time updates for candle timer
-- [ ] Implement quick action navigation buttons
+- [x] Fetch user's active candle from `candle_purchases` (if expires_at > now)
+- [x] Display candle animation and timer if active
+- [x] Fetch next major pilgrimage if no candle active
+- [x] Display upcoming pilgrimages user has joined
+- [x] Add real-time updates for candle timer
+- [x] Implement quick action navigation buttons
 
 ### 5.2 Orthodox Calendar Widget
-- [ ] Research and integrate Romanian Orthodox Calendar API
-- [ ] Display today's date and saint of the day
-- [ ] Add link to full calendar view
-- [ ] Handle API errors gracefully
-- [ ] Cache calendar data appropriately
+- [x] Research and integrate Romanian Orthodox Calendar API (using orthocal.info)
+- [x] Display today's date and saint of the day
+- [x] Add link to full calendar view
+- [x] Handle API errors gracefully
+- [x] Cache calendar data appropriately
 
 ### 5.3 Orthodox Calendar Full Page
-- [ ] Create `/calendar` route
-- [ ] Create Calendar.tsx page component
-- [ ] Display monthly calendar grid
-- [ ] Show saints and feasts for each day
-- [ ] Highlight major feasts with gold dot
-- [ ] Implement month navigation
-- [ ] Create day detail view
-- [ ] Add calendar data from Orthodox API
-- [ ] Add loading and error states
+- [x] Create `/calendar` route
+- [x] Create Calendar.tsx page component
+- [x] Display monthly calendar grid
+- [x] Show saints and feasts for each day
+- [x] Highlight major feasts with gold dot
+- [x] Implement month navigation
+- [x] Create day detail view
+- [x] Add calendar data from Orthodox API
+- [x] Add loading and error states
 
 **Testing checklist for Phase 5:**
-- [ ] Dashboard shows active candle if user has one
-- [ ] Candle timer counts down correctly
-- [ ] Dashboard shows next pilgrimage news if no candle
-- [ ] Orthodox calendar widget displays correct data
-- [ ] Full calendar page works and displays all days
-- [ ] Quick actions navigate correctly
+- [x] Dashboard shows active candle if user has one
+- [x] Candle timer counts down correctly
+- [x] Dashboard shows next pilgrimage news if no candle
+- [x] Orthodox calendar widget displays correct data
+- [x] Full calendar page works and displays all days
+- [x] Quick actions navigate correctly
 
 ---
 
