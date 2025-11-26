@@ -208,15 +208,18 @@
 - [x] Add empty state if no pilgrimages found
 
 ### 4.2 Pilgrimage Detail Page
-- [ ] Fetch pilgrimage details from database by ID
-- [ ] Check if current user has joined this pilgrimage
-- [ ] Implement "Join Pilgrimage" functionality:
-  - [ ] Insert into `user_pilgrimages` table
-  - [ ] Update participant count
-  - [ ] Update UI state
-  - [ ] Show success message
+- [x] Fetch pilgrimage details from database by ID
+- [x] Check if current user has joined this pilgrimage
+- [x] Implement "Join Pilgrimage" functionality:
+  - [x] Insert into `user_pilgrimages` table
+  - [x] Update participant count
+  - [x] Update UI state
+  - [x] Show success message
+- [x] Display participant list with avatars and city
+- [x] Show map link if available
+- [x] Add loading states with Skeleton components
+- [x] Add error handling for join/leave actions
 - [ ] Implement "Leave Pilgrimage" functionality (optional)
-- [ ] Add error handling for join/leave actions
 
 ### 4.3 Pilgrimage Community Wall
 - [ ] Fetch posts for specific pilgrimage from `posts` table
