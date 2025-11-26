@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 276 46% 26%;
 
-    /* Wine Purple - primary brand */
-    --primary: 276 46% 26%;
+    /* Indigo - primary brand */
+    --primary: 275 100% 26%;
     --primary-foreground: 0 0% 100%;
 
     /* Soft Clay - secondary surfaces */
@@ -74,8 +74,8 @@ All colors MUST be HSL.
     --popover: 276 46% 15%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 43 49% 53%;
-    --primary-foreground: 276 46% 26%;
+    --primary: 275 100% 65%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 276 30% 20%;
     --secondary-foreground: 0 0% 100%;
