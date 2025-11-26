@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { MapPin, Church, Calendar, Edit, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const profileSchema = z.object({
+  firstName: z.string().min(1, "Prenumele este obligatoriu"),
+  lastName: z.string().min(1, "Numele este obligatoriu"),
+  age: z.coerce.number().min(1, "Vârsta trebuie să fie mai mare de 0").max(150, "Vârstă invalidă"),
+  city: z.string().min(1, "Orașul este obligatoriu"),
+  parish: z.string().optional(),
+  profilePhoto: z.any().optional(),
+});
 
 interface Profile {
   firstName: string;
@@ -31,6 +46,20 @@ const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pastPilgrimages, setPastPilgrimages] = useState<PastPilgrimage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const form = useForm<z.infer<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      age: 0,
+      city: "",
+      parish: "",
+    },
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,6 +69,8 @@ const Profile = () => {
           navigate("/auth");
           return;
         }
+
+        setUserId(user.id);
 
         // Fetch profile
         const { data: profileData, error: profileError } = await supabase
@@ -58,7 +89,7 @@ const Profile = () => {
           return;
         }
 
-        setProfile({
+        const profileState = {
           firstName: profileData.first_name,
           lastName: profileData.last_name,
           age: profileData.age || 0,
@@ -66,6 +97,17 @@ const Profile = () => {
           city: profileData.city || "",
           parish: profileData.parish || "",
           profilePhoto: profileData.avatar_url,
+        };
+
+        setProfile(profileState);
+        
+        // Set form default values
+        form.reset({
+          firstName: profileState.firstName,
+          lastName: profileState.lastName,
+          age: profileState.age,
+          city: profileState.city,
+          parish: profileState.parish || "",
         });
 
         // Fetch past pilgrimages
@@ -87,7 +129,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [navigate]);
+  }, [navigate, form]);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -96,6 +138,68 @@ const Profile = () => {
     } else {
       toast.success("Te-ai deconectat cu succes");
       navigate("/auth");
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof profileSchema>) => {
+    if (!userId) return;
+
+    setSaving(true);
+    try {
+      let avatarUrl = profile?.profilePhoto || null;
+
+      // Handle photo upload if file is provided
+      if (values.profilePhoto && values.profilePhoto[0]) {
+        const file = values.profilePhoto[0];
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${userId}-${Date.now()}.${fileExt}`;
+
+        // Convert file to base64 for storage (MVP approach)
+        const reader = new FileReader();
+        await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            avatarUrl = reader.result as string;
+            resolve(avatarUrl);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Update profile in database
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          first_name: values.firstName,
+          last_name: values.lastName,
+          age: values.age,
+          city: values.city,
+          parish: values.parish || null,
+          avatar_url: avatarUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setProfile({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        age: values.age,
+        religion: profile?.religion || "Ortodox",
+        city: values.city,
+        parish: values.parish || "",
+        profilePhoto: avatarUrl,
+      });
+
+      toast.success("Profilul a fost actualizat cu succes");
+      setEditDialogOpen(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Eroare la actualizarea profilului");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -174,7 +278,7 @@ const Profile = () => {
             <Button
               variant="outline"
               className="w-full mt-6"
-              onClick={() => navigate("/onboarding")}
+              onClick={() => setEditDialogOpen(true)}
             >
               <Edit className="w-4 h-4 mr-2" />
               Editează profilul
@@ -252,6 +356,116 @@ const Profile = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-primary">Editează profilul</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prenume</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ion" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nume</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Popescu" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vârsta</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="25" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Oraș</FormLabel>
+                    <FormControl>
+                      <Input placeholder="București" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="parish"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Parohie (opțional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Biserica Sfântul Nicolae" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="profilePhoto"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>Fotografie de profil (opțional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => onChange(e.target.files)}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditDialogOpen(false)}
+                  className="flex-1"
+                  disabled={saving}
+                >
+                  Anulează
+                </Button>
+                <Button type="submit" className="flex-1" disabled={saving}>
+                  {saving ? "Se salvează..." : "Salvează"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Navigation />
     </div>

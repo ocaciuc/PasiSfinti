@@ -168,12 +168,12 @@
 - [x] Add error handling
 
 ### 3.2 Edit Profile Functionality
-- [ ] Create edit profile form/modal
-- [ ] Allow users to update: name, age, city, parish, photo
-- [ ] Implement photo update with storage
-- [ ] Add validation
-- [ ] Save changes to database
-- [ ] Show success/error feedback
+- [x] Create edit profile form/modal
+- [x] Allow users to update: name, age, city, parish, photo
+- [x] Implement photo update with storage
+- [x] Add validation
+- [x] Save changes to database
+- [x] Show success/error feedback
 
 ### 3.3 Manage Past Pilgrimages
 - [ ] Allow users to add new past pilgrimages
