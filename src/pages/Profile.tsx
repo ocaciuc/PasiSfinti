@@ -4,7 +4,9 @@ import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Church, Calendar, Edit } from "lucide-react";
+import { MapPin, Church, Calendar, Edit, LogOut } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Profile {
   firstName: string;
@@ -29,6 +31,16 @@ const Profile = () => {
       navigate("/onboarding");
     }
   }, [navigate]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Eroare la deconectare: " + error.message);
+    } else {
+      toast.success("Te-ai deconectat cu succes");
+      navigate("/auth");
+    }
+  };
 
   if (!profile) return null;
 
@@ -84,6 +96,14 @@ const Profile = () => {
             >
               <Edit className="w-4 h-4 mr-2" />
               Editează profilul
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full mt-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Deconectare
             </Button>
           </CardContent>
         </Card>
