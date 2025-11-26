@@ -1,65 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Calendar, Users, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Pilgrimage {
   id: string;
   title: string;
   location: string;
-  date: string;
-  participants: number;
-  type: "local" | "national";
-  description: string;
+  start_date: string;
+  end_date: string | null;
+  participant_count: number | null;
+  type: string;
+  description: string | null;
 }
-
-const pilgrimagesData: Pilgrimage[] = [
-  {
-    id: "1",
-    title: "Bobotează 2025",
-    location: "Mănăstirea Putna",
-    date: "6 Ianuarie 2025",
-    participants: 2400,
-    type: "national",
-    description: "Pelerinaj național la Mănăstirea Putna pentru sărbătoarea Bobotezei",
-  },
-  {
-    id: "2",
-    title: "Sf. Ioan Rusul",
-    location: "Mănăstirea Măgureni",
-    date: "27 Mai 2025",
-    participants: 850,
-    type: "national",
-    description: "Pelerinaj la moaștele Sfântului Ioan Rusul",
-  },
-  {
-    id: "3",
-    title: "Duminica Ortodoxiei",
-    location: "Catedrala Patriarhală",
-    date: "16 Martie 2025",
-    participants: 320,
-    type: "local",
-    description: "Procesiune religioasă în București",
-  },
-  {
-    id: "4",
-    title: "Sf. Parascheva",
-    location: "Iași - Catedrala Mitropolitană",
-    date: "14 Octombrie 2025",
-    participants: 5200,
-    type: "national",
-    description: "Cel mai mare pelerinaj ortodox din România",
-  },
-];
 
 const Pilgrimages = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("all");
+  const [pilgrimages, setPilgrimages] = useState<Pilgrimage[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPilgrimages = pilgrimagesData.filter((p) => {
+  useEffect(() => {
+    const fetchPilgrimages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("pilgrimages")
+          .select("*")
+          .order("start_date", { ascending: true });
+
+        if (error) throw error;
+        setPilgrimages(data || []);
+      } catch (error) {
+        console.error("Error fetching pilgrimages:", error);
+        toast.error("Eroare la încărcarea pelerinajelor");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPilgrimages();
+  }, []);
+
+  const filteredPilgrimages = pilgrimages.filter((p) => {
     if (activeTab === "all") return true;
     return p.type === activeTab;
   });
@@ -81,7 +69,31 @@ const Pilgrimages = () => {
           </TabsList>
 
           <TabsContent value={activeTab} className="space-y-4 mt-4">
-            {filteredPilgrimages.map((pilgrimage) => (
+            {loading ? (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="glow-soft">
+                    <CardHeader>
+                      <Skeleton className="h-6 w-3/4 mb-4" />
+                      <Skeleton className="h-4 w-1/2 mb-2" />
+                      <Skeleton className="h-4 w-2/3 mb-2" />
+                      <Skeleton className="h-4 w-1/3" />
+                    </CardHeader>
+                    <CardContent>
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <Skeleton className="h-10 w-full" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            ) : filteredPilgrimages.length === 0 ? (
+              <Card className="glow-soft">
+                <CardContent className="p-6 text-center text-muted-foreground">
+                  Nu există pelerinaje disponibile
+                </CardContent>
+              </Card>
+            ) : (
+              filteredPilgrimages.map((pilgrimage) => (
               <Card
                 key={pilgrimage.id}
                 className="glow-soft cursor-pointer hover:border-accent transition-all"
@@ -100,11 +112,15 @@ const Pilgrimages = () => {
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
-                          <span>{pilgrimage.date}</span>
+                          <span>{new Date(pilgrimage.start_date).toLocaleDateString("ro-RO", { 
+                            day: "numeric", 
+                            month: "long", 
+                            year: "numeric" 
+                          })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-accent font-medium">
                           <Users className="w-4 h-4" />
-                          <span>{pilgrimage.participants.toLocaleString()} pelerini</span>
+                          <span>{(pilgrimage.participant_count || 0).toLocaleString()} pelerini</span>
                         </div>
                       </div>
                     </div>
@@ -120,7 +136,8 @@ const Pilgrimages = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+              ))
+            )}
           </TabsContent>
         </Tabs>
       </div>
