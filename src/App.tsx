@@ -10,6 +10,7 @@ import Pilgrimages from "./pages/Pilgrimages";
 import PilgrimageDetail from "./pages/PilgrimageDetail";
 import Profile from "./pages/Profile";
 import Candle from "./pages/Candle";
+import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/pilgrimage/:id" element={<PilgrimageDetail />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/candle" element={<Candle />} />
+          <Route path="/calendar" element={<Calendar />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
