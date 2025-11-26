@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import type { User, Session } from "@supabase/supabase-js";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,28 +9,57 @@ import { Calendar, Flame, Map, Users } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [hasProfile, setHasProfile] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
   const [hasCandleLit, setHasCandleLit] = useState(false);
 
   useEffect(() => {
-    // Check if user has completed onboarding
-    const profile = localStorage.getItem("pilgrimProfile");
-    if (!profile) {
-      navigate("/onboarding");
-    } else {
-      setHasProfile(true);
-    }
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (!session) {
+          navigate("/auth");
+        }
+      }
+    );
 
-    // Check if candle is lit
-    const candleData = localStorage.getItem("virtualCandle");
-    if (candleData) {
-      const { litAt } = JSON.parse(candleData);
-      const hoursSinceLit = (Date.now() - litAt) / (1000 * 60 * 60);
-      setHasCandleLit(hoursSinceLit < 24);
-    }
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      
+      if (!session) {
+        navigate("/auth");
+      } else {
+        // Check if user has active candle
+        setTimeout(() => {
+          checkActiveCandleStatus(session.user.id);
+        }, 0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
-  if (!hasProfile) return null;
+  const checkActiveCandleStatus = async (userId: string) => {
+    const { data } = await supabase
+      .from("candle_purchases")
+      .select("expires_at")
+      .eq("user_id", userId)
+      .gte("expires_at", new Date().toISOString())
+      .order("expires_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    setHasCandleLit(!!data);
+  };
+
+  if (loading || !user) return null;
 
   const today = new Date().toLocaleDateString("ro-RO", {
     weekday: "long",

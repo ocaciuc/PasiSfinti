@@ -108,15 +108,15 @@
 - [ ] Set appropriate RLS policies
 
 ### 1.7 Authentication Implementation
-- [ ] Create `/auth` page for login/signup
-- [ ] Implement email/password signup flow
-- [ ] Implement email/password login flow
-- [ ] Add proper error handling and validation (use zod)
-- [ ] Add auth state management with `onAuthStateChange`
-- [ ] Implement session persistence
+- [x] Create `/auth` page for login/signup
+- [x] Implement email/password signup flow
+- [x] Implement email/password login flow
+- [x] Add proper error handling and validation (use zod)
+- [x] Add auth state management with `onAuthStateChange`
+- [x] Implement session persistence
 - [ ] Add logout functionality
-- [ ] Add protected route logic (redirect to /auth if not logged in)
-- [ ] Add auto-redirect to dashboard if already logged in (on /auth page)
+- [x] Add protected route logic (redirect to /auth if not logged in)
+- [x] Add auto-redirect to dashboard if already logged in (on /auth page)
 - [ ] Disable "Confirm email" in Supabase settings for faster testing
 
 **Testing checklist for Phase 1:**
