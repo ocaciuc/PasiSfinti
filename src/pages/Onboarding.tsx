@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Cross } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -27,17 +28,92 @@ const Onboarding = () => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // Save profile to localStorage
-      localStorage.setItem("pilgrimProfile", JSON.stringify(formData));
-      toast({
-        title: "Bun venit în comunitate!",
-        description: "Profilul tău a fost creat cu succes.",
-      });
-      navigate("/");
+      try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          toast({
+            title: "Eroare",
+            description: "Nu ești autentificat. Te rugăm să te autentifici.",
+            variant: "destructive",
+          });
+          navigate("/auth");
+          return;
+        }
+
+        // Save profile to Supabase
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            age: parseInt(formData.age),
+            religion: formData.religion,
+            city: formData.city,
+            parish: formData.parish,
+            avatar_url: formData.profilePhoto || null,
+          });
+
+        if (profileError) {
+          toast({
+            title: "Eroare",
+            description: "Nu s-a putut salva profilul: " + profileError.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Parse and save past pilgrimages if provided
+        if (formData.pastPilgrimages.trim()) {
+          const pilgrimageLines = formData.pastPilgrimages.split("\n").filter(line => line.trim());
+          const pilgrimages = pilgrimageLines.map(line => {
+            // Try to parse format: "Place Year - Impressions"
+            const match = line.match(/^(.+?)\s+(\d{4})\s*-\s*(.+)$/);
+            if (match) {
+              return {
+                user_id: user.id,
+                place: match[1].trim(),
+                period: match[2].trim(),
+                impressions: match[3].trim(),
+              };
+            }
+            // Fallback: treat whole line as place
+            return {
+              user_id: user.id,
+              place: line.trim(),
+              period: new Date().getFullYear().toString(),
+              impressions: null,
+            };
+          });
+
+          if (pilgrimages.length > 0) {
+            const { error: pilgrimagesError } = await supabase
+              .from("past_pilgrimages")
+              .insert(pilgrimages);
+
+            if (pilgrimagesError) {
+              console.error("Error saving past pilgrimages:", pilgrimagesError);
+            }
+          }
+        }
+
+        toast({
+          title: "Bun venit în comunitate!",
+          description: "Profilul tău a fost creat cu succes.",
+        });
+        navigate("/");
+      } catch (error) {
+        toast({
+          title: "Eroare",
+          description: "A apărut o eroare neprevăzută.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
