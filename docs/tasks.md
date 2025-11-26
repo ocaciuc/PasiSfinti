@@ -114,7 +114,7 @@
 - [x] Add proper error handling and validation (use zod)
 - [x] Add auth state management with `onAuthStateChange`
 - [x] Implement session persistence
-- [ ] Add logout functionality
+- [x] Add logout functionality
 - [x] Add protected route logic (redirect to /auth if not logged in)
 - [x] Add auto-redirect to dashboard if already logged in (on /auth page)
 - [ ] Disable "Confirm email" in Supabase settings for faster testing
@@ -130,42 +130,42 @@
 ---
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
-**Priority: HIGH | Status: NOT STARTED**
+**Priority: HIGH | Status: COMPLETED**
 
 ### 2.1 Connect Onboarding to Backend
-- [ ] Update Onboarding.tsx to save data to Supabase `profiles` table
-- [ ] Implement profile photo upload to `profile-photos` storage bucket
-- [ ] Save past pilgrimages to `past_pilgrimages` table
-- [ ] Add loading states during form submission
-- [ ] Add error handling with toast notifications
-- [ ] Redirect to dashboard after successful onboarding
-- [ ] Add validation for all form fields
+- [x] Update Onboarding.tsx to save data to Supabase `profiles` table
+- [x] Implement profile photo upload to `profile-photos` storage bucket (using base64 for MVP)
+- [x] Save past pilgrimages to `past_pilgrimages` table
+- [x] Add loading states during form submission
+- [x] Add error handling with toast notifications
+- [x] Redirect to dashboard after successful onboarding
+- [x] Add validation for all form fields
 
 ### 2.2 First-Time User Flow
-- [ ] Check if user has completed onboarding (profile data exists)
-- [ ] Redirect new users to /onboarding if profile incomplete
-- [ ] Skip onboarding if profile already exists
+- [x] Check if user has completed onboarding (profile data exists)
+- [x] Redirect new users to /onboarding if profile incomplete
+- [x] Skip onboarding if profile already exists
 
 **Testing checklist for Phase 2:**
-- [ ] New user goes through onboarding after signup
-- [ ] Profile data is saved to database
-- [ ] Profile photo uploads successfully
-- [ ] Past pilgrimages are saved
-- [ ] User is redirected to dashboard
-- [ ] Returning users skip onboarding
+- [x] New user goes through onboarding after signup
+- [x] Profile data is saved to database
+- [x] Profile photo uploads successfully
+- [x] Past pilgrimages are saved
+- [x] User is redirected to dashboard
+- [x] Returning users skip onboarding
 
 ---
 
 ## PHASE 3: PROFILE PAGE INTEGRATION
-**Priority: HIGH | Status: NOT STARTED**
+**Priority: HIGH | Status: PARTIALLY COMPLETED**
 
 ### 3.1 Connect Profile to Backend
-- [ ] Fetch user profile data from `profiles` table
-- [ ] Fetch user's past pilgrimages from `past_pilgrimages` table
+- [x] Fetch user profile data from `profiles` table
+- [x] Fetch user's past pilgrimages from `past_pilgrimages` table
 - [ ] Fetch user's upcoming pilgrimages from `user_pilgrimages` join
-- [ ] Display profile photo from storage
-- [ ] Add loading states while fetching data
-- [ ] Add error handling
+- [x] Display profile photo from storage
+- [x] Add loading states while fetching data
+- [x] Add error handling
 
 ### 3.2 Edit Profile Functionality
 - [ ] Create edit profile form/modal

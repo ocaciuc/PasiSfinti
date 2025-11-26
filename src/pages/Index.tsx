@@ -28,19 +28,33 @@ const Index = () => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
       
       if (!session) {
         navigate("/auth");
-      } else {
-        // Check if user has active candle
-        setTimeout(() => {
-          checkActiveCandleStatus(session.user.id);
-        }, 0);
+        setLoading(false);
+        return;
       }
+
+      // Check if user has a profile
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        // No profile found, redirect to onboarding
+        navigate("/onboarding");
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has active candle
+      checkActiveCandleStatus(session.user.id);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
