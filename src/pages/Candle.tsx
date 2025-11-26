@@ -1,0 +1,177 @@
+import { useState, useEffect } from "react";
+import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Flame } from "lucide-react";
+
+const Candle = () => {
+  const { toast } = useToast();
+  const [prayer, setPrayer] = useState("");
+  const [candleLit, setCandleLit] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState("");
+
+  useEffect(() => {
+    checkCandleStatus();
+    const interval = setInterval(checkCandleStatus, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkCandleStatus = () => {
+    const candleData = localStorage.getItem("virtualCandle");
+    if (candleData) {
+      const { litAt } = JSON.parse(candleData);
+      const elapsed = Date.now() - litAt;
+      const remaining = 24 * 60 * 60 * 1000 - elapsed; // 24 hours in ms
+
+      if (remaining > 0) {
+        setCandleLit(true);
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        setTimeRemaining(`${hours}h ${minutes}m`);
+      } else {
+        setCandleLit(false);
+        localStorage.removeItem("virtualCandle");
+      }
+    } else {
+      setCandleLit(false);
+    }
+  };
+
+  const handleLightCandle = () => {
+    const candleData = {
+      litAt: Date.now(),
+      prayer: prayer || "Pentru pace și binecuvântare",
+    };
+    localStorage.setItem("virtualCandle", JSON.stringify(candleData));
+    setCandleLit(true);
+    setPrayer("");
+    toast({
+      title: "Lumânarea ta arde",
+      description: "Rugăciunea ta a fost primită. Lumânarea va arde 24 de ore.",
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <header className="bg-primary text-primary-foreground p-6 glow-soft">
+        <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>
+        <p className="text-center text-sm opacity-90 mt-1">
+          Ridică o rugăciune către cer
+        </p>
+      </header>
+
+      <div className="max-w-lg mx-auto p-4">
+        {candleLit ? (
+          <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background">
+            <CardContent className="pt-8 text-center space-y-6">
+              <div className="relative">
+                <Flame className="w-32 h-32 text-accent mx-auto animate-flicker" />
+                <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full" />
+              </div>
+              
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-accent">
+                  Lumânarea ta arde
+                </h2>
+                <p className="text-muted-foreground">
+                  Rugăciunea ta luminează calea
+                </p>
+              </div>
+
+              <div className="bg-card rounded-lg p-4 border border-accent/20">
+                <p className="text-sm text-muted-foreground mb-1">
+                  Timp rămas
+                </p>
+                <p className="text-2xl font-bold text-accent">
+                  {timeRemaining}
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <p className="text-sm text-muted-foreground italic">
+                  "Lumina lumânării simbolizează rugăciunea noastră către Dumnezeu"
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="glow-soft">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <Flame className="w-16 h-16 text-accent/40" />
+              </div>
+              <CardTitle className="text-primary">
+                Aprinde o Lumânare Virtuală
+              </CardTitle>
+              <CardDescription>
+                Lumânarea ta va arde 24 de ore și va simboliza rugăciunea ta
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Rugăciunea ta (opțional)
+                </label>
+                <Textarea
+                  value={prayer}
+                  onChange={(e) => setPrayer(e.target.value)}
+                  placeholder="Pentru sănătate, pace și bunăstare..."
+                  rows={4}
+                  className="resize-none"
+                />
+              </div>
+
+              <div className="bg-secondary rounded-lg p-4 text-sm text-muted-foreground">
+                <p className="mb-2">
+                  Aprinderea unei lumânări virtuale este un gest simbolic de rugăciune 
+                  și contemplare spirituală.
+                </p>
+                <p className="text-accent font-medium">
+                  Donație sugerată: 5 RON
+                </p>
+              </div>
+
+              <Button
+                onClick={handleLightCandle}
+                className="w-full h-12 text-lg"
+              >
+                <Flame className="w-5 h-5 mr-2" />
+                Aprinde Lumânarea
+              </Button>
+
+              <p className="text-xs text-center text-muted-foreground">
+                Donațiile susțin comunitatea și lucrările de caritate
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Info Card */}
+        <Card className="mt-4 glow-soft">
+          <CardHeader>
+            <CardTitle className="text-lg text-primary">
+              Despre Lumânarea Virtuală
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>
+              În tradiția ortodoxă, lumânarea aprinsă simbolizează rugăciunea 
+              credinciosului care se înalță către cer.
+            </p>
+            <p>
+              Prin aprinderea unei lumânări virtuale, îți manifești intenția 
+              spirituală și sprijini comunitatea de pelerini.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Navigation />
+    </div>
+  );
+};
+
+export default Candle;
