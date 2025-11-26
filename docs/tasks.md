@@ -222,24 +222,24 @@
 - [ ] Implement "Leave Pilgrimage" functionality (optional)
 
 ### 4.3 Pilgrimage Community Wall
-- [ ] Fetch posts for specific pilgrimage from `posts` table
-- [ ] Display posts with user info (join with profiles)
-- [ ] Show post creation form only if user has joined pilgrimage
-- [ ] Implement post creation:
-  - [ ] Insert into `posts` table
-  - [ ] Update UI optimistically
-  - [ ] Handle errors
-- [ ] Implement post likes:
-  - [ ] Insert/delete from `post_likes` table
-  - [ ] Update like count in real-time
-  - [ ] Use candle icon for likes
-- [ ] Implement comments:
-  - [ ] Fetch comments for each post
-  - [ ] Allow users to add comments
-  - [ ] Display comment count
+- [x] Fetch posts for specific pilgrimage from `posts` table
+- [x] Display posts with user info (join with profiles)
+- [x] Show post creation form only if user has joined pilgrimage
+- [x] Implement post creation:
+  - [x] Insert into `posts` table
+  - [x] Update UI optimistically
+  - [x] Handle errors
+- [x] Implement post likes:
+  - [x] Insert/delete from `post_likes` table
+  - [x] Update like count in real-time
+  - [x] Use candle icon for likes
+- [x] Implement comments:
+  - [x] Fetch comments for each post
+  - [x] Allow users to add comments
+  - [x] Display comments with author info
 - [ ] Add sorting options (Newest / Most Helpful)
 - [ ] Implement delete post (only for post author)
-- [ ] Add loading and error states
+- [x] Add loading and error states
 
 **Testing checklist for Phase 4:**
 - [ ] Pilgrimages list displays data from database

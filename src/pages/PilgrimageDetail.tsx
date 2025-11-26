@@ -12,13 +12,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 
+interface Comment {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  author_name: string;
+  author_avatar: string | null;
+}
+
 interface Post {
   id: string;
-  author: string;
-  avatar: string;
+  user_id: string;
   content: string;
-  likes: number;
-  timestamp: string;
+  likes_count: number;
+  created_at: string;
+  author_name: string;
+  author_avatar: string | null;
+  user_has_liked: boolean;
+  comments: Comment[];
 }
 
 interface Pilgrimage {
@@ -52,6 +64,7 @@ const PilgrimageDetail = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -110,6 +123,84 @@ const PilgrimageDetail = () => {
       
       setParticipants(formattedParticipants);
 
+      // Fetch posts
+      const { data: postsData, error: postsError } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("pilgrimage_id", id)
+        .order("created_at", { ascending: false });
+
+      if (postsError) throw postsError;
+
+      // For each post, fetch author, comments, and check if user has liked
+      const postsWithDetails = await Promise.all(
+        (postsData || []).map(async (post: any) => {
+          // Fetch author profile
+          const { data: authorProfile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name, avatar_url")
+            .eq("user_id", post.user_id)
+            .maybeSingle();
+
+          // Check if current user has liked this post
+          let userHasLiked = false;
+          if (user) {
+            const { data: likeData } = await supabase
+              .from("post_likes")
+              .select("id")
+              .eq("post_id", post.id)
+              .eq("user_id", user.id)
+              .maybeSingle();
+            userHasLiked = !!likeData;
+          }
+
+          // Fetch comments for this post
+          const { data: commentsData } = await supabase
+            .from("comments")
+            .select("*")
+            .eq("post_id", post.id)
+            .order("created_at", { ascending: true });
+
+          // For each comment, fetch author profile
+          const commentsWithAuthors = await Promise.all(
+            (commentsData || []).map(async (comment: any) => {
+              const { data: commentAuthor } = await supabase
+                .from("profiles")
+                .select("first_name, last_name, avatar_url")
+                .eq("user_id", comment.user_id)
+                .maybeSingle();
+
+              return {
+                id: comment.id,
+                user_id: comment.user_id,
+                content: comment.content,
+                created_at: comment.created_at,
+                author_name: commentAuthor
+                  ? `${commentAuthor.first_name} ${commentAuthor.last_name}`
+                  : "Utilizator",
+                author_avatar: commentAuthor?.avatar_url || null,
+              };
+            })
+          );
+
+          return {
+            id: post.id,
+            user_id: post.user_id,
+            content: post.content,
+            likes_count: post.likes_count || 0,
+            created_at: post.created_at,
+            author_name: authorProfile
+              ? `${authorProfile.first_name} ${authorProfile.last_name}`
+              : "Utilizator",
+            author_avatar: authorProfile?.avatar_url || null,
+            user_has_liked: userHasLiked,
+            comments: commentsWithAuthors,
+          };
+        })
+      );
+
+      setPosts(postsWithDetails);
+
     } catch (error: any) {
       console.error("Error fetching pilgrimage data:", error);
       toast({
@@ -159,33 +250,181 @@ const PilgrimageDetail = () => {
     }
   };
 
-  const handlePostSubmit = () => {
-    if (!newPost.trim()) return;
+  const handlePostSubmit = async () => {
+    if (!newPost.trim() || !userId) return;
 
-    const profile = JSON.parse(localStorage.getItem("pilgrimProfile") || "{}");
-    const newPostObj: Post = {
-      id: Date.now().toString(),
-      author: `${profile.firstName} ${profile.lastName}`,
-      avatar: profile.profilePhoto || "",
-      content: newPost,
-      likes: 0,
-      timestamp: "acum",
-    };
+    try {
+      const { data, error } = await supabase
+        .from("posts")
+        .insert({
+          user_id: userId,
+          pilgrimage_id: id!,
+          content: newPost.trim(),
+        })
+        .select("*")
+        .single();
 
-    setPosts([newPostObj, ...posts]);
-    setNewPost("");
-    toast({
-      title: "Postare publicată!",
-      description: "Comunitatea va putea vedea întrebarea ta.",
-    });
+      if (error) throw error;
+
+      // Fetch author profile
+      const { data: authorProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const newPostObj: Post = {
+        id: data.id,
+        user_id: data.user_id,
+        content: data.content,
+        likes_count: 0,
+        created_at: data.created_at,
+        author_name: authorProfile
+          ? `${authorProfile.first_name} ${authorProfile.last_name}`
+          : "Utilizator",
+        author_avatar: authorProfile?.avatar_url || null,
+        user_has_liked: false,
+        comments: [],
+      };
+
+      setPosts([newPostObj, ...posts]);
+      setNewPost("");
+      toast({
+        title: "Postare publicată!",
+        description: "Comunitatea va putea vedea mesajul tău.",
+      });
+    } catch (error: any) {
+      console.error("Error creating post:", error);
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut publica postarea.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleLike = (postId: string) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === postId ? { ...post, likes: post.likes + 1 } : post
-      )
-    );
+  const handleLike = async (postId: string) => {
+    if (!userId) return;
+
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    try {
+      if (post.user_has_liked) {
+        // Unlike: delete from post_likes
+        const { error } = await supabase
+          .from("post_likes")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", userId);
+
+        if (error) throw error;
+
+        // Update local state
+        setPosts(
+          posts.map((p) =>
+            p.id === postId
+              ? {
+                  ...p,
+                  likes_count: Math.max(0, p.likes_count - 1),
+                  user_has_liked: false,
+                }
+              : p
+          )
+        );
+      } else {
+        // Like: insert into post_likes
+        const { error } = await supabase
+          .from("post_likes")
+          .insert({
+            post_id: postId,
+            user_id: userId,
+          });
+
+        if (error) throw error;
+
+        // Update local state
+        setPosts(
+          posts.map((p) =>
+            p.id === postId
+              ? {
+                  ...p,
+                  likes_count: p.likes_count + 1,
+                  user_has_liked: true,
+                }
+              : p
+          )
+        );
+      }
+    } catch (error: any) {
+      console.error("Error toggling like:", error);
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut actualiza aprecierea.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCommentSubmit = async (postId: string) => {
+    const commentText = commentTexts[postId]?.trim();
+    if (!commentText || !userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .insert({
+          post_id: postId,
+          user_id: userId,
+          content: commentText,
+        })
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      // Fetch author profile
+      const { data: authorProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      const newComment: Comment = {
+        id: data.id,
+        user_id: data.user_id,
+        content: data.content,
+        created_at: data.created_at,
+        author_name: authorProfile
+          ? `${authorProfile.first_name} ${authorProfile.last_name}`
+          : "Utilizator",
+        author_avatar: authorProfile?.avatar_url || null,
+      };
+
+      // Add comment to the post
+      setPosts(
+        posts.map((post) =>
+          post.id === postId
+            ? { ...post, comments: [...post.comments, newComment] }
+            : post
+        )
+      );
+
+      // Clear comment input
+      setCommentTexts({ ...commentTexts, [postId]: "" });
+
+      toast({
+        title: "Comentariu adăugat!",
+        description: "Comentariul tău a fost publicat.",
+      });
+    } catch (error: any) {
+      console.error("Error creating comment:", error);
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut publica comentariul.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -392,6 +631,11 @@ const PilgrimageDetail = () => {
 
             {/* Posts */}
             <div className="space-y-4 mt-6">
+              {posts.length === 0 && isRegistered && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Fii primul care împărtășește ceva cu comunitatea
+                </p>
+              )}
               {posts.map((post) => (
                 <div
                   key={post.id}
@@ -399,31 +643,85 @@ const PilgrimageDetail = () => {
                 >
                   <div className="flex items-start gap-3">
                     <Avatar>
-                      <AvatarImage src={post.avatar} />
+                      <AvatarImage src={post.author_avatar || ""} />
                       <AvatarFallback>
-                        {post.author
+                        {post.author_name
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="font-medium text-sm">{post.author}</p>
+                      <p className="font-medium text-sm">{post.author_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {post.timestamp}
+                        {format(new Date(post.created_at), "d MMM yyyy, HH:mm", { locale: ro })}
                       </p>
                     </div>
                   </div>
                   <p className="text-sm">{post.content}</p>
+                  
+                  {/* Like Button */}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleLike(post.id)}
-                    className="text-accent hover:text-accent/80"
+                    className={`${
+                      post.user_has_liked
+                        ? "text-accent"
+                        : "text-muted-foreground"
+                    } hover:text-accent`}
                   >
-                    <Flame className="w-4 h-4 mr-1" />
-                    {post.likes} aprinderi
+                    <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
+                    {post.likes_count} aprinderi
                   </Button>
+
+                  {/* Comments Section */}
+                  {post.comments.length > 0 && (
+                    <div className="mt-4 space-y-3 pl-4 border-l-2 border-border">
+                      {post.comments.map((comment) => (
+                        <div key={comment.id} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src={comment.author_avatar || ""} />
+                              <AvatarFallback className="text-xs">
+                                {comment.author_name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <p className="text-xs font-medium">{comment.author_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
+                            </p>
+                          </div>
+                          <p className="text-sm">{comment.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add Comment */}
+                  {isRegistered && (
+                    <div className="mt-3 space-y-2">
+                      <Textarea
+                        placeholder="Adaugă un comentariu..."
+                        value={commentTexts[post.id] || ""}
+                        onChange={(e) =>
+                          setCommentTexts({ ...commentTexts, [post.id]: e.target.value })
+                        }
+                        rows={2}
+                        className="text-sm"
+                      />
+                      <Button
+                        onClick={() => handleCommentSubmit(post.id)}
+                        size="sm"
+                        disabled={!commentTexts[post.id]?.trim()}
+                      >
+                        Comentează
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
