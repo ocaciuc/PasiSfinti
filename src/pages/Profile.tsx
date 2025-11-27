@@ -11,9 +11,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MapPin, Church, Calendar, Edit, LogOut } from "lucide-react";
+import { MapPin, Church, Calendar, Edit, LogOut, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { ro } from "date-fns/locale";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "Prenumele este obligatoriu"),
@@ -41,10 +43,21 @@ interface PastPilgrimage {
   impressions: string | null;
 }
 
+interface UpcomingPilgrimage {
+  id: string;
+  title: string;
+  location: string;
+  start_date: string;
+  end_date: string | null;
+  participant_count: number;
+  type: string;
+}
+
 const Profile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pastPilgrimages, setPastPilgrimages] = useState<PastPilgrimage[]>([]);
+  const [upcomingPilgrimages, setUpcomingPilgrimages] = useState<UpcomingPilgrimage[]>([]);
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -119,6 +132,33 @@ const Profile = () => {
 
         if (!pilgrimagesError && pilgrimagesData) {
           setPastPilgrimages(pilgrimagesData);
+        }
+
+        // Fetch upcoming joined pilgrimages
+        const { data: upcomingData, error: upcomingError } = await supabase
+          .from("user_pilgrimages")
+          .select(`
+            pilgrimage_id,
+            pilgrimages (
+              id,
+              title,
+              location,
+              start_date,
+              end_date,
+              participant_count,
+              type
+            )
+          `)
+          .eq("user_id", user.id);
+
+        if (!upcomingError && upcomingData) {
+          // Filter for upcoming pilgrimages and sort by date
+          const today = new Date().toISOString();
+          const upcoming = upcomingData
+            .map((item: any) => item.pilgrimages)
+            .filter((p: any) => p && p.start_date >= today)
+            .sort((a: any, b: any) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+          setUpcomingPilgrimages(upcoming);
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -336,7 +376,7 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Future Pilgrimages */}
+        {/* Upcoming Pilgrimages */}
         <Card className="glow-soft">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary">
@@ -345,14 +385,43 @@ const Profile = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-6">
-              <p className="text-muted-foreground text-sm mb-4">
-                Nu ești înscris la niciun pelerinaj încă
-              </p>
-              <Button onClick={() => navigate("/pilgrimages")}>
-                Explorează pelerinajele
-              </Button>
-            </div>
+            {upcomingPilgrimages.length > 0 ? (
+              <div className="space-y-3">
+                {upcomingPilgrimages.map((pilgrimage) => (
+                  <div
+                    key={pilgrimage.id}
+                    className="border rounded-lg p-4 space-y-2"
+                  >
+                    <h3 className="font-semibold text-lg">{pilgrimage.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      {pilgrimage.location}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
+                      {format(new Date(pilgrimage.start_date), 'd MMMM yyyy', { locale: ro })}
+                      {pilgrimage.end_date && ` - ${format(new Date(pilgrimage.end_date), 'd MMMM yyyy', { locale: ro })}`}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      {pilgrimage.participant_count || 0} participanți
+                    </div>
+                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+                      {pilgrimage.type === 'national' ? 'Național' : 'Local'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-muted-foreground text-sm mb-4">
+                  Nu ești înscris la niciun pelerinaj încă
+                </p>
+                <Button onClick={() => navigate("/pilgrimages")}>
+                  Explorează pelerinajele
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
