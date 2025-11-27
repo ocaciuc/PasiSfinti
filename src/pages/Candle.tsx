@@ -1,57 +1,161 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Flame } from "lucide-react";
+import { Flame, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
+import { ro } from "date-fns/locale";
+
+interface Candle {
+  id: string;
+  lit_at: string;
+  expires_at: string;
+  purpose: string | null;
+}
 
 const Candle = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [prayer, setPrayer] = useState("");
-  const [candleLit, setCandleLit] = useState(false);
+  const [activeCandle, setActiveCandle] = useState<Candle | null>(null);
+  const [candleHistory, setCandleHistory] = useState<Candle[]>([]);
   const [timeRemaining, setTimeRemaining] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    checkCandleStatus();
-    const interval = setInterval(checkCandleStatus, 1000);
-    return () => clearInterval(interval);
+    fetchCandles();
   }, []);
 
-  const checkCandleStatus = () => {
-    const candleData = localStorage.getItem("virtualCandle");
-    if (candleData) {
-      const { litAt } = JSON.parse(candleData);
-      const elapsed = Date.now() - litAt;
-      const remaining = 24 * 60 * 60 * 1000 - elapsed; // 24 hours in ms
+  useEffect(() => {
+    if (activeCandle) {
+      const interval = setInterval(() => {
+        const expiresAt = new Date(activeCandle.expires_at);
+        const now = new Date();
+        
+        if (expiresAt > now) {
+          setTimeRemaining(formatDistanceToNow(expiresAt, { locale: ro, addSuffix: true }));
+        } else {
+          setActiveCandle(null);
+          fetchCandles();
+        }
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [activeCandle]);
 
-      if (remaining > 0) {
-        setCandleLit(true);
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
-        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        setTimeRemaining(`${hours}h ${minutes}m`);
-      } else {
-        setCandleLit(false);
-        localStorage.removeItem("virtualCandle");
+  const fetchCandles = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/auth");
+        return;
       }
-    } else {
-      setCandleLit(false);
+
+      // Fetch active candle
+      const { data: activeData, error: activeError } = await supabase
+        .from("candle_purchases")
+        .select("*")
+        .eq("user_id", user.id)
+        .gt("expires_at", new Date().toISOString())
+        .order("lit_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (activeError && activeError.code !== "PGRST116") {
+        console.error("Error fetching active candle:", activeError);
+      } else if (activeData) {
+        setActiveCandle(activeData);
+      }
+
+      // Fetch candle history (expired candles)
+      const { data: historyData, error: historyError } = await supabase
+        .from("candle_purchases")
+        .select("*")
+        .eq("user_id", user.id)
+        .lte("expires_at", new Date().toISOString())
+        .order("lit_at", { ascending: false })
+        .limit(10);
+
+      if (historyError) {
+        console.error("Error fetching candle history:", historyError);
+      } else if (historyData) {
+        setCandleHistory(historyData);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLightCandle = () => {
-    const candleData = {
-      litAt: Date.now(),
-      prayer: prayer || "Pentru pace și binecuvântare",
-    };
-    localStorage.setItem("virtualCandle", JSON.stringify(candleData));
-    setCandleLit(true);
-    setPrayer("");
-    toast({
-      title: "Lumânarea ta arde",
-      description: "Rugăciunea ta a fost primită. Lumânarea va arde 24 de ore.",
-    });
+  const handleLightCandle = async () => {
+    try {
+      setSubmitting(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      const now = new Date().toISOString();
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+      const { data, error } = await supabase
+        .from("candle_purchases")
+        .insert({
+          user_id: user.id,
+          lit_at: now,
+          expires_at: expiresAt,
+          purpose: prayer || "Pentru pace și binecuvântare",
+          amount: 5,
+          payment_status: "completed",
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setActiveCandle(data);
+      setPrayer("");
+      
+      toast({
+        title: "Lumânarea ta arde",
+        description: "Rugăciunea ta a fost primită. Lumânarea va arde 24 de ore.",
+      });
+    } catch (error) {
+      console.error("Error lighting candle:", error);
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut aprinde lumânarea. Încearcă din nou.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pb-20">
+        <header className="bg-primary text-primary-foreground p-6 glow-soft">
+          <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>
+        </header>
+        <div className="max-w-lg mx-auto p-4 space-y-4">
+          <Skeleton className="h-64 w-full rounded-lg" />
+          <Skeleton className="h-32 w-full rounded-lg" />
+        </div>
+        <Navigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -63,8 +167,8 @@ const Candle = () => {
         </p>
       </header>
 
-      <div className="max-w-lg mx-auto p-4">
-        {candleLit ? (
+      <div className="max-w-lg mx-auto p-4 space-y-4">
+        {activeCandle ? (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background">
             <CardContent className="pt-8 text-center space-y-6">
               <div className="relative">
@@ -136,10 +240,11 @@ const Candle = () => {
 
               <Button
                 onClick={handleLightCandle}
+                disabled={submitting}
                 className="w-full h-12 text-lg"
               >
                 <Flame className="w-5 h-5 mr-2" />
-                Aprinde Lumânarea
+                {submitting ? "Se aprinde..." : "Aprinde Lumânarea"}
               </Button>
 
               <p className="text-xs text-center text-muted-foreground">
@@ -150,7 +255,7 @@ const Candle = () => {
         )}
 
         {/* Info Card */}
-        <Card className="mt-4 glow-soft">
+        <Card className="glow-soft">
           <CardHeader>
             <CardTitle className="text-lg text-primary">
               Despre Lumânarea Virtuală
@@ -167,6 +272,45 @@ const Candle = () => {
             </p>
           </CardContent>
         </Card>
+
+        {/* Candle History */}
+        {candleHistory.length > 0 && (
+          <Card className="glow-soft">
+            <CardHeader>
+              <CardTitle className="text-lg text-primary">
+                Istoricul Lumânărilor
+              </CardTitle>
+              <CardDescription>
+                Rugăciunile tale anterioare
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {candleHistory.map((candle) => (
+                <div
+                  key={candle.id}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50"
+                >
+                  <Flame className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {candle.purpose || "Pentru pace și binecuvântare"}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      <span>
+                        {new Date(candle.lit_at).toLocaleDateString("ro-RO", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Navigation />

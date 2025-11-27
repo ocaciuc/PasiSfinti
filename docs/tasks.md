@@ -294,46 +294,46 @@
 ---
 
 ## PHASE 6: VIRTUAL CANDLE FEATURE
-**Priority: MEDIUM | Status: NOT STARTED**
+**Priority: MEDIUM | Status: COMPLETED**
 
 ### 6.1 Candle Page Integration
-- [ ] Check if user has active candle (expires_at > now)
-- [ ] Display active candle with animation and timer
-- [ ] Display "Light a Candle" CTA if no active candle
-- [ ] Fetch and display candle history from database
+- [x] Check if user has active candle (expires_at > now)
+- [x] Display active candle with animation and timer
+- [x] Display "Light a Candle" CTA if no active candle
+- [x] Fetch and display candle history from database
 
 ### 6.2 Candle Purchase Flow (Placeholder)
-- [ ] Create donation flow UI
-- [ ] Add optional prayer intention field
-- [ ] Implement placeholder payment confirmation
-- [ ] On "payment success":
-  - [ ] Insert into `candle_purchases` table
-  - [ ] Set lit_at = now, expires_at = now + 24 hours
-  - [ ] Show success message
-  - [ ] Redirect to candle animation view
-- [ ] Add error handling
+- [x] Create donation flow UI
+- [x] Add optional prayer intention field
+- [x] Implement placeholder payment confirmation
+- [x] On "payment success":
+  - [x] Insert into `candle_purchases` table
+  - [x] Set lit_at = now, expires_at = now + 24 hours
+  - [x] Show success message
+  - [x] Redirect to candle animation view
+- [x] Add error handling
 
 ### 6.3 Candle Timer & Animation
-- [ ] Implement 24-hour countdown timer
-- [ ] Create soft, respectful candle animation (golden glow)
-- [ ] Update timer in real-time
-- [ ] Auto-hide candle when timer expires
-- [ ] Add visual feedback for time remaining
+- [x] Implement 24-hour countdown timer
+- [x] Create soft, respectful candle animation (golden glow)
+- [x] Update timer in real-time
+- [x] Auto-hide candle when timer expires
+- [x] Add visual feedback for time remaining
 
 ### 6.4 Candle History
-- [ ] Fetch all past candles from database
-- [ ] Display chronologically
-- [ ] Show date, intent, and status
-- [ ] Add empty state if no history
+- [x] Fetch all past candles from database
+- [x] Display chronologically
+- [x] Show date, intent, and status
+- [x] Add empty state if no history
 
 **Testing checklist for Phase 6:**
-- [ ] User can view active candle with timer
-- [ ] User can light a new candle (placeholder payment)
-- [ ] Candle data is saved to database
-- [ ] Timer counts down correctly
-- [ ] Candle expires after 24 hours
-- [ ] Candle history displays correctly
-- [ ] Candle appears on dashboard when active
+- [x] User can view active candle with timer
+- [x] User can light a new candle (placeholder payment)
+- [x] Candle data is saved to database
+- [x] Timer counts down correctly
+- [x] Candle expires after 24 hours
+- [x] Candle history displays correctly
+- [x] Candle appears on dashboard when active
 
 ---
 
