@@ -162,7 +162,7 @@
 ### 3.1 Connect Profile to Backend
 - [x] Fetch user profile data from `profiles` table
 - [x] Fetch user's past pilgrimages from `past_pilgrimages` table
-- [ ] Fetch user's upcoming pilgrimages from `user_pilgrimages` join
+- [x] Fetch user's upcoming pilgrimages from `user_pilgrimages` join
 - [x] Display profile photo from storage
 - [x] Add loading states while fetching data
 - [x] Add error handling
@@ -182,11 +182,11 @@
 - [ ] Update UI in real-time
 
 **Testing checklist for Phase 3:**
-- [ ] Profile page displays correct user data
-- [ ] Past pilgrimages are displayed
-- [ ] Upcoming pilgrimages are displayed
-- [ ] User can edit profile information
-- [ ] User can update profile photo
+- [x] Profile page displays correct user data
+- [x] Past pilgrimages are displayed
+- [x] Upcoming pilgrimages are displayed
+- [x] User can edit profile information
+- [x] User can update profile photo
 - [ ] User can manage past pilgrimages
 
 ---
