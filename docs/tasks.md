@@ -197,11 +197,11 @@
 ### 4.1 Pilgrimages List Page
 - [x] Fetch pilgrimages from database instead of hardcoded data
 - [x] Implement filtering by type (local/national/all)
-- [ ] Add search functionality (by title, location)
-- [ ] Implement filters:
-  - [ ] By date range
-  - [ ] By location/city
-  - [ ] By type (local/national)
+- [x] Add search functionality (by title, location)
+- [x] Implement filters:
+  - [x] By date range
+  - [x] By location/city
+  - [x] By type (local/national)
 - [x] Show participant count from database
 - [x] Add loading states
 - [x] Add error handling
