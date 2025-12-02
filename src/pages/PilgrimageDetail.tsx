@@ -19,6 +19,8 @@ interface Comment {
   created_at: string;
   author_name: string;
   author_avatar: string | null;
+  parent_comment_id: string | null;
+  replies?: Comment[];
 }
 
 interface Post {
@@ -65,6 +67,7 @@ const PilgrimageDetail = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
+  const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -161,7 +164,7 @@ const PilgrimageDetail = () => {
             .eq("post_id", post.id)
             .order("created_at", { ascending: true });
 
-          // For each comment, fetch author profile
+          // For each comment, fetch author profile and organize into threads
           const commentsWithAuthors = await Promise.all(
             (commentsData || []).map(async (comment: any) => {
               const { data: commentAuthor } = await supabase
@@ -175,6 +178,7 @@ const PilgrimageDetail = () => {
                 user_id: comment.user_id,
                 content: comment.content,
                 created_at: comment.created_at,
+                parent_comment_id: comment.parent_comment_id,
                 author_name: commentAuthor
                   ? `${commentAuthor.first_name} ${commentAuthor.last_name}`
                   : "Utilizator",
@@ -182,6 +186,13 @@ const PilgrimageDetail = () => {
               };
             })
           );
+
+          // Organize comments into threads
+          const topLevelComments = commentsWithAuthors.filter(c => !c.parent_comment_id);
+          const threadedComments = topLevelComments.map(comment => ({
+            ...comment,
+            replies: commentsWithAuthors.filter(c => c.parent_comment_id === comment.id)
+          }));
 
           return {
             id: post.id,
@@ -194,7 +205,7 @@ const PilgrimageDetail = () => {
               : "Utilizator",
             author_avatar: authorProfile?.avatar_url || null,
             user_has_liked: userHasLiked,
-            comments: commentsWithAuthors,
+            comments: threadedComments,
           };
         })
       );
@@ -218,6 +229,16 @@ const PilgrimageDetail = () => {
       toast({
         title: "Eroare",
         description: "Trebuie să fii autentificat pentru a te înscrie.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if pilgrimage date is in the past
+    if (pilgrimage && new Date(pilgrimage.start_date) < new Date(new Date().setHours(0, 0, 0, 0))) {
+      toast({
+        title: "Înregistrare indisponibilă",
+        description: "Nu te poți înscrie la pelerinaje care au trecut.",
         variant: "destructive",
       });
       return;
@@ -366,7 +387,7 @@ const PilgrimageDetail = () => {
     }
   };
 
-  const handleCommentSubmit = async (postId: string) => {
+  const handleCommentSubmit = async (postId: string, parentCommentId: string | null = null) => {
     const commentText = commentTexts[postId]?.trim();
     if (!commentText || !userId) return;
 
@@ -377,6 +398,7 @@ const PilgrimageDetail = () => {
           post_id: postId,
           user_id: userId,
           content: commentText,
+          parent_comment_id: parentCommentId,
         })
         .select("*")
         .single();
@@ -395,6 +417,7 @@ const PilgrimageDetail = () => {
         user_id: data.user_id,
         content: data.content,
         created_at: data.created_at,
+        parent_comment_id: data.parent_comment_id,
         author_name: authorProfile
           ? `${authorProfile.first_name} ${authorProfile.last_name}`
           : "Utilizator",
@@ -403,19 +426,33 @@ const PilgrimageDetail = () => {
 
       // Add comment to the post
       setPosts(
-        posts.map((post) =>
-          post.id === postId
-            ? { ...post, comments: [...post.comments, newComment] }
-            : post
-        )
+        posts.map((post) => {
+          if (post.id !== postId) return post;
+          
+          if (!parentCommentId) {
+            // Top-level comment
+            return { ...post, comments: [...post.comments, { ...newComment, replies: [] }] };
+          } else {
+            // Reply to existing comment
+            return {
+              ...post,
+              comments: post.comments.map(comment => 
+                comment.id === parentCommentId
+                  ? { ...comment, replies: [...(comment.replies || []), newComment] }
+                  : comment
+              )
+            };
+          }
+        })
       );
 
-      // Clear comment input
+      // Clear comment input and reply state
       setCommentTexts({ ...commentTexts, [postId]: "" });
+      setReplyingTo({ ...replyingTo, [postId]: null });
 
       toast({
-        title: "Comentariu adăugat!",
-        description: "Comentariul tău a fost publicat.",
+        title: parentCommentId ? "Răspuns adăugat!" : "Comentariu adăugat!",
+        description: parentCommentId ? "Răspunsul tău a fost publicat." : "Comentariul tău a fost publicat.",
       });
     } catch (error: any) {
       console.error("Error creating comment:", error);
@@ -536,11 +573,21 @@ const PilgrimageDetail = () => {
             )}
 
             <div className="pt-4">
-
               {!isRegistered ? (
-                <Button onClick={handleRegister} className="w-full">
-                  Înscrie-te la acest pelerinaj
-                </Button>
+                pilgrimage && new Date(pilgrimage.start_date) >= new Date(new Date().setHours(0, 0, 0, 0)) ? (
+                  <Button onClick={handleRegister} className="w-full">
+                    Înscrie-te la acest pelerinaj
+                  </Button>
+                ) : (
+                  <div className="bg-muted border border-border rounded-lg p-4 text-center">
+                    <p className="text-muted-foreground font-medium">
+                      Înregistrarea nu este disponibilă
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Acest pelerinaj a avut loc în trecut
+                    </p>
+                  </div>
+                )
               ) : (
                 <div className="bg-accent/10 border border-accent rounded-lg p-4 text-center">
                   <p className="text-accent font-medium">
@@ -677,35 +724,89 @@ const PilgrimageDetail = () => {
 
                   {/* Comments Section */}
                   {post.comments.length > 0 && (
-                    <div className="mt-4 space-y-3 pl-4 border-l-2 border-border">
+                    <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
                       {post.comments.map((comment) => (
-                        <div key={comment.id} className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6">
-                              <AvatarImage src={comment.author_avatar || ""} />
-                              <AvatarFallback className="text-xs">
-                                {comment.author_name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <p className="text-xs font-medium">{comment.author_name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
-                            </p>
+                        <div key={comment.id} className="space-y-2">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage src={comment.author_avatar || ""} />
+                                <AvatarFallback className="text-xs">
+                                  {comment.author_name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <p className="text-xs font-medium">{comment.author_name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
+                              </p>
+                            </div>
+                            <p className="text-sm">{comment.content}</p>
+                            {isRegistered && comment.user_id !== userId && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
+                                className="text-xs h-auto py-1 px-2"
+                              >
+                                Răspunde
+                              </Button>
+                            )}
                           </div>
-                          <p className="text-sm">{comment.content}</p>
+
+                          {/* Replies */}
+                          {comment.replies && comment.replies.length > 0 && (
+                            <div className="ml-6 space-y-2 pl-3 border-l border-border">
+                              {comment.replies.map((reply) => (
+                                <div key={reply.id} className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <Avatar className="w-5 h-5">
+                                      <AvatarImage src={reply.author_avatar || ""} />
+                                      <AvatarFallback className="text-xs">
+                                        {reply.author_name
+                                          .split(" ")
+                                          .map((n) => n[0])
+                                          .join("")}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <p className="text-xs font-medium">{reply.author_name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {format(new Date(reply.created_at), "d MMM, HH:mm", { locale: ro })}
+                                    </p>
+                                  </div>
+                                  <p className="text-sm">{reply.content}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Add Comment */}
+                  {/* Add Comment or Reply */}
                   {isRegistered && (
                     <div className="mt-3 space-y-2">
+                      {replyingTo[post.id] && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>
+                            Răspunzi la{" "}
+                            {post.comments.find(c => c.id === replyingTo[post.id])?.author_name || "comentariu"}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
+                            className="h-auto py-0 px-1"
+                          >
+                            Anulează
+                          </Button>
+                        </div>
+                      )}
                       <Textarea
-                        placeholder="Adaugă un comentariu..."
+                        placeholder={replyingTo[post.id] ? "Scrie răspunsul tău..." : "Adaugă un comentariu..."}
                         value={commentTexts[post.id] || ""}
                         onChange={(e) =>
                           setCommentTexts({ ...commentTexts, [post.id]: e.target.value })
@@ -714,11 +815,11 @@ const PilgrimageDetail = () => {
                         className="text-sm"
                       />
                       <Button
-                        onClick={() => handleCommentSubmit(post.id)}
+                        onClick={() => handleCommentSubmit(post.id, replyingTo[post.id])}
                         size="sm"
                         disabled={!commentTexts[post.id]?.trim()}
                       >
-                        Comentează
+                        {replyingTo[post.id] ? "Răspunde" : "Comentează"}
                       </Button>
                     </div>
                   )}
