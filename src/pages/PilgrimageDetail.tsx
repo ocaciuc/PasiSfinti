@@ -670,17 +670,23 @@ const PilgrimageDetail = () => {
               </div>
             )}
 
-            {!isRegistered && (
+            {!isRegistered && userId && (
               <p className="text-sm text-muted-foreground text-center py-4">
                 Înscrie-te la pelerinaj pentru a participa la discuții
               </p>
             )}
 
+            {!userId && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Autentifică-te și înscrie-te pentru a participa la discuții
+              </p>
+            )}
+
             {/* Posts */}
             <div className="space-y-4 mt-6">
-              {posts.length === 0 && isRegistered && (
+              {posts.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Fii primul care împărtășește ceva cu comunitatea
+                  {isRegistered ? "Fii primul care împărtășește ceva cu comunitatea" : "Nu există postări încă"}
                 </p>
               )}
               {posts.map((post) => (
