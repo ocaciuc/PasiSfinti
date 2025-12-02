@@ -271,17 +271,19 @@
 - [x] Add link to full calendar view
 - [x] Handle API errors gracefully
 - [x] Cache calendar data appropriately
+- [x] **REFACTORED**: Migrated to Supabase database storage
 
 ### 5.3 Orthodox Calendar Full Page
 - [x] Create `/calendar` route
 - [x] Create Calendar.tsx page component
-- [x] Display monthly calendar grid
-- [x] Show saints and feasts for each day
-- [x] Highlight major feasts with gold dot
-- [x] Implement month navigation
-- [x] Create day detail view
-- [x] Add calendar data from Orthodox API
+- [x] **REFACTORED**: Changed from monthly grid to simple today's view
+- [x] Show description for current day with color coding (red/black)
+- [x] Created `orthodox_calendar_days` table in Supabase
+- [x] Populated sample data (January + February)
+- [x] Removed clickable calendar grid (per requirements)
+- [x] Display only current date and description
 - [x] Add loading and error states
+- [ ] **TODO**: Populate remaining months (March-December) in database
 
 **Testing checklist for Phase 5:**
 - [x] Dashboard shows active candle if user has one
