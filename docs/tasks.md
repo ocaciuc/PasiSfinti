@@ -272,12 +272,15 @@
 - [x] Handle API errors gracefully
 - [x] Cache calendar data appropriately
 - [x] **REFACTORED**: Migrated to Supabase database storage
+- [x] **REFACTORED**: Created reusable TodayCalendarCard component
+- [x] Replaced external API with Supabase data in dashboard
 
 ### 5.3 Orthodox Calendar Full Page
 - [x] Create `/calendar` route
 - [x] Create Calendar.tsx page component
 - [x] **REFACTORED**: Changed from monthly grid to simple today's view
 - [x] Show description for current day with color coding (red/black)
+- [x] **REFACTORED**: Refactored to use shared TodayCalendarCard component
 - [x] Created `orthodox_calendar_days` table in Supabase
 - [x] Populated sample data (January + February)
 - [x] Removed clickable calendar grid (per requirements)

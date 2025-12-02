@@ -3,17 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import Navigation from "@/components/Navigation";
+import { TodayCalendarCard } from "@/components/TodayCalendarCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Flame, Map, Users } from "lucide-react";
+import { Flame, Map } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
-
-interface OrthodoxCalendarData {
-  summary_title: string;
-  fast_level_desc: string;
-  feast_level_description?: string;
-}
 
 interface Candle {
   expires_at: string;
@@ -34,7 +29,6 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeCandle, setActiveCandle] = useState<Candle | null>(null);
-  const [orthodoxCalendar, setOrthodoxCalendar] = useState<OrthodoxCalendarData | null>(null);
   const [nextPilgrimage, setNextPilgrimage] = useState<NextPilgrimage | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
 
@@ -79,7 +73,6 @@ const Index = () => {
       // Fetch dashboard data
       await Promise.all([
         checkActiveCandleStatus(session.user.id),
-        fetchOrthodoxCalendar(),
         fetchNextPilgrimage(session.user.id)
       ]);
       
@@ -102,25 +95,6 @@ const Index = () => {
     setActiveCandle(data);
   };
 
-  const fetchOrthodoxCalendar = async () => {
-    try {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = today.getMonth() + 1;
-      const day = today.getDate();
-      
-      const response = await fetch(
-        `https://orthocal.info/api/gregorian/${year}/${month}/${day}/`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        setOrthodoxCalendar(data);
-      }
-    } catch (error) {
-      console.error("Error fetching Orthodox calendar:", error);
-    }
-  };
 
   const fetchNextPilgrimage = async (userId: string) => {
     try {
@@ -183,13 +157,6 @@ const Index = () => {
 
   if (loading || !user) return null;
 
-  const today = new Date().toLocaleDateString("ro-RO", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -200,35 +167,7 @@ const Index = () => {
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
         {/* Orthodox Calendar */}
-        <Card 
-          className="glow-soft cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/calendar")}
-        >
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <Calendar className="w-5 h-5" />
-              Calendar Ortodox
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">{today}</p>
-            {orthodoxCalendar ? (
-              <>
-                <p className="font-medium">{orthodoxCalendar.summary_title}</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {orthodoxCalendar.fast_level_desc}
-                </p>
-                {orthodoxCalendar.feast_level_description && (
-                  <p className="text-xs text-accent mt-1">
-                    {orthodoxCalendar.feast_level_description}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Se încarcă...</p>
-            )}
-          </CardContent>
-        </Card>
+        <TodayCalendarCard />
 
         {/* Virtual Candle or Next Pilgrimage */}
         {activeCandle ? (
