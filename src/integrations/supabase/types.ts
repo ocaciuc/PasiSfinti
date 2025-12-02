@@ -82,6 +82,36 @@ export type Database = {
           },
         ]
       }
+      orthodox_calendar_days: {
+        Row: {
+          color: string
+          created_at: string
+          day_number: number
+          description: string
+          id: string
+          month: number
+          year: number
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          day_number: number
+          description: string
+          id?: string
+          month: number
+          year: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          day_number?: number
+          description?: string
+          id?: string
+          month?: number
+          year?: number
+        }
+        Relationships: []
+      }
       past_pilgrimages: {
         Row: {
           created_at: string
