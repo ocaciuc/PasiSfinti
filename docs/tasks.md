@@ -215,6 +215,7 @@
   - [x] Update participant count
   - [x] Update UI state
   - [x] Show success message
+  - [x] Add date validation (only allow enrollment for today or future dates)
 - [x] Display participant list with avatars and city
 - [x] Show map link if available
 - [x] Add loading states with Skeleton components
@@ -235,21 +236,27 @@
   - [x] Use candle icon for likes
 - [x] Implement comments:
   - [x] Fetch comments for each post
-  - [x] Allow users to add comments
+  - [x] Allow users to add comments (only if enrolled)
   - [x] Display comments with author info
+  - [x] Add threaded reply functionality with parent_comment_id
+  - [x] Show reply button on other users' comments
+  - [x] Display nested replies
 - [ ] Add sorting options (Newest / Most Helpful)
 - [ ] Implement delete post (only for post author)
 - [x] Add loading and error states
 
 **Testing checklist for Phase 4:**
-- [ ] Pilgrimages list displays data from database
-- [ ] Search and filters work correctly
-- [ ] User can join a pilgrimage
-- [ ] Join action updates participant count
-- [ ] Community wall shows only for joined users
-- [ ] User can create posts
-- [ ] User can like posts (candle icon)
-- [ ] User can comment on posts
+- [x] Pilgrimages list displays data from database
+- [x] Search and filters work correctly
+- [x] User can join a pilgrimage (only for today or future dates)
+- [x] Join button disabled for past pilgrimages
+- [x] Join action updates participant count
+- [x] Community wall shows only for joined users
+- [x] User can create posts
+- [x] User can like posts (candle icon)
+- [x] User can comment on posts (only if enrolled)
+- [x] User can reply to other users' comments
+- [x] Replies are displayed nested under parent comments
 - [ ] Sorting works correctly
 
 ---
@@ -262,6 +269,7 @@
 - [x] Display candle animation and timer if active
 - [x] Fetch next major pilgrimage if no candle active
 - [x] Display upcoming pilgrimages user has joined
+- [x] Show the closest upcoming pilgrimage (by date) that user is enrolled in
 - [x] Add real-time updates for candle timer
 - [x] Implement quick action navigation buttons
 
