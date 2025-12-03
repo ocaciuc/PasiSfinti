@@ -9,8 +9,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
+
+// Helper function to safely format dates
+const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
+  if (!dateString) return "Data necunoscută";
+  try {
+    const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
+    if (!isValid(date)) return "Data necunoscută";
+    return format(date, formatStr, { locale: ro });
+  } catch {
+    return "Data necunoscută";
+  }
+};
 
 interface Comment {
   id: string;
@@ -676,7 +688,7 @@ const PilgrimageDetail = () => {
                       <div className="flex-1">
                         <p className="font-medium text-sm">{post.author_name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(post.created_at), "d MMM yyyy, HH:mm", { locale: ro })}
+                          {safeFormatDate(post.created_at, "d MMM yyyy, HH:mm")}
                         </p>
                       </div>
                     </div>
@@ -711,7 +723,7 @@ const PilgrimageDetail = () => {
                                 </Avatar>
                                 <p className="text-xs font-medium">{comment.author_name}</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
+                                  {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
                                 </p>
                               </div>
                               <p className="text-sm">{comment.content}</p>
@@ -743,7 +755,7 @@ const PilgrimageDetail = () => {
                                       </Avatar>
                                       <p className="text-xs font-medium">{reply.author_name}</p>
                                       <p className="text-xs text-muted-foreground">
-                                        {format(new Date(reply.created_at), "d MMM, HH:mm", { locale: ro })}
+                                        {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
                                       </p>
                                     </div>
                                     <p className="text-sm">{reply.content}</p>
