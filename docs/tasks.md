@@ -455,10 +455,18 @@
 
 ### Architecture Decisions:
 - Backend: Lovable Cloud (Supabase)
-- Authentication: Email/password (social login deferred to post-MVP)
+- Authentication: Email/password + Facebook OAuth
 - Storage: Supabase Storage for images
 - Calendar: Romanian Orthodox Calendar API integration
 - Payment: Placeholder for MVP, Stripe integration post-MVP
+
+### Facebook Login & Data Deletion (Meta Compliance):
+- [x] Facebook OAuth integration with "Continue with Facebook" button
+- [x] Updated Auth page with modern social login UI
+- [x] Settings page with Delete Account functionality
+- [x] Public /user-data-deletion page for Meta compliance
+- [x] delete-account Edge Function for secure account deletion
+- [x] Account deleted confirmation page
 
 ### MVP Scope Constraints:
 - Community features: Only pilgrimage-specific walls (no global feed in MVP)

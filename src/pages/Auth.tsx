@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Flame } from "lucide-react";
+import { Flame, Mail, Loader2 } from "lucide-react";
 import { z } from "zod";
 
 // Validation schemas
@@ -21,9 +21,11 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [facebookLoading, setFacebookLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("signin");
 
   useEffect(() => {
     // Check if user is already logged in
@@ -67,10 +69,37 @@ const Auth = () => {
     }
   };
 
+  const handleFacebookLogin = async () => {
+    setFacebookLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: "Eroare la autentificare",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Eroare",
+        description: "A apărut o eroare la autentificarea cu Facebook",
+        variant: "destructive",
+      });
+    } finally {
+      setFacebookLoading(false);
+    }
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate inputs
     const emailError = validateEmail(email);
     if (emailError) {
       toast({
@@ -139,7 +168,6 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate inputs
     const emailError = validateEmail(email);
     if (emailError) {
       toast({
@@ -186,6 +214,12 @@ const Auth = () => {
     }
   };
 
+  const FacebookIcon = () => (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  );
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -202,27 +236,61 @@ const Auth = () => {
               Creează un cont nou sau autentifică-te pentru a continua
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+          <CardContent className="space-y-6">
+            {/* Social Login Buttons */}
+            <div className="space-y-3">
+              <Button
+                type="button"
+                onClick={handleFacebookLogin}
+                disabled={facebookLoading || loading}
+                className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white"
+              >
+                {facebookLoading ? (
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                ) : (
+                  <FacebookIcon />
+                )}
+                <span className="ml-2">Continuă cu Facebook</span>
+              </Button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  sau continuă cu email
+                </span>
+              </div>
+            </div>
+
+            {/* Email/Password Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Autentificare</TabsTrigger>
                 <TabsTrigger value="signup">Înregistrare</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="signin">
+              <TabsContent value="signin" className="mt-4">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="exemplu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={loading}
-                      maxLength={255}
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="signin-email"
+                        type="email"
+                        placeholder="exemplu@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={loading || facebookLoading}
+                        maxLength={255}
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signin-password">Parola</Label>
@@ -233,30 +301,51 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      disabled={loading}
+                      disabled={loading || facebookLoading}
                       maxLength={100}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Se încarcă..." : "Autentifică-te"}
+                  <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Se încarcă...
+                      </>
+                    ) : (
+                      "Autentifică-te"
+                    )}
                   </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Nu ai cont?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("signup")}
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Creează unul acum
+                    </button>
+                  </p>
                 </form>
               </TabsContent>
 
-              <TabsContent value="signup">
+              <TabsContent value="signup" className="mt-4">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="exemplu@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={loading}
-                      maxLength={255}
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="exemplu@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={loading || facebookLoading}
+                        maxLength={255}
+                        className="pl-10"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Parola</Label>
@@ -267,7 +356,7 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      disabled={loading}
+                      disabled={loading || facebookLoading}
                       maxLength={100}
                     />
                   </div>
@@ -280,13 +369,30 @@ const Auth = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      disabled={loading}
+                      disabled={loading || facebookLoading}
                       maxLength={100}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Se încarcă..." : "Creează cont"}
+                  <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Se încarcă...
+                      </>
+                    ) : (
+                      "Creează cont"
+                    )}
                   </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Ai deja cont?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("signin")}
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Autentifică-te
+                    </button>
+                  </p>
                 </form>
               </TabsContent>
             </Tabs>
