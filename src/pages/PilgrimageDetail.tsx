@@ -76,9 +76,11 @@ const PilgrimageDetail = () => {
   const fetchPilgrimageData = async () => {
     try {
       setLoading(true);
-      
+
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUserId(user?.id || null);
 
       // Fetch pilgrimage details
@@ -106,7 +108,8 @@ const PilgrimageDetail = () => {
       // Fetch participants
       const { data: participantsData, error: participantsError } = await supabase
         .from("user_pilgrimages")
-        .select(`
+        .select(
+          `
           user_id,
           profiles:user_id (
             id,
@@ -115,21 +118,20 @@ const PilgrimageDetail = () => {
             avatar_url,
             city
           )
-        `)
+        `,
+        )
         .eq("pilgrimage_id", id);
 
       if (participantsError) throw participantsError;
 
-      const formattedParticipants = participantsData
-        .map((p: any) => p.profiles)
-        .filter(Boolean);
-      
+      const formattedParticipants = participantsData.map((p: any) => p.profiles).filter(Boolean);
+
       setParticipants(formattedParticipants);
 
       // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from("posts")
-        .select("*")
+        .select("content")
         .eq("pilgrimage_id", id)
         .order("created_at", { ascending: false });
 
@@ -179,19 +181,17 @@ const PilgrimageDetail = () => {
                 content: comment.content,
                 created_at: comment.created_at,
                 parent_comment_id: comment.parent_comment_id,
-                author_name: commentAuthor
-                  ? `${commentAuthor.first_name} ${commentAuthor.last_name}`
-                  : "Utilizator",
+                author_name: commentAuthor ? `${commentAuthor.first_name} ${commentAuthor.last_name}` : "Utilizator",
                 author_avatar: commentAuthor?.avatar_url || null,
               };
-            })
+            }),
           );
 
           // Organize comments into threads
-          const topLevelComments = commentsWithAuthors.filter(c => !c.parent_comment_id);
-          const threadedComments = topLevelComments.map(comment => ({
+          const topLevelComments = commentsWithAuthors.filter((c) => !c.parent_comment_id);
+          const threadedComments = topLevelComments.map((comment) => ({
             ...comment,
-            replies: commentsWithAuthors.filter(c => c.parent_comment_id === comment.id)
+            replies: commentsWithAuthors.filter((c) => c.parent_comment_id === comment.id),
           }));
 
           return {
@@ -200,18 +200,15 @@ const PilgrimageDetail = () => {
             content: post.content,
             likes_count: post.likes_count || 0,
             created_at: post.created_at,
-            author_name: authorProfile
-              ? `${authorProfile.first_name} ${authorProfile.last_name}`
-              : "Utilizator",
+            author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
             author_avatar: authorProfile?.avatar_url || null,
             user_has_liked: userHasLiked,
             comments: threadedComments,
           };
-        })
+        }),
       );
 
       setPosts(postsWithDetails);
-
     } catch (error: any) {
       console.error("Error fetching pilgrimage data:", error);
       toast({
@@ -245,18 +242,16 @@ const PilgrimageDetail = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from("user_pilgrimages")
-        .insert({
-          user_id: userId,
-          pilgrimage_id: id!,
-        });
+      const { error } = await supabase.from("user_pilgrimages").insert({
+        user_id: userId,
+        pilgrimage_id: id!,
+      });
 
       if (error) throw error;
 
       setIsRegistered(true);
       fetchPilgrimageData(); // Refresh to update participant count
-      
+
       toast({
         title: "Înregistrare reușită!",
         description: "Te-ai înscris la acest pelerinaj. Drum bun!",
@@ -300,9 +295,7 @@ const PilgrimageDetail = () => {
         content: data.content,
         likes_count: 0,
         created_at: data.created_at,
-        author_name: authorProfile
-          ? `${authorProfile.first_name} ${authorProfile.last_name}`
-          : "Utilizator",
+        author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
         author_avatar: authorProfile?.avatar_url || null,
         user_has_liked: false,
         comments: [],
@@ -333,11 +326,7 @@ const PilgrimageDetail = () => {
     try {
       if (post.user_has_liked) {
         // Unlike: delete from post_likes
-        const { error } = await supabase
-          .from("post_likes")
-          .delete()
-          .eq("post_id", postId)
-          .eq("user_id", userId);
+        const { error } = await supabase.from("post_likes").delete().eq("post_id", postId).eq("user_id", userId);
 
         if (error) throw error;
 
@@ -350,17 +339,15 @@ const PilgrimageDetail = () => {
                   likes_count: Math.max(0, p.likes_count - 1),
                   user_has_liked: false,
                 }
-              : p
-          )
+              : p,
+          ),
         );
       } else {
         // Like: insert into post_likes
-        const { error } = await supabase
-          .from("post_likes")
-          .insert({
-            post_id: postId,
-            user_id: userId,
-          });
+        const { error } = await supabase.from("post_likes").insert({
+          post_id: postId,
+          user_id: userId,
+        });
 
         if (error) throw error;
 
@@ -373,8 +360,8 @@ const PilgrimageDetail = () => {
                   likes_count: p.likes_count + 1,
                   user_has_liked: true,
                 }
-              : p
-          )
+              : p,
+          ),
         );
       }
     } catch (error: any) {
@@ -418,9 +405,7 @@ const PilgrimageDetail = () => {
         content: data.content,
         created_at: data.created_at,
         parent_comment_id: data.parent_comment_id,
-        author_name: authorProfile
-          ? `${authorProfile.first_name} ${authorProfile.last_name}`
-          : "Utilizator",
+        author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
         author_avatar: authorProfile?.avatar_url || null,
       };
 
@@ -428,7 +413,7 @@ const PilgrimageDetail = () => {
       setPosts(
         posts.map((post) => {
           if (post.id !== postId) return post;
-          
+
           if (!parentCommentId) {
             // Top-level comment
             return { ...post, comments: [...post.comments, { ...newComment, replies: [] }] };
@@ -436,14 +421,14 @@ const PilgrimageDetail = () => {
             // Reply to existing comment
             return {
               ...post,
-              comments: post.comments.map(comment => 
+              comments: post.comments.map((comment) =>
                 comment.id === parentCommentId
                   ? { ...comment, replies: [...(comment.replies || []), newComment] }
-                  : comment
-              )
+                  : comment,
+              ),
             };
           }
-        })
+        }),
       );
 
       // Clear comment input and reply state
@@ -543,7 +528,10 @@ const PilgrimageDetail = () => {
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-5 h-5" />
-              <span>{pilgrimage.location}{pilgrimage.city && `, ${pilgrimage.city}`}</span>
+              <span>
+                {pilgrimage.location}
+                {pilgrimage.city && `, ${pilgrimage.city}`}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-accent font-medium">
               <Users className="w-5 h-5" />
@@ -552,9 +540,7 @@ const PilgrimageDetail = () => {
 
             {pilgrimage.description && (
               <div className="pt-4">
-                <p className="text-sm text-muted-foreground mb-4">
-                  {pilgrimage.description}
-                </p>
+                <p className="text-sm text-muted-foreground mb-4">{pilgrimage.description}</p>
               </div>
             )}
 
@@ -580,22 +566,14 @@ const PilgrimageDetail = () => {
                   </Button>
                 ) : (
                   <div className="bg-muted border border-border rounded-lg p-4 text-center">
-                    <p className="text-muted-foreground font-medium">
-                      Înregistrarea nu este disponibilă
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Acest pelerinaj a avut loc în trecut
-                    </p>
+                    <p className="text-muted-foreground font-medium">Înregistrarea nu este disponibilă</p>
+                    <p className="text-sm text-muted-foreground mt-1">Acest pelerinaj a avut loc în trecut</p>
                   </div>
                 )
               ) : (
                 <div className="bg-accent/10 border border-accent rounded-lg p-4 text-center">
-                  <p className="text-accent font-medium">
-                    Ești înregistrat pentru acest pelerinaj
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Drum bun pe calea ta spirituală!
-                  </p>
+                  <p className="text-accent font-medium">Ești înregistrat pentru acest pelerinaj</p>
+                  <p className="text-sm text-muted-foreground mt-1">Drum bun pe calea ta spirituală!</p>
                 </div>
               )}
             </div>
@@ -614,33 +592,25 @@ const PilgrimageDetail = () => {
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
                 {participants.slice(0, 8).map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="flex items-center gap-2 p-2 border border-border rounded-lg"
-                  >
+                  <div key={participant.id} className="flex items-center gap-2 p-2 border border-border rounded-lg">
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={participant.avatar_url || ""} />
                       <AvatarFallback className="text-xs">
-                        {participant.first_name[0]}{participant.last_name[0]}
+                        {participant.first_name[0]}
+                        {participant.last_name[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">
                         {participant.first_name} {participant.last_name}
                       </p>
-                      {participant.city && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {participant.city}
-                        </p>
-                      )}
+                      {participant.city && <p className="text-xs text-muted-foreground truncate">{participant.city}</p>}
                     </div>
                   </div>
                 ))}
               </div>
               {participants.length > 8 && (
-                <p className="text-xs text-muted-foreground text-center mt-3">
-                  +{participants.length - 8} pelerini
-                </p>
+                <p className="text-xs text-muted-foreground text-center mt-3">+{participants.length - 8} pelerini</p>
               )}
             </CardContent>
           </Card>
@@ -691,10 +661,7 @@ const PilgrimageDetail = () => {
                   </p>
                 )}
                 {posts.map((post) => (
-                  <div
-                    key={post.id}
-                    className="border border-border rounded-lg p-4 space-y-3"
-                  >
+                  <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <Avatar>
                         <AvatarImage src={post.author_avatar || ""} />
@@ -713,17 +680,13 @@ const PilgrimageDetail = () => {
                       </div>
                     </div>
                     <p className="text-sm">{post.content}</p>
-                    
+
                     {/* Like Button */}
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleLike(post.id)}
-                      className={`${
-                        post.user_has_liked
-                          ? "text-accent"
-                          : "text-muted-foreground"
-                      } hover:text-accent`}
+                      className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
                     >
                       <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
                       {post.likes_count} aprinderi
@@ -798,7 +761,7 @@ const PilgrimageDetail = () => {
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>
                             Răspunzi la{" "}
-                            {post.comments.find(c => c.id === replyingTo[post.id])?.author_name || "comentariu"}
+                            {post.comments.find((c) => c.id === replyingTo[post.id])?.author_name || "comentariu"}
                           </span>
                           <Button
                             variant="ghost"
@@ -813,9 +776,7 @@ const PilgrimageDetail = () => {
                       <Textarea
                         placeholder={replyingTo[post.id] ? "Scrie răspunsul tău..." : "Adaugă un comentariu..."}
                         value={commentTexts[post.id] || ""}
-                        onChange={(e) =>
-                          setCommentTexts({ ...commentTexts, [post.id]: e.target.value })
-                        }
+                        onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
                         rows={2}
                         className="text-sm"
                       />
