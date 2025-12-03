@@ -239,10 +239,11 @@
   - [x] Allow users to add comments (only if enrolled)
   - [x] Display comments with author info (name, avatar, date)
   - [x] Add threaded reply functionality with parent_comment_id
-  - [x] Show reply button on other users' comments
+  - [x] Show reply button - all enrolled users can reply to any comment
   - [x] Display nested replies
-  - [x] All users can view comments (RLS updated for public read)
+  - [x] Only enrolled users can view posts and comments (RLS enforced)
   - [x] Only enrolled users can add comments/replies
+  - [x] Users cannot edit posts from other users (enforced via RLS)
 - [ ] Add sorting options (Newest / Most Helpful)
 - [ ] Implement delete post (only for post author)
 - [x] Add loading and error states
