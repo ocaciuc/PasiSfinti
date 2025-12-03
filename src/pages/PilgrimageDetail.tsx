@@ -105,33 +105,34 @@ const PilgrimageDetail = () => {
         setIsRegistered(!!userPilgrimageData);
       }
 
-      // Fetch participants
-      const { data: participantsData, error: participantsError } = await supabase
+      // Fetch participants - first get user_ids, then fetch profiles separately
+      const { data: userPilgrimagesData, error: participantsError } = await supabase
         .from("user_pilgrimages")
-        .select(
-          `
-          user_id,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name,
-            avatar_url,
-            city
-          )
-        `,
-        )
+        .select("user_id")
         .eq("pilgrimage_id", id);
 
       if (participantsError) throw participantsError;
 
-      const formattedParticipants = participantsData.map((p: any) => p.profiles).filter(Boolean);
+      // Fetch profiles for all participant user_ids
+      const userIds = (userPilgrimagesData || []).map((up: any) => up.user_id);
+      let formattedParticipants: Participant[] = [];
+      
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, avatar_url, city")
+          .in("user_id", userIds);
+
+        if (profilesError) throw profilesError;
+        formattedParticipants = (profilesData || []) as Participant[];
+      }
 
       setParticipants(formattedParticipants);
 
       // Fetch posts
       const { data: postsData, error: postsError } = await supabase
         .from("posts")
-        .select("content")
+        .select("*")
         .eq("pilgrimage_id", id)
         .order("created_at", { ascending: false });
 
