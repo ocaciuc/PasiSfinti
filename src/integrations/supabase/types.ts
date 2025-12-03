@@ -358,26 +358,17 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
-        Row: {
-          avatar_url: string | null
-          first_name: string | null
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          first_name?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          first_name?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_co_pilgrim_profiles: {
+        Args: { requesting_user_id: string }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
