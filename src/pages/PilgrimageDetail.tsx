@@ -682,75 +682,76 @@ const PilgrimageDetail = () => {
               </p>
             )}
 
-            {/* Posts */}
-            <div className="space-y-4 mt-6">
-              {posts.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  {isRegistered ? "Fii primul care împărtășește ceva cu comunitatea" : "Nu există postări încă"}
-                </p>
-              )}
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="border border-border rounded-lg p-4 space-y-3"
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar>
-                      <AvatarImage src={post.author_avatar || ""} />
-                      <AvatarFallback>
-                        {post.author_name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{post.author_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(post.created_at), "d MMM yyyy, HH:mm", { locale: ro })}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm">{post.content}</p>
-                  
-                  {/* Like Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className={`${
-                      post.user_has_liked
-                        ? "text-accent"
-                        : "text-muted-foreground"
-                    } hover:text-accent`}
+            {/* Posts - Only visible to enrolled users */}
+            {isRegistered ? (
+              <div className="space-y-4 mt-6">
+                {posts.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Fii primul care împărtășește ceva cu comunitatea
+                  </p>
+                )}
+                {posts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="border border-border rounded-lg p-4 space-y-3"
                   >
-                    <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
-                    {post.likes_count} aprinderi
-                  </Button>
+                    <div className="flex items-start gap-3">
+                      <Avatar>
+                        <AvatarImage src={post.author_avatar || ""} />
+                        <AvatarFallback>
+                          {post.author_name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{post.author_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(post.created_at), "d MMM yyyy, HH:mm", { locale: ro })}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm">{post.content}</p>
+                    
+                    {/* Like Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(post.id)}
+                      className={`${
+                        post.user_has_liked
+                          ? "text-accent"
+                          : "text-muted-foreground"
+                      } hover:text-accent`}
+                    >
+                      <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
+                      {post.likes_count} aprinderi
+                    </Button>
 
-                  {/* Comments Section */}
-                  {post.comments.length > 0 && (
-                    <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
-                      {post.comments.map((comment) => (
-                        <div key={comment.id} className="space-y-2">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <Avatar className="w-6 h-6">
-                                <AvatarImage src={comment.author_avatar || ""} />
-                                <AvatarFallback className="text-xs">
-                                  {comment.author_name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                              <p className="text-xs font-medium">{comment.author_name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
-                              </p>
-                            </div>
-                            <p className="text-sm">{comment.content}</p>
-                            {isRegistered && comment.user_id !== userId && (
+                    {/* Comments Section */}
+                    {post.comments.length > 0 && (
+                      <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
+                        {post.comments.map((comment) => (
+                          <div key={comment.id} className="space-y-2">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="w-6 h-6">
+                                  <AvatarImage src={comment.author_avatar || ""} />
+                                  <AvatarFallback className="text-xs">
+                                    {comment.author_name
+                                      .split(" ")
+                                      .map((n) => n[0])
+                                      .join("")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <p className="text-xs font-medium">{comment.author_name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {format(new Date(comment.created_at), "d MMM, HH:mm", { locale: ro })}
+                                </p>
+                              </div>
+                              <p className="text-sm">{comment.content}</p>
+                              {/* Reply button - available for all enrolled users */}
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -759,41 +760,39 @@ const PilgrimageDetail = () => {
                               >
                                 Răspunde
                               </Button>
+                            </div>
+
+                            {/* Replies */}
+                            {comment.replies && comment.replies.length > 0 && (
+                              <div className="ml-6 space-y-2 pl-3 border-l border-border">
+                                {comment.replies.map((reply) => (
+                                  <div key={reply.id} className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <Avatar className="w-5 h-5">
+                                        <AvatarImage src={reply.author_avatar || ""} />
+                                        <AvatarFallback className="text-xs">
+                                          {reply.author_name
+                                            .split(" ")
+                                            .map((n) => n[0])
+                                            .join("")}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <p className="text-xs font-medium">{reply.author_name}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {format(new Date(reply.created_at), "d MMM, HH:mm", { locale: ro })}
+                                      </p>
+                                    </div>
+                                    <p className="text-sm">{reply.content}</p>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
+                        ))}
+                      </div>
+                    )}
 
-                          {/* Replies */}
-                          {comment.replies && comment.replies.length > 0 && (
-                            <div className="ml-6 space-y-2 pl-3 border-l border-border">
-                              {comment.replies.map((reply) => (
-                                <div key={reply.id} className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <Avatar className="w-5 h-5">
-                                      <AvatarImage src={reply.author_avatar || ""} />
-                                      <AvatarFallback className="text-xs">
-                                        {reply.author_name
-                                          .split(" ")
-                                          .map((n) => n[0])
-                                          .join("")}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <p className="text-xs font-medium">{reply.author_name}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {format(new Date(reply.created_at), "d MMM, HH:mm", { locale: ro })}
-                                    </p>
-                                  </div>
-                                  <p className="text-sm">{reply.content}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add Comment or Reply */}
-                  {isRegistered && (
+                    {/* Add Comment or Reply */}
                     <div className="mt-3 space-y-2">
                       {replyingTo[post.id] && (
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -828,10 +827,17 @@ const PilgrimageDetail = () => {
                         {replyingTo[post.id] ? "Răspunde" : "Comentează"}
                       </Button>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 mt-4 bg-muted/50 rounded-lg">
+                <MessageCircle className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  Înscrie-te la pelerinaj pentru a vedea discuțiile comunității
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
