@@ -62,10 +62,7 @@ export const TodayCalendarCard = ({ onClick, showHeader = true }: TodayCalendarC
   });
 
   return (
-    <Card 
-      className="glow-soft cursor-pointer hover:shadow-lg transition-shadow"
-      onClick={onClick || (() => navigate("/calendar"))}
-    >
+    <Card className="glow-soft">
       {showHeader && (
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary">
