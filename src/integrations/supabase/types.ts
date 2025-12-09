@@ -90,10 +90,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "v_comments_threaded"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "v_posts_active"
             referencedColumns: ["id"]
           },
         ]
@@ -308,6 +322,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "v_posts_active"
+            referencedColumns: ["id"]
+          },
         ]
       }
       posts: {
@@ -347,6 +368,20 @@ export type Database = {
             columns: ["pilgrimage_id"]
             isOneToOne: false
             referencedRelation: "pilgrimages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_passed"
             referencedColumns: ["id"]
           },
         ]
@@ -432,6 +467,20 @@ export type Database = {
             referencedRelation: "pilgrimages"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_pilgrimages_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_pilgrimages_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_passed"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -457,9 +506,246 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_comments_threaded: {
+        Row: {
+          author_avatar: string | null
+          author_name: string | null
+          content: string | null
+          created_at: string | null
+          id: string | null
+          parent_comment_id: string | null
+          post_id: string | null
+          reply_count: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "v_comments_threaded"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "v_posts_active"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pilgrimages_active: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string | null
+          image_url: string | null
+          location: string | null
+          map_url: string | null
+          participant_count: number | null
+          start_date: string | null
+          title: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          map_url?: string | null
+          participant_count?: number | null
+          start_date?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          map_url?: string | null
+          participant_count?: number | null
+          start_date?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      v_pilgrimages_passed: {
+        Row: {
+          city: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string | null
+          image_url: string | null
+          location: string | null
+          map_url: string | null
+          participant_count: number | null
+          start_date: string | null
+          title: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          map_url?: string | null
+          participant_count?: number | null
+          start_date?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string | null
+          image_url?: string | null
+          location?: string | null
+          map_url?: string | null
+          participant_count?: number | null
+          start_date?: string | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      v_posts_active: {
+        Row: {
+          avatar_url: string | null
+          content: string | null
+          created_at: string | null
+          deleted_at: string | null
+          first_name: string | null
+          id: string | null
+          likes_count: number | null
+          pilgrimage_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "pilgrimages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_passed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_profiles_active: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          created_at: string | null
+          deleted_at: string | null
+          first_name: string | null
+          id: string | null
+          is_deleted: boolean | null
+          last_name: string | null
+          parish: string | null
+          religion: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          last_name?: string | null
+          parish?: string | null
+          religion?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          last_name?: string | null
+          parish?: string | null
+          religion?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      delete_user_account: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
       get_co_pilgrim_profiles: {
         Args: { requesting_user_id: string }
         Returns: {
