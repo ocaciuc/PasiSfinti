@@ -14,6 +14,7 @@ import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 import AccountDeleted from "./pages/AccountDeleted";
 import UserDataDeletion from "./pages/UserDataDeletion";
+import SpiritualDiary from "./pages/SpiritualDiary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/pilgrimages" element={<Pilgrimages />} />
           <Route path="/pilgrimage/:id" element={<PilgrimageDetail />} />
+          <Route path="/pilgrimage/:pilgrimageId/diary" element={<SpiritualDiary />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/candle" element={<Candle />} />
           <Route path="/calendar" element={<Calendar />} />

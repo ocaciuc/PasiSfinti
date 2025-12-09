@@ -11,11 +11,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { MapPin, Church, Calendar, Edit, LogOut, Users } from "lucide-react";
+import { MapPin, Church, Calendar, Edit, LogOut, Users, BookHeart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
+import BadgesSection from "@/components/BadgesSection";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "Prenumele este obligatoriu"),
@@ -340,6 +341,9 @@ const Profile = () => {
           </CardContent>
         </Card>
 
+        {/* Badges Section */}
+        {userId && <BadgesSection userId={userId} />}
+
         {/* Past Pilgrimages */}
         <Card className="glow-soft">
           <CardHeader>
@@ -370,9 +374,20 @@ const Profile = () => {
                       <Users className="w-4 h-4" />
                       {pilgrimage.participant_count || 0} participanți
                     </div>
-                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">
-                      {pilgrimage.type === 'national' ? 'Național' : 'Local'}
-                    </span>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="inline-block px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">
+                        {pilgrimage.type === 'national' ? 'Național' : 'Local'}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/pilgrimage/${pilgrimage.id}/diary`)}
+                        className="ml-auto"
+                      >
+                        <BookHeart className="w-4 h-4 mr-1" />
+                        Jurnal Spiritual
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
