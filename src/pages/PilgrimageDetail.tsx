@@ -695,63 +695,17 @@ const PilgrimageDetail = () => {
                     </div>
                     <p className="text-sm">{post.content}</p>
 
-                    {/* Like Button and Comment Button */}
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(post.id)}
-                        className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
-                      >
-                        <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
-                        {post.likes_count} aprinderi
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowTopLevelComment({ ...showTopLevelComment, [post.id]: true })}
-                        className="text-muted-foreground"
-                      >
-                        <MessageCircle className="w-4 h-4 mr-1" />
-                        Comentează
-                      </Button>
-                    </div>
+                    {/* Like Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(post.id)}
+                      className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
+                    >
+                      <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
+                      {post.likes_count} aprinderi
+                    </Button>
 
-                    {/* Top-level comment input */}
-                    {showTopLevelComment[post.id] && !replyingTo[post.id] && (
-                      <div className="mt-3 space-y-2">
-                        <Textarea
-                          placeholder="Adaugă un comentariu..."
-                          value={commentTexts[post.id] || ""}
-                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                          rows={2}
-                          className="text-sm"
-                          autoFocus
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => {
-                              handleCommentSubmit(post.id, null);
-                              setShowTopLevelComment({ ...showTopLevelComment, [post.id]: false });
-                            }}
-                            size="sm"
-                            disabled={!commentTexts[post.id]?.trim()}
-                          >
-                            Comentează
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setShowTopLevelComment({ ...showTopLevelComment, [post.id]: false });
-                              setCommentTexts({ ...commentTexts, [post.id]: "" });
-                            }}
-                          >
-                            Anulează
-                          </Button>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Comments Section */}
                     {post.comments.length > 0 && (
