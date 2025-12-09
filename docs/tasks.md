@@ -175,19 +175,19 @@
 - [x] Save changes to database
 - [x] Show success/error feedback
 
-### 3.3 Manage Past Pilgrimages
-- [ ] Allow users to add new past pilgrimages
-- [ ] Allow users to edit past pilgrimages
-- [ ] Allow users to delete past pilgrimages
-- [ ] Update UI in real-time
+### 3.3 Past Pilgrimages Section
+- [x] Updated to show enrolled pilgrimages that have passed (start_date or end_date before today)
+- [x] Removed "Adaugă pelerinaje" button from section
+- [x] Added friendly empty state message guiding users to explore pilgrimages
+- [x] Using same card layout as upcoming pilgrimages
 
 **Testing checklist for Phase 3:**
 - [x] Profile page displays correct user data
-- [x] Past pilgrimages are displayed
+- [x] Past pilgrimages section shows enrolled pilgrimages that have passed
 - [x] Upcoming pilgrimages are displayed
 - [x] User can edit profile information
 - [x] User can update profile photo
-- [ ] User can manage past pilgrimages
+- [x] Empty state message displays correctly when no past pilgrimages
 
 ---
 

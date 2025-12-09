@@ -38,9 +38,12 @@ interface Profile {
 
 interface PastPilgrimage {
   id: string;
-  place: string;
-  period: string;
-  impressions: string | null;
+  title: string;
+  location: string;
+  start_date: string;
+  end_date: string | null;
+  participant_count: number;
+  type: string;
 }
 
 interface UpcomingPilgrimage {
@@ -123,19 +126,8 @@ const Profile = () => {
           parish: profileState.parish || "",
         });
 
-        // Fetch past pilgrimages
-        const { data: pilgrimagesData, error: pilgrimagesError } = await supabase
-          .from("past_pilgrimages")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("period", { ascending: false });
-
-        if (!pilgrimagesError && pilgrimagesData) {
-          setPastPilgrimages(pilgrimagesData);
-        }
-
-        // Fetch upcoming joined pilgrimages
-        const { data: upcomingData, error: upcomingError } = await supabase
+        // Fetch user's enrolled pilgrimages
+        const { data: enrolledData, error: enrolledError } = await supabase
           .from("user_pilgrimages")
           .select(`
             pilgrimage_id,
@@ -151,12 +143,26 @@ const Profile = () => {
           `)
           .eq("user_id", user.id);
 
-        if (!upcomingError && upcomingData) {
-          // Filter for upcoming pilgrimages and sort by date
-          const today = new Date().toISOString();
-          const upcoming = upcomingData
+        if (!enrolledError && enrolledData) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          // Filter for past pilgrimages (start_date OR end_date before today)
+          const past = enrolledData
             .map((item: any) => item.pilgrimages)
-            .filter((p: any) => p && p.start_date >= today)
+            .filter((p: any) => {
+              if (!p) return false;
+              const startDate = new Date(p.start_date);
+              const endDate = p.end_date ? new Date(p.end_date) : null;
+              return startDate < today || (endDate && endDate < today);
+            })
+            .sort((a: any, b: any) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
+          setPastPilgrimages(past);
+
+          // Filter for upcoming pilgrimages (start_date >= today)
+          const upcoming = enrolledData
+            .map((item: any) => item.pilgrimages)
+            .filter((p: any) => p && new Date(p.start_date) >= today)
             .sort((a: any, b: any) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
           setUpcomingPilgrimages(upcoming);
         }
@@ -348,28 +354,40 @@ const Profile = () => {
                 {pastPilgrimages.map((pilgrimage) => (
                   <div
                     key={pilgrimage.id}
-                    className="border-l-4 border-accent pl-4 py-2"
+                    className="border rounded-lg p-4 space-y-2"
                   >
-                    <p className="font-medium">{pilgrimage.place}</p>
-                    <p className="text-sm text-muted-foreground">{pilgrimage.period}</p>
-                    {pilgrimage.impressions && (
-                      <p className="text-sm mt-1">{pilgrimage.impressions}</p>
-                    )}
+                    <h3 className="font-semibold text-lg">{pilgrimage.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      {pilgrimage.location}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
+                      {format(new Date(pilgrimage.start_date), 'd MMMM yyyy', { locale: ro })}
+                      {pilgrimage.end_date && ` - ${format(new Date(pilgrimage.end_date), 'd MMMM yyyy', { locale: ro })}`}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4" />
+                      {pilgrimage.participant_count || 0} participanți
+                    </div>
+                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground">
+                      {pilgrimage.type === 'national' ? 'Național' : 'Local'}
+                    </span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-6">
                 <p className="text-muted-foreground text-sm">
-                  Nu ai adăugat încă pelerinaje anterioare
+                  Nu ai încă pelerinaje încheiate. Înscrie-te la un pelerinaj viitor pentru a începe călătoria!
                 </p>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="mt-2"
-                  onClick={() => navigate("/onboarding")}
+                  className="mt-4"
+                  onClick={() => navigate("/pilgrimages")}
                 >
-                  Adaugă pelerinaje
+                  Explorează pelerinajele
                 </Button>
               </div>
             )}
