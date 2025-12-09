@@ -738,6 +738,36 @@ const PilgrimageDetail = () => {
                               </Button>
                             </div>
 
+                            {/* Inline Reply Input - appears right under the comment being replied to */}
+                            {replyingTo[post.id] === comment.id && (
+                              <div className="ml-6 mt-2 space-y-2 pl-3 border-l border-accent">
+                                <Textarea
+                                  placeholder="Scrie răspunsul tău..."
+                                  value={commentTexts[post.id] || ""}
+                                  onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                                  rows={2}
+                                  className="text-sm"
+                                  autoFocus
+                                />
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() => handleCommentSubmit(post.id, comment.id)}
+                                    size="sm"
+                                    disabled={!commentTexts[post.id]?.trim()}
+                                  >
+                                    Răspunde
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
+                                  >
+                                    Anulează
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
                             {/* Replies */}
                             {comment.replies && comment.replies.length > 0 && (
                               <div className="ml-6 space-y-2 pl-3 border-l border-border">
@@ -768,39 +798,25 @@ const PilgrimageDetail = () => {
                       </div>
                     )}
 
-                    {/* Add Comment or Reply */}
-                    <div className="mt-3 space-y-2">
-                      {replyingTo[post.id] && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>
-                            Răspunzi la{" "}
-                            {post.comments.find((c) => c.id === replyingTo[post.id])?.author_name || "comentariu"}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
-                            className="h-auto py-0 px-1"
-                          >
-                            Anulează
-                          </Button>
-                        </div>
-                      )}
-                      <Textarea
-                        placeholder={replyingTo[post.id] ? "Scrie răspunsul tău..." : "Adaugă un comentariu..."}
-                        value={commentTexts[post.id] || ""}
-                        onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                        rows={2}
-                        className="text-sm"
-                      />
-                      <Button
-                        onClick={() => handleCommentSubmit(post.id, replyingTo[post.id])}
-                        size="sm"
-                        disabled={!commentTexts[post.id]?.trim()}
-                      >
-                        {replyingTo[post.id] ? "Răspunde" : "Comentează"}
-                      </Button>
-                    </div>
+                    {/* Add Top-Level Comment (only when not replying) */}
+                    {!replyingTo[post.id] && (
+                      <div className="mt-3 space-y-2">
+                        <Textarea
+                          placeholder="Adaugă un comentariu..."
+                          value={commentTexts[post.id] || ""}
+                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                          rows={2}
+                          className="text-sm"
+                        />
+                        <Button
+                          onClick={() => handleCommentSubmit(post.id, null)}
+                          size="sm"
+                          disabled={!commentTexts[post.id]?.trim()}
+                        >
+                          Comentează
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
