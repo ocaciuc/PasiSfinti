@@ -80,7 +80,7 @@ const PilgrimageDetail = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
-  const [showCommentInput, setShowCommentInput] = useState<Record<string, boolean>>({});
+  const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -695,16 +695,63 @@ const PilgrimageDetail = () => {
                     </div>
                     <p className="text-sm">{post.content}</p>
 
-                    {/* Like Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLike(post.id)}
-                      className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
-                    >
-                      <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
-                      {post.likes_count} aprinderi
-                    </Button>
+                    {/* Like Button and Comment Button */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLike(post.id)}
+                        className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
+                      >
+                        <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
+                        {post.likes_count} aprinderi
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowTopLevelComment({ ...showTopLevelComment, [post.id]: true })}
+                        className="text-muted-foreground"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        Comentează
+                      </Button>
+                    </div>
+
+                    {/* Top-level comment input */}
+                    {showTopLevelComment[post.id] && !replyingTo[post.id] && (
+                      <div className="mt-3 space-y-2">
+                        <Textarea
+                          placeholder="Adaugă un comentariu..."
+                          value={commentTexts[post.id] || ""}
+                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                          rows={2}
+                          className="text-sm"
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              handleCommentSubmit(post.id, null);
+                              setShowTopLevelComment({ ...showTopLevelComment, [post.id]: false });
+                            }}
+                            size="sm"
+                            disabled={!commentTexts[post.id]?.trim()}
+                          >
+                            Comentează
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setShowTopLevelComment({ ...showTopLevelComment, [post.id]: false });
+                              setCommentTexts({ ...commentTexts, [post.id]: "" });
+                            }}
+                          >
+                            Anulează
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Comments Section */}
                     {post.comments.length > 0 && (
@@ -771,7 +818,7 @@ const PilgrimageDetail = () => {
 
                             {/* Replies */}
                             {comment.replies && comment.replies.length > 0 && (
-                              <div className="ml-6 space-y-2 pl-3 border-l border-border">
+                              <div className="ml-6 space-y-3 pl-3 border-l border-border">
                                 {comment.replies.map((reply) => (
                                   <div key={reply.id} className="space-y-1">
                                     <div className="flex items-center gap-2">
@@ -790,6 +837,44 @@ const PilgrimageDetail = () => {
                                       </p>
                                     </div>
                                     <p className="text-sm">{reply.content}</p>
+                                    {/* Reply button for replies */}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setReplyingTo({ ...replyingTo, [post.id]: reply.id })}
+                                      className="text-xs h-auto py-1 px-2"
+                                    >
+                                      Răspunde
+                                    </Button>
+                                    {/* Inline Reply Input for reply */}
+                                    {replyingTo[post.id] === reply.id && (
+                                      <div className="mt-2 space-y-2 pl-3 border-l border-accent">
+                                        <Textarea
+                                          placeholder="Scrie răspunsul tău..."
+                                          value={commentTexts[post.id] || ""}
+                                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                                          rows={2}
+                                          className="text-sm"
+                                          autoFocus
+                                        />
+                                        <div className="flex gap-2">
+                                          <Button
+                                            onClick={() => handleCommentSubmit(post.id, comment.id)}
+                                            size="sm"
+                                            disabled={!commentTexts[post.id]?.trim()}
+                                          >
+                                            Răspunde
+                                          </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
+                                          >
+                                            Anulează
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -799,55 +884,6 @@ const PilgrimageDetail = () => {
                       </div>
                     )}
 
-                    {/* Add Top-Level Comment Button / Input */}
-                    {!replyingTo[post.id] && (
-                      <div className="mt-3">
-                        {showCommentInput[post.id] ? (
-                          <div className="space-y-2">
-                            <Textarea
-                              placeholder="Adaugă un comentariu..."
-                              value={commentTexts[post.id] || ""}
-                              onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                              rows={2}
-                              className="text-sm"
-                              autoFocus
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                onClick={() => {
-                                  handleCommentSubmit(post.id, null);
-                                  setShowCommentInput({ ...showCommentInput, [post.id]: false });
-                                }}
-                                size="sm"
-                                disabled={!commentTexts[post.id]?.trim()}
-                              >
-                                Comentează
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setShowCommentInput({ ...showCommentInput, [post.id]: false });
-                                  setCommentTexts({ ...commentTexts, [post.id]: "" });
-                                }}
-                              >
-                                Anulează
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setShowCommentInput({ ...showCommentInput, [post.id]: true })}
-                            className="text-muted-foreground"
-                          >
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            Comentează
-                          </Button>
-                        )}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
