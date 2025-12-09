@@ -235,6 +235,9 @@ const SpiritualDiary = () => {
       await supabase.rpc("evaluate_and_award_badges", { target_user_id: userId });
 
       toast.success("Jurnalul spiritual a fost salvat cu succes!");
+      
+      // Navigate back to profile page
+      navigate("/profile");
     } catch (error) {
       console.error("Error saving diary:", error);
       toast.error("Nu s-a putut salva jurnalul.");
