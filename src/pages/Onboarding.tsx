@@ -21,7 +21,7 @@ const Onboarding = () => {
     city: "",
     parish: "",
     profilePhoto: "",
-    pastPilgrimages: "",
+    bio: "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -57,6 +57,7 @@ const Onboarding = () => {
             city: formData.city,
             parish: formData.parish,
             avatar_url: formData.profilePhoto || null,
+            bio: formData.bio || null,
           });
 
         if (profileError) {
@@ -68,39 +69,7 @@ const Onboarding = () => {
           return;
         }
 
-        // Parse and save past pilgrimages if provided
-        if (formData.pastPilgrimages.trim()) {
-          const pilgrimageLines = formData.pastPilgrimages.split("\n").filter(line => line.trim());
-          const pilgrimages = pilgrimageLines.map(line => {
-            // Try to parse format: "Place Year - Impressions"
-            const match = line.match(/^(.+?)\s+(\d{4})\s*-\s*(.+)$/);
-            if (match) {
-              return {
-                user_id: user.id,
-                place: match[1].trim(),
-                period: match[2].trim(),
-                impressions: match[3].trim(),
-              };
-            }
-            // Fallback: treat whole line as place
-            return {
-              user_id: user.id,
-              place: line.trim(),
-              period: new Date().getFullYear().toString(),
-              impressions: null,
-            };
-          });
-
-          if (pilgrimages.length > 0) {
-            const { error: pilgrimagesError } = await supabase
-              .from("past_pilgrimages")
-              .insert(pilgrimages);
-
-            if (pilgrimagesError) {
-              console.error("Error saving past pilgrimages:", pilgrimagesError);
-            }
-          }
-        }
+        // Bio is already saved with the profile above
 
         toast({
           title: "Bun venit în comunitate!",
@@ -126,7 +95,7 @@ const Onboarding = () => {
       case 3:
         return true; // Photo is optional
       case 4:
-        return true; // Past pilgrimages are optional
+        return true; // Bio is optional
       default:
         return false;
     }
@@ -242,16 +211,16 @@ const Onboarding = () => {
 
           {step === 4 && (
             <div className="space-y-2">
-              <Label htmlFor="pastPilgrimages">Pelerinaje anterioare (opțional)</Label>
+              <Label htmlFor="bio">Despre tine (opțional)</Label>
               <Textarea
-                id="pastPilgrimages"
-                value={formData.pastPilgrimages}
-                onChange={(e) => handleInputChange("pastPilgrimages", e.target.value)}
-                placeholder="Ex: Putna 2023 - Experiență minunată, oameni frumoși&#10;Nicula 2022 - Prima mea călătorie de pelerin"
-                rows={6}
+                id="bio"
+                value={formData.bio}
+                onChange={(e) => handleInputChange("bio", e.target.value)}
+                placeholder="Scrie câteva cuvinte despre tine, credința ta și ce te-a adus pe calea pelerinajului..."
+                rows={5}
               />
               <p className="text-xs text-muted-foreground">
-                Descrie locul, perioada și impresiile tale din fiecare pelerinaj
+                Spune-ne povestea ta de pelerin
               </p>
             </div>
           )}
