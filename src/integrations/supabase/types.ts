@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           amount: number | null
           created_at: string
+          deleted_at: string | null
           expires_at: string
           id: string
           lit_at: string
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           amount?: number | null
           created_at?: string
+          deleted_at?: string | null
           expires_at: string
           id?: string
           lit_at?: string
@@ -38,6 +40,7 @@ export type Database = {
         Update: {
           amount?: number | null
           created_at?: string
+          deleted_at?: string | null
           expires_at?: string
           id?: string
           lit_at?: string
@@ -51,6 +54,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
           parent_comment_id: string | null
           post_id: string
@@ -60,6 +64,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           parent_comment_id?: string | null
           post_id: string
@@ -69,6 +74,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           parent_comment_id?: string | null
           post_id?: string
@@ -91,6 +97,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_settings: {
+        Row: {
+          allow_email: boolean | null
+          allow_push: boolean | null
+          comment_replies: boolean | null
+          community_updates: boolean | null
+          created_at: string | null
+          pilgrimage_reminders: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          allow_email?: boolean | null
+          allow_push?: boolean | null
+          comment_replies?: boolean | null
+          community_updates?: boolean | null
+          created_at?: string | null
+          pilgrimage_reminders?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          allow_email?: boolean | null
+          allow_push?: boolean | null
+          comment_replies?: boolean | null
+          community_updates?: boolean | null
+          created_at?: string | null
+          pilgrimage_reminders?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          message: string | null
+          read: boolean | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       orthodox_calendar_days: {
         Row: {
@@ -125,6 +200,7 @@ export type Database = {
       past_pilgrimages: {
         Row: {
           created_at: string
+          deleted_at: string | null
           id: string
           impressions: string | null
           period: string
@@ -133,6 +209,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           impressions?: string | null
           period: string
@@ -141,6 +218,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           impressions?: string | null
           period?: string
@@ -153,6 +231,7 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           end_date: string | null
           id: string
@@ -168,6 +247,7 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
@@ -183,6 +263,7 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           end_date?: string | null
           id?: string
@@ -200,18 +281,21 @@ export type Database = {
       post_likes: {
         Row: {
           created_at: string
+          deleted_at: string | null
           id: string
           post_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           post_id: string
           user_id: string
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           id?: string
           post_id?: string
           user_id?: string
@@ -230,6 +314,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
           likes_count: number | null
           pilgrimage_id: string
@@ -239,6 +324,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           likes_count?: number | null
           pilgrimage_id: string
@@ -248,6 +334,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           likes_count?: number | null
           pilgrimage_id?: string
@@ -271,8 +358,10 @@ export type Database = {
           bio: string | null
           city: string | null
           created_at: string
+          deleted_at: string | null
           first_name: string
           id: string
+          is_deleted: boolean | null
           last_name: string
           parish: string | null
           religion: string | null
@@ -285,8 +374,10 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           first_name: string
           id?: string
+          is_deleted?: boolean | null
           last_name: string
           parish?: string | null
           religion?: string | null
@@ -299,8 +390,10 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           first_name?: string
           id?: string
+          is_deleted?: boolean | null
           last_name?: string
           parish?: string | null
           religion?: string | null
@@ -311,18 +404,21 @@ export type Database = {
       }
       user_pilgrimages: {
         Row: {
+          deleted_at: string | null
           id: string
           joined_at: string
           pilgrimage_id: string
           user_id: string
         }
         Insert: {
+          deleted_at?: string | null
           id?: string
           joined_at?: string
           pilgrimage_id: string
           user_id: string
         }
         Update: {
+          deleted_at?: string | null
           id?: string
           joined_at?: string
           pilgrimage_id?: string
