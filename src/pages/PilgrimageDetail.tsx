@@ -11,6 +11,16 @@ import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
+import UserBadge from "@/components/UserBadge";
+
+interface Badge {
+  id: string;
+  name: string;
+  name_ro: string;
+  description: string;
+  icon_name: string;
+  priority: number;
+}
 
 // Helper function to safely format dates
 const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
@@ -81,6 +91,29 @@ const PilgrimageDetail = () => {
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
   const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
+  const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
+
+  // Fetch top badge for a user
+  const fetchUserTopBadge = async (targetUserId: string): Promise<Badge | null> => {
+    try {
+      const { data: userBadgesData } = await supabase
+        .from("user_badges")
+        .select(`
+          badge_id,
+          badges (*)
+        `)
+        .eq("user_id", targetUserId);
+
+      if (!userBadgesData || userBadgesData.length === 0) return null;
+
+      const badges = userBadgesData.map((ub: any) => ub.badges).filter(Boolean);
+      badges.sort((a: Badge, b: Badge) => a.priority - b.priority);
+      
+      return badges.length > 0 ? badges[0] : null;
+    } catch {
+      return null;
+    }
+  };
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -223,6 +256,27 @@ const PilgrimageDetail = () => {
       );
 
       setPosts(postsWithDetails);
+
+      // Collect all unique user IDs and fetch their top badges
+      const allUserIds = new Set<string>();
+      postsWithDetails.forEach(post => {
+        allUserIds.add(post.user_id);
+        post.comments.forEach((comment: Comment) => {
+          allUserIds.add(comment.user_id);
+          if (comment.replies) {
+            comment.replies.forEach((reply: Comment) => allUserIds.add(reply.user_id));
+          }
+        });
+      });
+
+      // Fetch badges for all users
+      const badgesMap: Record<string, Badge | null> = {};
+      await Promise.all(
+        Array.from(allUserIds).map(async (uid) => {
+          badgesMap[uid] = await fetchUserTopBadge(uid);
+        })
+      );
+      setUserBadges(badgesMap);
     } catch (error: any) {
       console.error("Error fetching pilgrimage data:", error);
       toast({
@@ -687,7 +741,12 @@ const PilgrimageDetail = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium text-sm">{post.author_name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-medium text-sm">{post.author_name}</p>
+                          {userBadges[post.user_id] && (
+                            <UserBadge badge={userBadges[post.user_id]!} size="sm" />
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {safeFormatDate(post.created_at, "d MMM yyyy, HH:mm")}
                         </p>
@@ -755,6 +814,9 @@ const PilgrimageDetail = () => {
                                   </AvatarFallback>
                                 </Avatar>
                                 <p className="text-xs font-medium">{comment.author_name}</p>
+                                {userBadges[comment.user_id] && (
+                                  <UserBadge badge={userBadges[comment.user_id]!} size="sm" />
+                                )}
                                 <p className="text-xs text-muted-foreground">
                                   {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
                                 </p>
@@ -817,6 +879,9 @@ const PilgrimageDetail = () => {
                                         </AvatarFallback>
                                       </Avatar>
                                       <p className="text-xs font-medium">{reply.author_name}</p>
+                                      {userBadges[reply.user_id] && (
+                                        <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
+                                      )}
                                       <p className="text-xs text-muted-foreground">
                                         {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
                                       </p>
