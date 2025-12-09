@@ -695,16 +695,6 @@ const PilgrimageDetail = () => {
                     </div>
                     <p className="text-sm">{post.content}</p>
 
-                    {/* Like Button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLike(post.id)}
-                      className={`${post.user_has_liked ? "text-accent" : "text-muted-foreground"} hover:text-accent`}
-                    >
-                      <Flame className={`w-4 h-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
-                      {post.likes_count} aprinderi
-                    </Button>
 
 
                     {/* Comments Section */}
