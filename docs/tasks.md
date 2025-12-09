@@ -2,130 +2,99 @@
 
 ## Current Status Overview
 - ✅ Basic UI structure implemented (onboarding, profile, pilgrimages, candle, dashboard, navigation)
-- ❌ No backend integration (Lovable Cloud/Supabase)
-- ❌ No authentication system
-- ❌ All data is hardcoded (no database)
-- ❌ No persistent storage
+- ✅ Backend integration with Supabase (external project)
+- ✅ Authentication system (email/password + Facebook OAuth)
+- ✅ Database schema with production-ready features
+- ✅ Persistent storage configured
+
+---
+
+## DATABASE SCHEMA UPGRADE
+**Priority: HIGH | Status: COMPLETED**
+
+### Schema Improvements Completed:
+- [x] Added soft deletes (`deleted_at` column) to all user-created content tables:
+  - profiles, posts, comments, user_pilgrimages, candle_purchases, past_pilgrimages, post_likes, pilgrimages
+- [x] Added `is_deleted` boolean flag to profiles for quick filtering
+- [x] Created notifications system tables:
+  - `notifications` (id, user_id, type, title, message, data, read, created_at, read_at)
+  - `notification_settings` (user_id, allow_push, allow_email, pilgrimage_reminders, community_updates, comment_replies)
+- [x] Added performance indexes for soft delete queries on all tables
+- [x] Created helper views for clean queries:
+  - `v_pilgrimages_active` - active/upcoming pilgrimages not deleted
+  - `v_pilgrimages_passed` - past pilgrimages not deleted
+  - `v_posts_active` - active posts with author info
+  - `v_comments_threaded` - threaded comments with author info and reply count
+  - `v_profiles_active` - active profiles not deleted
+- [x] Created `delete_user_account(target_user_id)` SECURITY DEFINER function for GDPR/Meta compliance:
+  - Soft deletes all user content (posts, comments, likes, pilgrimages, candles)
+  - Anonymizes profile (sets name to "Deleted User", clears personal info)
+  - Hard deletes transient data (notifications, roles)
+- [x] Updated RLS policies to exclude soft-deleted records:
+  - Posts, comments, profiles, user_pilgrimages, post_likes policies updated
+- [x] Added co-pilgrim profile visibility policy (limited profile info for pilgrimage participants)
+- [x] All views use SECURITY INVOKER for proper RLS enforcement
+
+### Security Note:
+- "Leaked Password Protection" warning in Supabase - can be enabled in Auth settings
 
 ---
 
 ## PHASE 1: BACKEND FOUNDATION & AUTHENTICATION
-**Priority: HIGH | Status: NOT STARTED**
+**Priority: HIGH | Status: COMPLETED**
 
 ### 1.1 Enable Lovable Cloud
-- [ ] Enable Lovable Cloud for the project
-- [ ] Verify database is created and accessible
-- [ ] Review Cloud dashboard and configuration
+- [x] Connected to external Supabase project (yanjhfqqdcevlzmwsrnj)
+- [x] Database is created and accessible
+- [x] Cloud dashboard configured
 
 ### 1.2 Database Schema Setup
-- [ ] Create `profiles` table with columns:
-  - id (uuid, PK, references auth.users.id)
-  - first_name (text)
-  - last_name (text)
-  - age (int)
-  - city (text)
-  - parish (text)
-  - photo_url (text)
-  - religion (text, default 'Orthodox')
-  - created_at (timestamp)
-  - updated_at (timestamp)
-- [ ] Create `pilgrimages` table with columns:
-  - id (uuid, PK)
-  - title (text)
-  - description (text)
-  - location (text)
-  - start_date (date)
-  - end_date (date)
-  - type (text) // 'local' or 'national'
-  - image_url (text)
-  - participant_count (int, default 0)
-  - created_at (timestamp)
-- [ ] Create `user_pilgrimages` join table:
-  - id (uuid, PK)
-  - user_id (uuid, FK → profiles.id)
-  - pilgrimage_id (uuid, FK → pilgrimages.id)
-  - joined_at (timestamp)
-  - UNIQUE constraint on (user_id, pilgrimage_id)
-- [ ] Create `past_pilgrimages` table:
-  - id (uuid, PK)
-  - user_id (uuid, FK → profiles.id)
-  - place (text)
-  - period (text)
-  - impressions (text)
-  - created_at (timestamp)
-- [ ] Create `posts` table:
-  - id (uuid, PK)
-  - pilgrimage_id (uuid, FK → pilgrimages.id)
-  - user_id (uuid, FK → profiles.id)
-  - content (text)
-  - created_at (timestamp)
-  - updated_at (timestamp)
-- [ ] Create `comments` table:
-  - id (uuid, PK)
-  - post_id (uuid, FK → posts.id)
-  - user_id (uuid, FK → profiles.id)
-  - content (text)
-  - created_at (timestamp)
-- [ ] Create `post_likes` table:
-  - id (uuid, PK)
-  - post_id (uuid, FK → posts.id)
-  - user_id (uuid, FK → profiles.id)
-  - created_at (timestamp)
-  - UNIQUE constraint on (post_id, user_id)
-- [ ] Create `candle_purchases` table:
-  - id (uuid, PK)
-  - user_id (uuid, FK → profiles.id)
-  - lit_at (timestamp)
-  - expires_at (timestamp)
-  - intent (text, nullable)
-  - created_at (timestamp)
+- [x] Created `profiles` table with all required columns
+- [x] Created `pilgrimages` table with all required columns
+- [x] Created `user_pilgrimages` join table
+- [x] Created `past_pilgrimages` table
+- [x] Created `posts` table
+- [x] Created `comments` table with `parent_comment_id` for threading
+- [x] Created `post_likes` table
+- [x] Created `candle_purchases` table
+- [x] Created `orthodox_calendar_days` table
+- [x] Created `user_roles` table for admin/moderator roles
+- [x] Created `notifications` and `notification_settings` tables
 
 ### 1.3 Row Level Security (RLS) Policies
-- [ ] Enable RLS on all tables
-- [ ] Create RLS policy for `profiles`: users can read all, update only their own
-- [ ] Create RLS policy for `pilgrimages`: public read access
-- [ ] Create RLS policy for `user_pilgrimages`: users can read all, insert/delete only their own
-- [ ] Create RLS policy for `past_pilgrimages`: users can only access their own
-- [ ] Create RLS policy for `posts`: read all, insert/update/delete only their own
-- [ ] Create RLS policy for `comments`: read all, insert/update/delete only their own
-- [ ] Create RLS policy for `post_likes`: read all, insert/delete only their own
-- [ ] Create RLS policy for `candle_purchases`: users can only access their own
+- [x] Enabled RLS on all tables
+- [x] Created RLS policies for all tables with soft-delete awareness
+- [x] Created `has_role()` SECURITY DEFINER function to avoid RLS recursion
 
 ### 1.4 Database Triggers & Functions
-- [ ] Create trigger function `handle_new_user()` to auto-create profile on signup
-- [ ] Create trigger `on_auth_user_created` to call `handle_new_user()`
-- [ ] Create function to update `participant_count` on pilgrimages when users join/leave
+- [x] Created `update_updated_at_column()` trigger function
+- [x] Created `update_pilgrimage_participant_count()` trigger function
+- [x] Created `update_post_likes_count()` trigger function
+- [x] Created `set_candle_expiration()` trigger function
+- [x] Created `get_co_pilgrim_profiles()` SECURITY DEFINER function
+- [x] Created `delete_user_account()` SECURITY DEFINER function
 
 ### 1.5 Seed Initial Data
-- [ ] Insert sample pilgrimages (Bobotează 2025, Sf. Parascheva, etc.)
-- [ ] Verify data is accessible through database
+- [x] Inserted sample pilgrimages
+- [x] Populated Orthodox calendar data (January, February)
 
 ### 1.6 Storage Setup
 - [ ] Create storage bucket `profile-photos` for user profile pictures
 - [ ] Set bucket to public access
 - [ ] Create RLS policies for profile-photos bucket
 - [ ] Create storage bucket `pilgrimage-images` for pilgrimage photos
-- [ ] Set appropriate RLS policies
 
 ### 1.7 Authentication Implementation
-- [x] Create `/auth` page for login/signup
-- [x] Implement email/password signup flow
-- [x] Implement email/password login flow
-- [x] Add proper error handling and validation (use zod)
-- [x] Add auth state management with `onAuthStateChange`
-- [x] Implement session persistence
-- [x] Add logout functionality
-- [x] Add protected route logic (redirect to /auth if not logged in)
-- [x] Add auto-redirect to dashboard if already logged in (on /auth page)
-- [ ] Disable "Confirm email" in Supabase settings for faster testing
-
-**Testing checklist for Phase 1:**
-- [ ] User can sign up with email/password
-- [ ] User can log in with email/password
-- [ ] Profile is automatically created on signup
-- [ ] Session persists on page refresh
-- [ ] User can log out
-- [ ] Protected routes redirect to /auth when not authenticated
+- [x] Created `/auth` page for login/signup
+- [x] Implemented email/password signup flow
+- [x] Implemented email/password login flow
+- [x] Added Facebook OAuth integration
+- [x] Added proper error handling and validation
+- [x] Added auth state management with `onAuthStateChange`
+- [x] Implemented session persistence
+- [x] Added logout functionality
+- [x] Added protected route logic
+- [x] Added auto-redirect to dashboard if already logged in
 
 ---
 
@@ -134,8 +103,7 @@
 
 ### 2.1 Connect Onboarding to Backend
 - [x] Update Onboarding.tsx to save data to Supabase `profiles` table
-- [x] Implement profile photo upload to `profile-photos` storage bucket (using base64 for MVP)
-- [x] Save past pilgrimages to `past_pilgrimages` table
+- [x] Implement profile photo upload (using base64 for MVP)
 - [x] Add loading states during form submission
 - [x] Add error handling with toast notifications
 - [x] Redirect to dashboard after successful onboarding
@@ -146,210 +114,85 @@
 - [x] Redirect new users to /onboarding if profile incomplete
 - [x] Skip onboarding if profile already exists
 
-**Testing checklist for Phase 2:**
-- [x] New user goes through onboarding after signup
-- [x] Profile data is saved to database
-- [x] Profile photo uploads successfully
-- [x] Past pilgrimages are saved
-- [x] User is redirected to dashboard
-- [x] Returning users skip onboarding
-
 ---
 
 ## PHASE 3: PROFILE PAGE INTEGRATION
-**Priority: HIGH | Status: PARTIALLY COMPLETED**
+**Priority: HIGH | Status: COMPLETED**
 
 ### 3.1 Connect Profile to Backend
 - [x] Fetch user profile data from `profiles` table
-- [x] Fetch user's past pilgrimages from `past_pilgrimages` table
-- [x] Fetch user's upcoming pilgrimages from `user_pilgrimages` join
-- [x] Display profile photo from storage
-- [x] Add loading states while fetching data
-- [x] Add error handling
+- [x] Fetch user's past pilgrimages
+- [x] Fetch user's upcoming pilgrimages
+- [x] Display profile photo
+- [x] Add loading states and error handling
 
 ### 3.2 Edit Profile Functionality
 - [x] Create edit profile form/modal
-- [x] Allow users to update: name, age, city, parish, photo
-- [x] Implement photo update with storage
-- [x] Add validation
-- [x] Save changes to database
-- [x] Show success/error feedback
+- [x] Allow users to update profile info
+- [x] Implement photo update
+- [x] Add validation and save to database
 
 ### 3.3 Past Pilgrimages Section
-- [x] Updated to show enrolled pilgrimages that have passed (start_date or end_date before today)
-- [x] Removed "Adaugă pelerinaje" button from section
-- [x] Added friendly empty state message guiding users to explore pilgrimages
-- [x] Using same card layout as upcoming pilgrimages
-
-**Testing checklist for Phase 3:**
-- [x] Profile page displays correct user data
-- [x] Past pilgrimages section shows enrolled pilgrimages that have passed
-- [x] Upcoming pilgrimages are displayed
-- [x] User can edit profile information
-- [x] User can update profile photo
-- [x] Empty state message displays correctly when no past pilgrimages
+- [x] Shows enrolled pilgrimages that have passed
+- [x] Friendly empty state message
 
 ---
 
 ## PHASE 4: PILGRIMAGES INTEGRATION
-**Priority: HIGH | Status: IN PROGRESS**
+**Priority: HIGH | Status: MOSTLY COMPLETED**
 
 ### 4.1 Pilgrimages List Page
-- [x] Fetch pilgrimages from database instead of hardcoded data
+- [x] Fetch pilgrimages from database
 - [x] Implement filtering by type (local/national/all)
-- [x] Add search functionality (by title, location)
-- [x] Implement filters:
-  - [x] By date range
-  - [x] By location/city
-  - [x] By type (local/national)
-- [x] Show participant count from database
-- [x] Add loading states
-- [x] Add error handling
-- [x] Add empty state if no pilgrimages found
+- [x] Add search functionality
+- [x] Implement Smart Filter Bar with date, location, type filters
+- [x] Show participant count
+- [x] Add loading and error states
 
 ### 4.2 Pilgrimage Detail Page
-- [x] Fetch pilgrimage details from database by ID
-- [x] Check if current user has joined this pilgrimage
-- [x] Implement "Join Pilgrimage" functionality:
-  - [x] Insert into `user_pilgrimages` table
-  - [x] Update participant count
-  - [x] Update UI state
-  - [x] Show success message
-  - [x] Add date validation (only allow enrollment for today or future dates)
-- [x] Display participant list with avatars and city
+- [x] Fetch pilgrimage details
+- [x] Check if user has joined
+- [x] Implement "Join Pilgrimage" functionality with date validation
+- [x] Display participant list
 - [x] Show map link if available
-- [x] Add loading states with Skeleton components
-- [x] Add error handling for join/leave actions
 - [ ] Implement "Leave Pilgrimage" functionality (optional)
 
 ### 4.3 Pilgrimage Community Wall
-- [x] Fetch posts for specific pilgrimage from `posts` table
-- [x] Display posts with user info (join with profiles)
-- [x] Show post creation form only if user has joined pilgrimage
-- [x] Implement post creation:
-  - [x] Insert into `posts` table
-  - [x] Update UI optimistically
-  - [x] Handle errors
-- [x] Implement post likes:
-  - [x] Insert/delete from `post_likes` table
-  - [x] Update like count in real-time
-  - [x] Use candle icon for likes
-- [x] Implement comments:
-  - [x] Fetch comments for each post
-  - [x] Allow users to add comments (only if enrolled)
-  - [x] Display comments with author info (name, avatar, date)
-  - [x] Add threaded reply functionality with parent_comment_id
-  - [x] Show reply button - all enrolled users can reply to any comment
-  - [x] Display nested replies
-  - [x] Only enrolled users can view posts and comments (RLS enforced)
-  - [x] Only enrolled users can add comments/replies
-  - [x] Users cannot edit posts from other users (enforced via RLS)
+- [x] Fetch posts for specific pilgrimage
+- [x] Display posts with user info
+- [x] Show post creation form only if user has joined
+- [x] Implement post creation with optimistic UI
+- [x] Implement post likes with candle icon
+- [x] Implement comments with threading
+- [x] Only enrolled users can view/add posts and comments (RLS enforced)
 - [ ] Add sorting options (Newest / Most Helpful)
 - [ ] Implement delete post (only for post author)
-- [x] Add loading and error states
-
-**Testing checklist for Phase 4:**
-- [x] Pilgrimages list displays data from database
-- [x] Search and filters work correctly
-- [x] User can join a pilgrimage (only for today or future dates)
-- [x] Join button disabled for past pilgrimages
-- [x] Join action updates participant count
-- [x] Community wall shows only for joined users
-- [x] User can create posts
-- [x] User can like posts (candle icon)
-- [x] User can comment on posts (only if enrolled)
-- [x] User can reply to other users' comments
-- [x] Replies are displayed nested under parent comments
-- [ ] Sorting works correctly
 
 ---
 
 ## PHASE 5: DASHBOARD INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
 
-### 5.1 Dashboard Data Integration
-- [x] Fetch user's active candle from `candle_purchases` (if expires_at > now)
-- [x] Display candle animation and timer if active
-- [x] Fetch next major pilgrimage if no candle active
-- [x] Display upcoming pilgrimages user has joined
-- [x] Show the closest upcoming pilgrimage (by date) that user is enrolled in
-- [x] Add real-time updates for candle timer
-- [x] Implement quick action navigation buttons
-
-### 5.2 Orthodox Calendar Widget
-- [x] Research and integrate Romanian Orthodox Calendar API (using orthocal.info)
-- [x] Display today's date and saint of the day
-- [x] Add link to full calendar view
-- [x] Handle API errors gracefully
-- [x] Cache calendar data appropriately
-- [x] **REFACTORED**: Migrated to Supabase database storage
-- [x] **REFACTORED**: Created reusable TodayCalendarCard component
-- [x] Replaced external API with Supabase data in dashboard
-
-### 5.3 Orthodox Calendar Full Page
-- [x] Create `/calendar` route
-- [x] Create Calendar.tsx page component
-- [x] **REFACTORED**: Changed from monthly grid to simple today's view
-- [x] Show description for current day with color coding (red/black)
-- [x] **REFACTORED**: Refactored to use shared TodayCalendarCard component
-- [x] Created `orthodox_calendar_days` table in Supabase
-- [x] Populated sample data (January + February)
-- [x] Removed clickable calendar grid (per requirements)
-- [x] Display only current date and description
-- [x] Add loading and error states
-- [ ] **TODO**: Populate remaining months (March-December) in database
-
-**Testing checklist for Phase 5:**
-- [x] Dashboard shows active candle if user has one
-- [x] Candle timer counts down correctly
-- [x] Dashboard shows next pilgrimage news if no candle
-- [x] Orthodox calendar widget displays correct data
-- [x] Full calendar page works and displays all days
-- [x] Quick actions navigate correctly
+- [x] Fetch user's active candle and display with timer
+- [x] Display next major pilgrimage if no candle active
+- [x] Show closest upcoming enrolled pilgrimage
+- [x] Real-time candle timer
+- [x] Quick action navigation buttons
+- [x] Orthodox Calendar widget (from Supabase)
+- [x] Calendar page with TodayCalendarCard component
+- [ ] Populate remaining calendar months (March-December)
 
 ---
 
 ## PHASE 6: VIRTUAL CANDLE FEATURE
 **Priority: MEDIUM | Status: COMPLETED**
 
-### 6.1 Candle Page Integration
-- [x] Check if user has active candle (expires_at > now)
-- [x] Display active candle with animation and timer
-- [x] Display "Light a Candle" CTA if no active candle
-- [x] Fetch and display candle history from database
-
-### 6.2 Candle Purchase Flow (Placeholder)
-- [x] Create donation flow UI
-- [x] Add optional prayer intention field
-- [x] Implement placeholder payment confirmation
-- [x] On "payment success":
-  - [x] Insert into `candle_purchases` table
-  - [x] Set lit_at = now, expires_at = now + 24 hours
-  - [x] Show success message
-  - [x] Redirect to candle animation view
-- [x] Add error handling
-
-### 6.3 Candle Timer & Animation
-- [x] Implement 24-hour countdown timer
-- [x] Create soft, respectful candle animation (golden glow)
-- [x] Update timer in real-time
-- [x] Auto-hide candle when timer expires
-- [x] Add visual feedback for time remaining
-
-### 6.4 Candle History
-- [x] Fetch all past candles from database
-- [x] Display chronologically
-- [x] Show date, intent, and status
-- [x] Add empty state if no history
-
-**Testing checklist for Phase 6:**
-- [x] User can view active candle with timer
-- [x] User can light a new candle (placeholder payment)
-- [x] Candle data is saved to database
-- [x] Timer counts down correctly
-- [x] Candle expires after 24 hours
-- [x] Candle history displays correctly
-- [x] Candle appears on dashboard when active
+- [x] Check if user has active candle
+- [x] Display candle with animation and timer
+- [x] Placeholder donation flow with prayer intention
+- [x] Insert candle purchase to database
+- [x] 24-hour countdown timer
+- [x] Candle history display
 
 ---
 
@@ -357,42 +200,28 @@
 **Priority: MEDIUM | Status: NOT STARTED**
 
 ### 7.1 UI/UX Improvements
-- [ ] Review all colors use HSL and design tokens from index.css
-- [ ] Ensure Indigo primary color (#4B0082) is used consistently
+- [ ] Review all colors use HSL and design tokens
+- [ ] Ensure Indigo primary color is used consistently
 - [ ] Review all text for calm, spiritual tone
-- [ ] Ensure soft glows and rounded edges throughout
-- [ ] Add gentle shadows (very light)
-- [ ] Review all icons (footsteps, candles, paths, crosses)
-- [ ] Ensure mobile responsiveness on all screens
+- [ ] Ensure soft glows and rounded edges
+- [ ] Review all icons
+- [ ] Mobile responsiveness audit
 
 ### 7.2 Performance Optimizations
 - [ ] Add proper loading skeletons
-- [ ] Implement optimistic UI updates where appropriate
+- [ ] Implement optimistic UI updates
 - [ ] Add image lazy loading
 - [ ] Optimize database queries
-- [ ] Add proper caching strategies
 
 ### 7.3 Error Handling & Edge Cases
 - [ ] Review all error states
 - [ ] Add user-friendly error messages
 - [ ] Handle network failures gracefully
-- [ ] Add empty states for all lists/feeds
-- [ ] Test with slow network conditions
 
 ### 7.4 Accessibility
 - [ ] Add proper ARIA labels
-- [ ] Ensure keyboard navigation works
-- [ ] Test with screen readers
-- [ ] Ensure sufficient color contrast
-- [ ] Add focus indicators
-
-**Testing checklist for Phase 7:**
-- [ ] All colors follow design system
-- [ ] UI is responsive on mobile and tablet
-- [ ] Loading states are clear and smooth
-- [ ] Error messages are helpful and calm
-- [ ] App works well on slow connections
-- [ ] Accessibility requirements are met
+- [ ] Ensure keyboard navigation
+- [ ] Test color contrast
 
 ---
 
@@ -400,37 +229,22 @@
 **Priority: HIGH | Status: NOT STARTED**
 
 ### 8.1 Comprehensive Testing
-- [ ] Test complete user journey: signup → onboarding → browse → join → post
+- [ ] Test complete user journey
 - [ ] Test all authentication flows
 - [ ] Test all database operations
-- [ ] Test file uploads
 - [ ] Test on different devices
 - [ ] Test with multiple users
-- [ ] Test edge cases (expired sessions, network errors, etc.)
 
 ### 8.2 Content & Data
 - [ ] Add real pilgrimage data for 2025
-- [ ] Verify all pilgrimage information is accurate
 - [ ] Add pilgrimage images
 - [ ] Review all interface text in Romanian
-- [ ] Ensure spiritual tone is consistent
 
 ### 8.3 Pre-Launch Checklist
-- [ ] Set up production environment
 - [ ] Configure proper email settings in Supabase
-- [ ] Set up analytics (optional)
 - [ ] Create privacy policy page
 - [ ] Create terms & conditions page
-- [ ] Test payment integration (when implementing real payments)
 - [ ] Set up error monitoring
-- [ ] Prepare launch announcement
-
-**Testing checklist for Phase 8:**
-- [ ] Complete end-to-end user journey works
-- [ ] No critical bugs
-- [ ] All content is accurate and appropriate
-- [ ] Legal pages are in place
-- [ ] Production environment is configured
 
 ---
 
@@ -440,7 +254,7 @@
 - [ ] Real-time queue tracker for pilgrimages
 - [ ] Advanced Orthodox calendar with liturgical readings
 - [ ] Location-based features and maps
-- [ ] Push notifications
+- [ ] Push notifications (infrastructure now ready with notifications tables)
 - [ ] Direct messaging between pilgrims
 - [ ] Stripe payment integration for candles
 - [ ] Advanced search with more filters
@@ -454,36 +268,30 @@
 ## NOTES & DECISIONS
 
 ### Architecture Decisions:
-- Backend: Lovable Cloud (Supabase)
+- Backend: External Supabase project (yanjhfqqdcevlzmwsrnj)
 - Authentication: Email/password + Facebook OAuth
 - Storage: Supabase Storage for images
-- Calendar: Romanian Orthodox Calendar API integration
+- Calendar: Data stored in Supabase `orthodox_calendar_days` table
 - Payment: Placeholder for MVP, Stripe integration post-MVP
+- Soft Deletes: All user content uses soft deletes with `deleted_at` column
+- Views: Helper views created for clean queries with SECURITY INVOKER
 
 ### Facebook Login & Data Deletion (Meta Compliance):
-- [x] Facebook OAuth integration with "Continue with Facebook" button
-- [x] Updated Auth page with modern social login UI
+- [x] Facebook OAuth integration
 - [x] Settings page with Delete Account functionality
 - [x] Public /user-data-deletion page for Meta compliance
 - [x] delete-account Edge Function for secure account deletion
+- [x] `delete_user_account()` database function for comprehensive cleanup
 - [x] Account deleted confirmation page
 
 ### MVP Scope Constraints:
 - Community features: Only pilgrimage-specific walls (no global feed in MVP)
 - Queue tracker: Deferred to post-MVP
 - Search/Filters: Include date, location, and type filters
-- Notifications: In-app only (no push notifications in MVP)
+- Notifications: Infrastructure ready, implementation deferred
 
 ### Design System:
 - Primary color: Indigo (#4B0082 in HSL)
-- Secondary colors: Earth Gold, Soft Clay, Stone Grey, White
-- All colors must use HSL format and design tokens
-- Tone: Calm, respectful, spiritual
-- Icons: Minimal, inspired by footsteps, candles, paths, crosses
-- Shadows: Very light, gentle
-- Edges: Soft, rounded, welcoming
-
----
-
-**Last Updated:** [Will be updated as tasks are completed]
-**Next Priority:** Phase 1 - Backend Foundation & Authentication
+- Secondary: Earth Gold, Soft Clay, Stone Grey, White
+- Design: Simple, sacred, thin lines, elegant icons, soft glows
+- All colors must use HSL format and semantic tokens
