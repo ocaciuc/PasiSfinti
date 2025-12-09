@@ -169,8 +169,8 @@ const Index = () => {
         {/* Orthodox Calendar */}
         <TodayCalendarCard />
 
-        {/* Virtual Candle or Next Pilgrimage */}
-        {activeCandle ? (
+        {/* Active Candle */}
+        {activeCandle && (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 to-background">
             <CardContent className="pt-6 text-center">
               <Flame className="w-12 h-12 text-accent mx-auto mb-3 animate-flicker" />
@@ -185,15 +185,13 @@ const Index = () => {
               </p>
             </CardContent>
           </Card>
-        ) : nextPilgrimage ? (
+        )}
+
+        {/* Next Pilgrimage - Always shown */}
+        {nextPilgrimage ? (
           <Card className="glow-soft">
             <CardHeader>
-              <CardTitle className="text-primary">
-                {nextPilgrimage.participant_count && nextPilgrimage.participant_count > 0 
-                  ? "Următorul tău pelerinaj"
-                  : "Următorul Pelerinaj Mare"
-                }
-              </CardTitle>
+              <CardTitle className="text-primary">Următorul tău pelerinaj</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="font-medium mb-2">{nextPilgrimage.title}</p>
