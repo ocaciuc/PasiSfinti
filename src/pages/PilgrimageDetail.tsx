@@ -71,6 +71,7 @@ interface Pilgrimage {
 
 interface Participant {
   id: string;
+  user_id: string;
   first_name: string;
   last_name: string;
   avatar_url: string | null;
@@ -166,7 +167,7 @@ const PilgrimageDetail = () => {
       if (userIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from("profiles")
-          .select("id, first_name, last_name, avatar_url, city")
+          .select("id, user_id, first_name, last_name, avatar_url, city")
           .in("user_id", userIds);
 
         if (profilesError) throw profilesError;
@@ -259,6 +260,11 @@ const PilgrimageDetail = () => {
 
       // Collect all unique user IDs and fetch their top badges
       const allUserIds = new Set<string>();
+      
+      // Add participant user IDs
+      formattedParticipants.forEach(p => allUserIds.add(p.user_id));
+      
+      // Add post/comment author user IDs
       postsWithDetails.forEach(post => {
         allUserIds.add(post.user_id);
         post.comments.forEach((comment: Comment) => {
@@ -669,9 +675,14 @@ const PilgrimageDetail = () => {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">
-                        {participant.first_name} {participant.last_name}
-                      </p>
+                      <div className="flex items-center gap-1">
+                        <p className="text-xs font-medium truncate">
+                          {participant.first_name} {participant.last_name}
+                        </p>
+                        {userBadges[participant.user_id] && (
+                          <UserBadge badge={userBadges[participant.user_id]!} size="sm" />
+                        )}
+                      </div>
                       {participant.city && <p className="text-xs text-muted-foreground truncate">{participant.city}</p>}
                     </div>
                   </div>
