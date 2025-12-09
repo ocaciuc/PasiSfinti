@@ -80,6 +80,7 @@ const PilgrimageDetail = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
+  const [showCommentInput, setShowCommentInput] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -798,23 +799,53 @@ const PilgrimageDetail = () => {
                       </div>
                     )}
 
-                    {/* Add Top-Level Comment (only when not replying) */}
+                    {/* Add Top-Level Comment Button / Input */}
                     {!replyingTo[post.id] && (
-                      <div className="mt-3 space-y-2">
-                        <Textarea
-                          placeholder="Adaugă un comentariu..."
-                          value={commentTexts[post.id] || ""}
-                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                          rows={2}
-                          className="text-sm"
-                        />
-                        <Button
-                          onClick={() => handleCommentSubmit(post.id, null)}
-                          size="sm"
-                          disabled={!commentTexts[post.id]?.trim()}
-                        >
-                          Comentează
-                        </Button>
+                      <div className="mt-3">
+                        {showCommentInput[post.id] ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              placeholder="Adaugă un comentariu..."
+                              value={commentTexts[post.id] || ""}
+                              onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                              rows={2}
+                              className="text-sm"
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => {
+                                  handleCommentSubmit(post.id, null);
+                                  setShowCommentInput({ ...showCommentInput, [post.id]: false });
+                                }}
+                                size="sm"
+                                disabled={!commentTexts[post.id]?.trim()}
+                              >
+                                Comentează
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setShowCommentInput({ ...showCommentInput, [post.id]: false });
+                                  setCommentTexts({ ...commentTexts, [post.id]: "" });
+                                }}
+                              >
+                                Anulează
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowCommentInput({ ...showCommentInput, [post.id]: true })}
+                            className="text-muted-foreground"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            Comentează
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
