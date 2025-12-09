@@ -695,7 +695,48 @@ const PilgrimageDetail = () => {
                     </div>
                     <p className="text-sm">{post.content}</p>
 
+                    {/* Reply to post button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setReplyingTo({ ...replyingTo, [post.id]: 'post' })}
+                      className="text-xs h-auto py-1 px-2 text-muted-foreground"
+                    >
+                      Răspunde
+                    </Button>
 
+                    {/* Reply input for post */}
+                    {replyingTo[post.id] === 'post' && (
+                      <div className="mt-2 space-y-2 pl-3 border-l border-accent">
+                        <Textarea
+                          placeholder="Scrie un comentariu..."
+                          value={commentTexts[post.id] || ""}
+                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                          rows={2}
+                          className="text-sm"
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => {
+                              handleCommentSubmit(post.id, null);
+                              setReplyingTo({ ...replyingTo, [post.id]: null });
+                            }}
+                            size="sm"
+                            disabled={!commentTexts[post.id]?.trim()}
+                          >
+                            Comentează
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
+                          >
+                            Anulează
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Comments Section */}
                     {post.comments.length > 0 && (
