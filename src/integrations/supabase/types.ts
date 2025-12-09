@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          created_at: string
+          description: string
+          icon_name: string
+          id: string
+          name: string
+          name_ro: string
+          priority: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          icon_name: string
+          id?: string
+          name: string
+          name_ro: string
+          priority?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          icon_name?: string
+          id?: string
+          name?: string
+          name_ro?: string
+          priority?: number
+        }
+        Relationships: []
+      }
       candle_purchases: {
         Row: {
           amount: number | null
@@ -437,6 +467,119 @@ export type Database = {
         }
         Relationships: []
       }
+      spiritual_diaries: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          people_met: string | null
+          pilgrimage_id: string
+          reflections: string | null
+          updated_at: string
+          user_id: string
+          visited_places: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          people_met?: string | null
+          pilgrimage_id: string
+          reflections?: string | null
+          updated_at?: string
+          user_id: string
+          visited_places?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          people_met?: string | null
+          pilgrimage_id?: string
+          reflections?: string | null
+          updated_at?: string
+          user_id?: string
+          visited_places?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spiritual_diaries_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "pilgrimages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spiritual_diaries_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spiritual_diaries_pilgrimage_id_fkey"
+            columns: ["pilgrimage_id"]
+            isOneToOne: false
+            referencedRelation: "v_pilgrimages_passed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spiritual_diary_photos: {
+        Row: {
+          created_at: string
+          diary_id: string
+          id: string
+          image_url: string
+        }
+        Insert: {
+          created_at?: string
+          diary_id: string
+          id?: string
+          image_url: string
+        }
+        Update: {
+          created_at?: string
+          diary_id?: string
+          id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spiritual_diary_photos_diary_id_fkey"
+            columns: ["diary_id"]
+            isOneToOne: false
+            referencedRelation: "spiritual_diaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_pilgrimages: {
         Row: {
           deleted_at: string | null
@@ -745,6 +888,10 @@ export type Database = {
       delete_user_account: {
         Args: { target_user_id: string }
         Returns: boolean
+      }
+      evaluate_and_award_badges: {
+        Args: { target_user_id: string }
+        Returns: undefined
       }
       get_co_pilgrim_profiles: {
         Args: { requesting_user_id: string }

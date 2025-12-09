@@ -250,6 +250,18 @@
 
 ## POST-MVP FEATURES (Future Releases)
 
+### Recently Completed:
+- [x] Spiritual Diary (Jurnal Spiritual) for past pilgrimages
+  - Database: spiritual_diaries, spiritual_diary_photos tables with RLS
+  - Storage bucket: diary-photos for photo uploads
+  - UI: /pilgrimage/:pilgrimageId/diary page with photos, reflections, places, people
+  - Navigation: "Jurnal Spiritual" button on past pilgrimages in Profile
+- [x] Gamification Badge System (Insigne)
+  - Database: badges, user_badges tables with 4 predefined badges
+  - Badges: Primul Pelerinaj, 5 Mănăstiri Vizitate, Pelerin Săptămânal, Ajutătorul Comunității
+  - Function: evaluate_and_award_badges() for automated badge awarding
+  - UI: BadgesSection component on Profile page showing earned/locked badges
+
 ### Deferred to Post-MVP:
 - [ ] Real-time queue tracker for pilgrimages
 - [ ] Advanced Orthodox calendar with liturgical readings
