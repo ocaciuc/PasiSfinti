@@ -79,14 +79,6 @@ interface Pilgrimage {
   map_url: string | null;
 }
 
-interface Participant {
-  id: string;
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  avatar_url: string | null;
-  city: string | null;
-}
 
 const PilgrimageDetail = () => {
   const { id } = useParams();
@@ -95,7 +87,6 @@ const PilgrimageDetail = () => {
   const [newPost, setNewPost] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [pilgrimage, setPilgrimage] = useState<Pilgrimage | null>(null);
-  const [participants, setParticipants] = useState<Participant[]>([]);
   const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -151,19 +142,19 @@ const PilgrimageDetail = () => {
       if (pilgrimageResult.error) throw pilgrimageResult.error;
       setPilgrimage(pilgrimageResult.data);
 
-      // Process participants
+      // Check if current user is enrolled
       const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
       setIsRegistered(currentUserId ? participantUserIds.includes(currentUserId) : false);
 
-      // Collect all user IDs we need profiles for (participants + post authors)
+      // Collect all user IDs we need profiles for (post authors)
       const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
-      const allUserIdsForProfiles = [...new Set([...participantUserIds, ...postUserIds])];
+      const allUserIdsForProfiles = [...new Set(postUserIds)];
 
       // Fetch profiles and comments in parallel
       const [profilesResult, commentsResult, userLikesResult] = await Promise.all([
-        // Batch fetch all profiles we need
+        // Batch fetch all profiles we need for posts
         allUserIdsForProfiles.length > 0
-          ? supabase.from("profiles").select("id, user_id, first_name, last_name, avatar_url, city").in("user_id", allUserIdsForProfiles)
+          ? supabase.from("profiles").select("id, user_id, first_name, last_name, avatar_url").in("user_id", allUserIdsForProfiles)
           : Promise.resolve({ data: [], error: null }),
         // Fetch all comments for all posts in one query
         postsResult.data && postsResult.data.length > 0
@@ -180,12 +171,6 @@ const PilgrimageDetail = () => {
       (profilesResult.data || []).forEach((p: any) => {
         profileMap.set(p.user_id, p);
       });
-
-      // Set participants
-      const formattedParticipants = participantUserIds
-        .map((uid: string) => profileMap.get(uid))
-        .filter(Boolean) as Participant[];
-      setParticipants(formattedParticipants);
 
       // Collect comment author user IDs we might be missing
       const commentUserIds = (commentsResult.data || []).map((c: any) => c.user_id);
@@ -256,9 +241,8 @@ const PilgrimageDetail = () => {
 
       setPosts(postsWithDetails);
 
-      // Collect all unique user IDs for badge fetching
+      // Collect all unique user IDs for badge fetching (post authors and commenters)
       const allUserIdsForBadges = new Set<string>();
-      formattedParticipants.forEach(p => allUserIdsForBadges.add(p.user_id));
       postsWithDetails.forEach(post => {
         allUserIdsForBadges.add(post.user_id);
         post.comments.forEach((comment: Comment) => {
@@ -353,16 +337,6 @@ const PilgrimageDetail = () => {
         setPilgrimage({ ...pilgrimage, participant_count: pilgrimage.participant_count + 1 });
       }
       
-      // Fetch current user profile and add to participants
-      const { data: userProfile } = await supabase
-        .from("profiles")
-        .select("id, user_id, first_name, last_name, avatar_url, city")
-        .eq("user_id", userId)
-        .maybeSingle();
-      
-      if (userProfile) {
-        setParticipants(prev => [...prev, userProfile as Participant]);
-      }
 
       toast({
         title: "Înregistrare reușită!",
@@ -398,8 +372,6 @@ const PilgrimageDetail = () => {
         setPilgrimage({ ...pilgrimage, participant_count: Math.max(0, pilgrimage.participant_count - 1) });
       }
       
-      // Remove current user from participants list
-      setParticipants(prev => prev.filter(p => p.user_id !== userId));
 
       toast({
         title: "Succes",
@@ -431,25 +403,19 @@ const PilgrimageDetail = () => {
 
       if (error) throw error;
 
-      // Use cached profile if available, otherwise fetch
-      const existingParticipant = participants.find(p => p.user_id === userId);
+      // Fetch current user profile for the new post
       let authorName = "Utilizator";
       let authorAvatar: string | null = null;
 
-      if (existingParticipant) {
-        authorName = `${existingParticipant.first_name} ${existingParticipant.last_name}`;
-        authorAvatar = existingParticipant.avatar_url;
-      } else {
-        const { data: authorProfile } = await supabase
-          .from("profiles")
-          .select("first_name, last_name, avatar_url")
-          .eq("user_id", userId)
-          .maybeSingle();
-        
-        if (authorProfile) {
-          authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
-          authorAvatar = authorProfile.avatar_url;
-        }
+      const { data: authorProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle();
+      
+      if (authorProfile) {
+        authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+        authorAvatar = authorProfile.avatar_url;
       }
 
       const newPostObj: Post = {
@@ -555,25 +521,19 @@ const PilgrimageDetail = () => {
 
       if (error) throw error;
 
-      // Use cached profile if available
-      const existingParticipant = participants.find(p => p.user_id === userId);
+      // Fetch current user profile for the new comment
       let authorName = "Utilizator";
       let authorAvatar: string | null = null;
 
-      if (existingParticipant) {
-        authorName = `${existingParticipant.first_name} ${existingParticipant.last_name}`;
-        authorAvatar = existingParticipant.avatar_url;
-      } else {
-        const { data: authorProfile } = await supabase
-          .from("profiles")
-          .select("first_name, last_name, avatar_url")
-          .eq("user_id", userId)
-          .maybeSingle();
-        
-        if (authorProfile) {
-          authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
-          authorAvatar = authorProfile.avatar_url;
-        }
+      const { data: authorProfile } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("user_id", userId)
+        .maybeSingle();
+      
+      if (authorProfile) {
+        authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+        authorAvatar = authorProfile.avatar_url;
       }
 
       const newComment: Comment = {
@@ -773,46 +733,22 @@ const PilgrimageDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Participants Card */}
+        {/* Participants Count Card */}
         <Card className="glow-soft">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Pelerini înscriși ({participants.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {participants.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nu sunt pelerini înscriși încă.</p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {participants.slice(0, 10).map((participant) => (
-                  <div key={participant.id} className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1.5">
-                    <Avatar className="w-6 h-6">
-                      <AvatarImage src={participant.avatar_url || undefined} loading="lazy" />
-                      <AvatarFallback className="text-xs">
-                        {participant.first_name?.[0]}
-                        {participant.last_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1">
-                        <p className="text-xs font-medium truncate">
-                          {participant.first_name} {participant.last_name}
-                        </p>
-                        {userBadges[participant.user_id] && (
-                          <UserBadge badge={userBadges[participant.user_id]!} size="sm" />
-                        )}
-                      </div>
-                      {participant.city && <p className="text-xs text-muted-foreground truncate">{participant.city}</p>}
-                    </div>
-                  </div>
-                ))}
-                {participants.length > 10 && (
-                  <span className="text-xs text-muted-foreground self-center">+{participants.length - 10} alții</span>
-                )}
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-accent" />
               </div>
-            )}
+              <div>
+                <p className="text-sm text-muted-foreground">Participanți</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {pilgrimage.participant_count === 0 
+                    ? "Niciun pelerin înscris încă" 
+                    : `${pilgrimage.participant_count} ${pilgrimage.participant_count === 1 ? 'persoană' : 'persoane'}`}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
