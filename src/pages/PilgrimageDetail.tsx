@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import UserBadge from "@/components/UserBadge";
+import CommentSection from "@/components/CommentSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,17 +45,6 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
   }
 };
 
-interface Comment {
-  id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  author_name: string;
-  author_avatar: string | null;
-  parent_comment_id: string | null;
-  replies?: Comment[];
-}
-
 interface Post {
   id: string;
   user_id: string;
@@ -64,7 +54,6 @@ interface Post {
   author_name: string;
   author_avatar: string | null;
   user_has_liked: boolean;
-  comments: Comment[];
 }
 
 interface Pilgrimage {
@@ -79,7 +68,6 @@ interface Pilgrimage {
   map_url: string | null;
 }
 
-
 const PilgrimageDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -90,9 +78,6 @@ const PilgrimageDetail = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [commentTexts, setCommentTexts] = useState<Record<string, string>>({});
-  const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
-  const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
   const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
@@ -150,15 +135,11 @@ const PilgrimageDetail = () => {
       const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
       const allUserIdsForProfiles = [...new Set(postUserIds)];
 
-      // Fetch profiles and comments in parallel
-      const [profilesResult, commentsResult, userLikesResult] = await Promise.all([
+      // Fetch profiles and user likes in parallel
+      const [profilesResult, userLikesResult] = await Promise.all([
         // Batch fetch all profiles we need for posts
         allUserIdsForProfiles.length > 0
           ? supabase.from("profiles").select("id, user_id, first_name, last_name, avatar_url").in("user_id", allUserIdsForProfiles)
-          : Promise.resolve({ data: [], error: null }),
-        // Fetch all comments for all posts in one query
-        postsResult.data && postsResult.data.length > 0
-          ? supabase.from("comments").select("id, post_id, user_id, content, created_at, parent_comment_id").in("post_id", postsResult.data.map((p: any) => p.id)).order("created_at", { ascending: true })
           : Promise.resolve({ data: [], error: null }),
         // Fetch user's likes for all posts in one query
         currentUserId && postsResult.data && postsResult.data.length > 0
@@ -172,59 +153,12 @@ const PilgrimageDetail = () => {
         profileMap.set(p.user_id, p);
       });
 
-      // Collect comment author user IDs we might be missing
-      const commentUserIds = (commentsResult.data || []).map((c: any) => c.user_id);
-      const missingProfileIds = commentUserIds.filter((uid: string) => !profileMap.has(uid));
-      
-      // Fetch missing comment author profiles if any
-      if (missingProfileIds.length > 0) {
-        const { data: missingProfiles } = await supabase
-          .from("profiles")
-          .select("id, user_id, first_name, last_name, avatar_url")
-          .in("user_id", [...new Set(missingProfileIds)]);
-        
-        (missingProfiles || []).forEach((p: any) => {
-          profileMap.set(p.user_id, p);
-        });
-      }
-
       // Create liked posts set for O(1) lookup
       const likedPostIds = new Set((userLikesResult.data || []).map((l: any) => l.post_id));
 
-      // Group comments by post_id for O(1) lookup
-      const commentsByPost = new Map<string, any[]>();
-      (commentsResult.data || []).forEach((c: any) => {
-        if (!commentsByPost.has(c.post_id)) {
-          commentsByPost.set(c.post_id, []);
-        }
-        commentsByPost.get(c.post_id)!.push(c);
-      });
-
-      // Build posts with all details - no additional queries needed
+      // Build posts with all details - comments are now loaded separately per post
       const postsWithDetails: Post[] = (postsResult.data || []).map((post: any) => {
         const authorProfile = profileMap.get(post.user_id);
-        const postComments = commentsByPost.get(post.id) || [];
-
-        // Build comments with author info
-        const commentsWithAuthors = postComments.map((comment: any) => {
-          const commentAuthor = profileMap.get(comment.user_id);
-          return {
-            id: comment.id,
-            user_id: comment.user_id,
-            content: comment.content,
-            created_at: comment.created_at,
-            parent_comment_id: comment.parent_comment_id,
-            author_name: commentAuthor ? `${commentAuthor.first_name} ${commentAuthor.last_name}` : "Utilizator",
-            author_avatar: commentAuthor?.avatar_url || null,
-          };
-        });
-
-        // Organize comments into threads
-        const topLevelComments = commentsWithAuthors.filter((c: Comment) => !c.parent_comment_id);
-        const threadedComments = topLevelComments.map((comment: Comment) => ({
-          ...comment,
-          replies: commentsWithAuthors.filter((c: Comment) => c.parent_comment_id === comment.id),
-        }));
 
         return {
           id: post.id,
@@ -235,22 +169,15 @@ const PilgrimageDetail = () => {
           author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
           author_avatar: authorProfile?.avatar_url || null,
           user_has_liked: likedPostIds.has(post.id),
-          comments: threadedComments,
         };
       });
 
       setPosts(postsWithDetails);
 
-      // Collect all unique user IDs for badge fetching (post authors and commenters)
+      // Fetch badges for post authors
       const allUserIdsForBadges = new Set<string>();
       postsWithDetails.forEach(post => {
         allUserIdsForBadges.add(post.user_id);
-        post.comments.forEach((comment: Comment) => {
-          allUserIdsForBadges.add(comment.user_id);
-          if (comment.replies) {
-            comment.replies.forEach((reply: Comment) => allUserIdsForBadges.add(reply.user_id));
-          }
-        });
       });
 
       // Batch fetch all user badges in one query
@@ -336,7 +263,6 @@ const PilgrimageDetail = () => {
       if (pilgrimage) {
         setPilgrimage({ ...pilgrimage, participant_count: pilgrimage.participant_count + 1 });
       }
-      
 
       toast({
         title: "Înregistrare reușită!",
@@ -371,7 +297,6 @@ const PilgrimageDetail = () => {
       if (pilgrimage) {
         setPilgrimage({ ...pilgrimage, participant_count: Math.max(0, pilgrimage.participant_count - 1) });
       }
-      
 
       toast({
         title: "Succes",
@@ -427,7 +352,6 @@ const PilgrimageDetail = () => {
         author_name: authorName,
         author_avatar: authorAvatar,
         user_has_liked: false,
-        comments: [],
       };
 
       setPosts([newPostObj, ...posts]);
@@ -503,87 +427,12 @@ const PilgrimageDetail = () => {
     }
   };
 
-  const handleCommentSubmit = async (postId: string, parentCommentId: string | null = null) => {
-    const commentText = commentTexts[postId]?.trim();
-    if (!commentText || !userId) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("comments")
-        .insert({
-          post_id: postId,
-          user_id: userId,
-          content: commentText,
-          parent_comment_id: parentCommentId,
-        })
-        .select("id, user_id, content, created_at, parent_comment_id")
-        .single();
-
-      if (error) throw error;
-
-      // Fetch current user profile for the new comment
-      let authorName = "Utilizator";
-      let authorAvatar: string | null = null;
-
-      const { data: authorProfile } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, avatar_url")
-        .eq("user_id", userId)
-        .maybeSingle();
-      
-      if (authorProfile) {
-        authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
-        authorAvatar = authorProfile.avatar_url;
-      }
-
-      const newComment: Comment = {
-        id: data.id,
-        user_id: data.user_id,
-        content: data.content,
-        created_at: data.created_at,
-        parent_comment_id: data.parent_comment_id,
-        author_name: authorName,
-        author_avatar: authorAvatar,
-      };
-
-      // Add comment to the post
-      setPosts(
-        posts.map((post) => {
-          if (post.id !== postId) return post;
-
-          if (!parentCommentId) {
-            // Top-level comment
-            return { ...post, comments: [...post.comments, { ...newComment, replies: [] }] };
-          } else {
-            // Reply to existing comment
-            return {
-              ...post,
-              comments: post.comments.map((comment) =>
-                comment.id === parentCommentId
-                  ? { ...comment, replies: [...(comment.replies || []), newComment] }
-                  : comment,
-              ),
-            };
-          }
-        }),
-      );
-
-      setCommentTexts((prev) => ({ ...prev, [postId]: "" }));
-      setReplyingTo((prev) => ({ ...prev, [postId]: null }));
-      setShowTopLevelComment((prev) => ({ ...prev, [postId]: false }));
-      toast({
-        title: "Comentariu adăugat!",
-        description: "Răspunsul tău a fost publicat.",
-      });
-    } catch (error: any) {
-      console.error("Error creating comment:", error);
-      toast({
-        title: "Eroare",
-        description: "Nu s-a putut adăuga comentariul.",
-        variant: "destructive",
-      });
-    }
-  };
+  const handleCommentAdded = useCallback(() => {
+    toast({
+      title: "Comentariu adăugat!",
+      description: "Răspunsul tău a fost publicat.",
+    });
+  }, [toast]);
 
   const isPastPilgrimage = useMemo(() => {
     if (!pilgrimage) return false;
@@ -821,221 +670,15 @@ const PilgrimageDetail = () => {
                             <Flame className={`w-4 h-4 ${post.user_has_liked ? "fill-current" : ""}`} />
                             <span>{post.likes_count}</span>
                           </button>
-                          <button
-                            onClick={() =>
-                              setShowTopLevelComment((prev) => ({
-                                ...prev,
-                                [post.id]: !prev[post.id],
-                              }))
-                            }
-                            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            <span>Răspunde</span>
-                          </button>
                         </div>
 
-                        {/* Top-level comment input */}
-                        {showTopLevelComment[post.id] && (
-                          <div className="flex gap-2 mt-2">
-                            <Textarea
-                              placeholder="Scrie un comentariu..."
-                              value={commentTexts[post.id] || ""}
-                              onChange={(e) =>
-                                setCommentTexts((prev) => ({
-                                  ...prev,
-                                  [post.id]: e.target.value,
-                                }))
-                              }
-                              className="min-h-[60px] text-sm"
-                            />
-                            <div className="flex flex-col gap-1">
-                              <Button
-                                onClick={() => handleCommentSubmit(post.id, null)}
-                                disabled={!commentTexts[post.id]?.trim()}
-                                size="sm"
-                              >
-                                Comentează
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setShowTopLevelComment((prev) => ({
-                                    ...prev,
-                                    [post.id]: false,
-                                  }))
-                                }
-                              >
-                                Anulează
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Comments */}
-                        {post.comments.length > 0 && (
-                          <div className="pl-4 border-l-2 border-muted space-y-3 mt-3">
-                            {post.comments.map((comment) => (
-                              <div key={comment.id} className="space-y-2">
-                                <div className="flex items-start gap-2">
-                                  <Avatar className="w-6 h-6">
-                                    <AvatarImage src={comment.author_avatar || undefined} loading="lazy" />
-                                    <AvatarFallback className="text-xs">
-                                      {comment.author_name
-                                        .split(" ")
-                                        .map((n) => n[0])
-                                        .join("")}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-1">
-                                      <p className="text-xs font-medium">{comment.author_name}</p>
-                                      {userBadges[comment.user_id] && (
-                                        <UserBadge badge={userBadges[comment.user_id]!} size="sm" />
-                                      )}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                      {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
-                                    </p>
-                                    <p className="text-sm mt-1">{comment.content}</p>
-                                    <button
-                                      onClick={() =>
-                                        setReplyingTo((prev) => ({
-                                          ...prev,
-                                          [post.id]: prev[post.id] === comment.id ? null : comment.id,
-                                        }))
-                                      }
-                                      className="text-xs text-muted-foreground hover:text-foreground mt-1"
-                                    >
-                                      Răspunde
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {/* Reply input */}
-                                {replyingTo[post.id] === comment.id && (
-                                  <div className="flex gap-2 ml-8">
-                                    <Textarea
-                                      placeholder="Scrie un răspuns..."
-                                      value={commentTexts[post.id] || ""}
-                                      onChange={(e) =>
-                                        setCommentTexts((prev) => ({
-                                          ...prev,
-                                          [post.id]: e.target.value,
-                                        }))
-                                      }
-                                      className="min-h-[50px] text-sm"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                      <Button
-                                        onClick={() => handleCommentSubmit(post.id, comment.id)}
-                                        disabled={!commentTexts[post.id]?.trim()}
-                                        size="sm"
-                                      >
-                                        Trimite
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                          setReplyingTo((prev) => ({
-                                            ...prev,
-                                            [post.id]: null,
-                                          }))
-                                        }
-                                      >
-                                        Anulează
-                                      </Button>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Replies */}
-                                {comment.replies && comment.replies.length > 0 && (
-                                  <div className="pl-4 border-l border-muted/50 space-y-2 mt-2">
-                                    {comment.replies.map((reply) => (
-                                      <div key={reply.id} className="space-y-2">
-                                        <div className="flex items-start gap-2">
-                                          <Avatar className="w-5 h-5">
-                                            <AvatarImage src={reply.author_avatar || undefined} loading="lazy" />
-                                            <AvatarFallback className="text-xs">
-                                              {reply.author_name
-                                                .split(" ")
-                                                .map((n) => n[0])
-                                                .join("")}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          <div className="flex-1">
-                                            <div className="flex items-center gap-1">
-                                              <p className="text-xs font-medium">{reply.author_name}</p>
-                                              {userBadges[reply.user_id] && (
-                                                <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
-                                              )}
-                                            </div>
-                                            <p className="text-xs text-muted-foreground">
-                                              {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
-                                            </p>
-                                            <p className="text-sm mt-1">{reply.content}</p>
-                                            <button
-                                              onClick={() =>
-                                                setReplyingTo((prev) => ({
-                                                  ...prev,
-                                                  [post.id]: prev[post.id] === reply.id ? null : reply.id,
-                                                }))
-                                              }
-                                              className="text-xs text-muted-foreground hover:text-foreground mt-1"
-                                            >
-                                              Răspunde
-                                            </button>
-                                          </div>
-                                        </div>
-
-                                        {/* Reply input for nested reply */}
-                                        {replyingTo[post.id] === reply.id && (
-                                          <div className="flex gap-2 ml-7">
-                                            <Textarea
-                                              placeholder="Scrie un răspuns..."
-                                              value={commentTexts[post.id] || ""}
-                                              onChange={(e) =>
-                                                setCommentTexts((prev) => ({
-                                                  ...prev,
-                                                  [post.id]: e.target.value,
-                                                }))
-                                              }
-                                              className="min-h-[50px] text-sm"
-                                            />
-                                            <div className="flex flex-col gap-1">
-                                              <Button
-                                                onClick={() => handleCommentSubmit(post.id, comment.id)}
-                                                disabled={!commentTexts[post.id]?.trim()}
-                                                size="sm"
-                                              >
-                                                Trimite
-                                              </Button>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                  setReplyingTo((prev) => ({
-                                                    ...prev,
-                                                    [post.id]: null,
-                                                  }))
-                                                }
-                                              >
-                                                Anulează
-                                              </Button>
-                                            </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {/* Comments Section - Now paginated */}
+                        <CommentSection
+                          postId={post.id}
+                          userId={userId}
+                          userBadges={userBadges}
+                          onCommentAdded={handleCommentAdded}
+                        />
                       </div>
                     ))
                   )}
