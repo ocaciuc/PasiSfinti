@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame } from "lucide-react";
+import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame, ArrowUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
@@ -93,6 +93,20 @@ const PilgrimageDetail = () => {
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
   const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
   const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Handle scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   useEffect(() => {
     fetchPilgrimageData();
@@ -1038,6 +1052,17 @@ const PilgrimageDetail = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-24 right-4 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 ${
+          showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp className="h-5 w-5" />
+      </button>
 
       <Navigation />
     </div>
