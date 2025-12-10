@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -94,195 +94,193 @@ const PilgrimageDetail = () => {
   const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
   const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
 
-  // Fetch top badge for a user
-  const fetchUserTopBadge = async (targetUserId: string): Promise<Badge | null> => {
-    try {
-      const { data: userBadgesData } = await supabase
-        .from("user_badges")
-        .select(`
-          badge_id,
-          badges (*)
-        `)
-        .eq("user_id", targetUserId);
-
-      if (!userBadgesData || userBadgesData.length === 0) return null;
-
-      const badges = userBadgesData.map((ub: any) => ub.badges).filter(Boolean);
-      badges.sort((a: Badge, b: Badge) => a.priority - b.priority);
-      
-      return badges.length > 0 ? badges[0] : null;
-    } catch {
-      return null;
-    }
-  };
-
   useEffect(() => {
     fetchPilgrimageData();
   }, [id]);
 
   const fetchPilgrimageData = async () => {
+    if (!id) return;
+    
     try {
       setLoading(true);
 
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUserId(user?.id || null);
+      // Get current user first
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id || null;
+      setUserId(currentUserId);
 
-      // Fetch pilgrimage details
-      const { data: pilgrimageData, error: pilgrimageError } = await supabase
-        .from("pilgrimages")
-        .select("*")
-        .eq("id", id)
-        .single();
+      // Fetch all data in parallel for better performance
+      const [
+        pilgrimageResult,
+        userPilgrimagesResult,
+        postsResult,
+      ] = await Promise.all([
+        // Fetch pilgrimage details
+        supabase.from("pilgrimages").select("id, title, description, location, city, start_date, end_date, participant_count, map_url").eq("id", id).single(),
+        // Fetch all user_pilgrimages for this pilgrimage
+        supabase.from("user_pilgrimages").select("user_id").eq("pilgrimage_id", id),
+        // Fetch posts for this pilgrimage
+        supabase.from("posts").select("id, user_id, content, likes_count, created_at").eq("pilgrimage_id", id).order("created_at", { ascending: false }),
+      ]);
 
-      if (pilgrimageError) throw pilgrimageError;
-      setPilgrimage(pilgrimageData);
+      if (pilgrimageResult.error) throw pilgrimageResult.error;
+      setPilgrimage(pilgrimageResult.data);
 
-      // Check if user has joined this pilgrimage
-      if (user) {
-        const { data: userPilgrimageData } = await supabase
-          .from("user_pilgrimages")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("pilgrimage_id", id)
-          .single();
+      // Process participants
+      const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
+      setIsRegistered(currentUserId ? participantUserIds.includes(currentUserId) : false);
 
-        setIsRegistered(!!userPilgrimageData);
-      }
+      // Collect all user IDs we need profiles for (participants + post authors)
+      const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
+      const allUserIdsForProfiles = [...new Set([...participantUserIds, ...postUserIds])];
 
-      // Fetch participants - first get user_ids, then fetch profiles separately
-      const { data: userPilgrimagesData, error: participantsError } = await supabase
-        .from("user_pilgrimages")
-        .select("user_id")
-        .eq("pilgrimage_id", id);
+      // Fetch profiles and comments in parallel
+      const [profilesResult, commentsResult, userLikesResult] = await Promise.all([
+        // Batch fetch all profiles we need
+        allUserIdsForProfiles.length > 0
+          ? supabase.from("profiles").select("id, user_id, first_name, last_name, avatar_url, city").in("user_id", allUserIdsForProfiles)
+          : Promise.resolve({ data: [], error: null }),
+        // Fetch all comments for all posts in one query
+        postsResult.data && postsResult.data.length > 0
+          ? supabase.from("comments").select("id, post_id, user_id, content, created_at, parent_comment_id").in("post_id", postsResult.data.map((p: any) => p.id)).order("created_at", { ascending: true })
+          : Promise.resolve({ data: [], error: null }),
+        // Fetch user's likes for all posts in one query
+        currentUserId && postsResult.data && postsResult.data.length > 0
+          ? supabase.from("post_likes").select("post_id").eq("user_id", currentUserId).in("post_id", postsResult.data.map((p: any) => p.id))
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
-      if (participantsError) throw participantsError;
+      // Create a profile lookup map for O(1) access
+      const profileMap = new Map<string, any>();
+      (profilesResult.data || []).forEach((p: any) => {
+        profileMap.set(p.user_id, p);
+      });
 
-      // Fetch profiles for all participant user_ids
-      const userIds = (userPilgrimagesData || []).map((up: any) => up.user_id);
-      let formattedParticipants: Participant[] = [];
-      
-      if (userIds.length > 0) {
-        const { data: profilesData, error: profilesError } = await supabase
-          .from("profiles")
-          .select("id, user_id, first_name, last_name, avatar_url, city")
-          .in("user_id", userIds);
-
-        if (profilesError) throw profilesError;
-        formattedParticipants = (profilesData || []) as Participant[];
-      }
-
+      // Set participants
+      const formattedParticipants = participantUserIds
+        .map((uid: string) => profileMap.get(uid))
+        .filter(Boolean) as Participant[];
       setParticipants(formattedParticipants);
 
-      // Fetch posts
-      const { data: postsData, error: postsError } = await supabase
-        .from("posts")
-        .select("*")
-        .eq("pilgrimage_id", id)
-        .order("created_at", { ascending: false });
+      // Collect comment author user IDs we might be missing
+      const commentUserIds = (commentsResult.data || []).map((c: any) => c.user_id);
+      const missingProfileIds = commentUserIds.filter((uid: string) => !profileMap.has(uid));
+      
+      // Fetch missing comment author profiles if any
+      if (missingProfileIds.length > 0) {
+        const { data: missingProfiles } = await supabase
+          .from("profiles")
+          .select("id, user_id, first_name, last_name, avatar_url")
+          .in("user_id", [...new Set(missingProfileIds)]);
+        
+        (missingProfiles || []).forEach((p: any) => {
+          profileMap.set(p.user_id, p);
+        });
+      }
 
-      if (postsError) throw postsError;
+      // Create liked posts set for O(1) lookup
+      const likedPostIds = new Set((userLikesResult.data || []).map((l: any) => l.post_id));
 
-      // For each post, fetch author, comments, and check if user has liked
-      const postsWithDetails = await Promise.all(
-        (postsData || []).map(async (post: any) => {
-          // Fetch author profile
-          const { data: authorProfile } = await supabase
-            .from("profiles")
-            .select("first_name, last_name, avatar_url")
-            .eq("user_id", post.user_id)
-            .maybeSingle();
+      // Group comments by post_id for O(1) lookup
+      const commentsByPost = new Map<string, any[]>();
+      (commentsResult.data || []).forEach((c: any) => {
+        if (!commentsByPost.has(c.post_id)) {
+          commentsByPost.set(c.post_id, []);
+        }
+        commentsByPost.get(c.post_id)!.push(c);
+      });
 
-          // Check if current user has liked this post
-          let userHasLiked = false;
-          if (user) {
-            const { data: likeData } = await supabase
-              .from("post_likes")
-              .select("id")
-              .eq("post_id", post.id)
-              .eq("user_id", user.id)
-              .maybeSingle();
-            userHasLiked = !!likeData;
-          }
+      // Build posts with all details - no additional queries needed
+      const postsWithDetails: Post[] = (postsResult.data || []).map((post: any) => {
+        const authorProfile = profileMap.get(post.user_id);
+        const postComments = commentsByPost.get(post.id) || [];
 
-          // Fetch comments for this post
-          const { data: commentsData } = await supabase
-            .from("comments")
-            .select("*")
-            .eq("post_id", post.id)
-            .order("created_at", { ascending: true });
-
-          // For each comment, fetch author profile and organize into threads
-          const commentsWithAuthors = await Promise.all(
-            (commentsData || []).map(async (comment: any) => {
-              const { data: commentAuthor } = await supabase
-                .from("profiles")
-                .select("first_name, last_name, avatar_url")
-                .eq("user_id", comment.user_id)
-                .maybeSingle();
-
-              return {
-                id: comment.id,
-                user_id: comment.user_id,
-                content: comment.content,
-                created_at: comment.created_at,
-                parent_comment_id: comment.parent_comment_id,
-                author_name: commentAuthor ? `${commentAuthor.first_name} ${commentAuthor.last_name}` : "Utilizator",
-                author_avatar: commentAuthor?.avatar_url || null,
-              };
-            }),
-          );
-
-          // Organize comments into threads
-          const topLevelComments = commentsWithAuthors.filter((c) => !c.parent_comment_id);
-          const threadedComments = topLevelComments.map((comment) => ({
-            ...comment,
-            replies: commentsWithAuthors.filter((c) => c.parent_comment_id === comment.id),
-          }));
-
+        // Build comments with author info
+        const commentsWithAuthors = postComments.map((comment: any) => {
+          const commentAuthor = profileMap.get(comment.user_id);
           return {
-            id: post.id,
-            user_id: post.user_id,
-            content: post.content,
-            likes_count: post.likes_count || 0,
-            created_at: post.created_at,
-            author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
-            author_avatar: authorProfile?.avatar_url || null,
-            user_has_liked: userHasLiked,
-            comments: threadedComments,
+            id: comment.id,
+            user_id: comment.user_id,
+            content: comment.content,
+            created_at: comment.created_at,
+            parent_comment_id: comment.parent_comment_id,
+            author_name: commentAuthor ? `${commentAuthor.first_name} ${commentAuthor.last_name}` : "Utilizator",
+            author_avatar: commentAuthor?.avatar_url || null,
           };
-        }),
-      );
+        });
+
+        // Organize comments into threads
+        const topLevelComments = commentsWithAuthors.filter((c: Comment) => !c.parent_comment_id);
+        const threadedComments = topLevelComments.map((comment: Comment) => ({
+          ...comment,
+          replies: commentsWithAuthors.filter((c: Comment) => c.parent_comment_id === comment.id),
+        }));
+
+        return {
+          id: post.id,
+          user_id: post.user_id,
+          content: post.content,
+          likes_count: post.likes_count || 0,
+          created_at: post.created_at,
+          author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
+          author_avatar: authorProfile?.avatar_url || null,
+          user_has_liked: likedPostIds.has(post.id),
+          comments: threadedComments,
+        };
+      });
 
       setPosts(postsWithDetails);
 
-      // Collect all unique user IDs and fetch their top badges
-      const allUserIds = new Set<string>();
-      
-      // Add participant user IDs
-      formattedParticipants.forEach(p => allUserIds.add(p.user_id));
-      
-      // Add post/comment author user IDs
+      // Collect all unique user IDs for badge fetching
+      const allUserIdsForBadges = new Set<string>();
+      formattedParticipants.forEach(p => allUserIdsForBadges.add(p.user_id));
       postsWithDetails.forEach(post => {
-        allUserIds.add(post.user_id);
+        allUserIdsForBadges.add(post.user_id);
         post.comments.forEach((comment: Comment) => {
-          allUserIds.add(comment.user_id);
+          allUserIdsForBadges.add(comment.user_id);
           if (comment.replies) {
-            comment.replies.forEach((reply: Comment) => allUserIds.add(reply.user_id));
+            comment.replies.forEach((reply: Comment) => allUserIdsForBadges.add(reply.user_id));
           }
         });
       });
 
-      // Fetch badges for all users
-      const badgesMap: Record<string, Badge | null> = {};
-      await Promise.all(
-        Array.from(allUserIds).map(async (uid) => {
-          badgesMap[uid] = await fetchUserTopBadge(uid);
-        })
-      );
-      setUserBadges(badgesMap);
+      // Batch fetch all user badges in one query
+      if (allUserIdsForBadges.size > 0) {
+        const { data: allUserBadgesData } = await supabase
+          .from("user_badges")
+          .select(`user_id, badges (id, name, name_ro, description, icon_name, priority)`)
+          .in("user_id", Array.from(allUserIdsForBadges));
+
+        // Group badges by user and find the highest priority one
+        const badgesMap: Record<string, Badge | null> = {};
+        const userBadgesGroup = new Map<string, any[]>();
+        
+        (allUserBadgesData || []).forEach((ub: any) => {
+          if (!userBadgesGroup.has(ub.user_id)) {
+            userBadgesGroup.set(ub.user_id, []);
+          }
+          if (ub.badges) {
+            userBadgesGroup.get(ub.user_id)!.push(ub.badges);
+          }
+        });
+
+        // For each user, get the highest priority badge
+        userBadgesGroup.forEach((badges, uid) => {
+          if (badges.length > 0) {
+            badges.sort((a, b) => a.priority - b.priority);
+            badgesMap[uid] = badges[0];
+          }
+        });
+
+        // Initialize all users with null if they don't have badges
+        allUserIdsForBadges.forEach(uid => {
+          if (!badgesMap[uid]) {
+            badgesMap[uid] = null;
+          }
+        });
+
+        setUserBadges(badgesMap);
+      }
     } catch (error: any) {
       console.error("Error fetching pilgrimage data:", error);
       toast({
@@ -324,7 +322,22 @@ const PilgrimageDetail = () => {
       if (error) throw error;
 
       setIsRegistered(true);
-      fetchPilgrimageData(); // Refresh to update participant count
+      
+      // Update participant count locally instead of refetching everything
+      if (pilgrimage) {
+        setPilgrimage({ ...pilgrimage, participant_count: pilgrimage.participant_count + 1 });
+      }
+      
+      // Fetch current user profile and add to participants
+      const { data: userProfile } = await supabase
+        .from("profiles")
+        .select("id, user_id, first_name, last_name, avatar_url, city")
+        .eq("user_id", userId)
+        .maybeSingle();
+      
+      if (userProfile) {
+        setParticipants(prev => [...prev, userProfile as Participant]);
+      }
 
       toast({
         title: "Înregistrare reușită!",
@@ -351,17 +364,31 @@ const PilgrimageDetail = () => {
           pilgrimage_id: id!,
           content: newPost.trim(),
         })
-        .select("*")
+        .select("id, user_id, content, likes_count, created_at")
         .single();
 
       if (error) throw error;
 
-      // Fetch author profile
-      const { data: authorProfile } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, avatar_url")
-        .eq("user_id", userId)
-        .maybeSingle();
+      // Use cached profile if available, otherwise fetch
+      const existingParticipant = participants.find(p => p.user_id === userId);
+      let authorName = "Utilizator";
+      let authorAvatar: string | null = null;
+
+      if (existingParticipant) {
+        authorName = `${existingParticipant.first_name} ${existingParticipant.last_name}`;
+        authorAvatar = existingParticipant.avatar_url;
+      } else {
+        const { data: authorProfile } = await supabase
+          .from("profiles")
+          .select("first_name, last_name, avatar_url")
+          .eq("user_id", userId)
+          .maybeSingle();
+        
+        if (authorProfile) {
+          authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+          authorAvatar = authorProfile.avatar_url;
+        }
+      }
 
       const newPostObj: Post = {
         id: data.id,
@@ -369,8 +396,8 @@ const PilgrimageDetail = () => {
         content: data.content,
         likes_count: 0,
         created_at: data.created_at,
-        author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
-        author_avatar: authorProfile?.avatar_url || null,
+        author_name: authorName,
+        author_avatar: authorAvatar,
         user_has_liked: false,
         comments: [],
       };
@@ -461,17 +488,31 @@ const PilgrimageDetail = () => {
           content: commentText,
           parent_comment_id: parentCommentId,
         })
-        .select("*")
+        .select("id, user_id, content, created_at, parent_comment_id")
         .single();
 
       if (error) throw error;
 
-      // Fetch author profile
-      const { data: authorProfile } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, avatar_url")
-        .eq("user_id", userId)
-        .maybeSingle();
+      // Use cached profile if available
+      const existingParticipant = participants.find(p => p.user_id === userId);
+      let authorName = "Utilizator";
+      let authorAvatar: string | null = null;
+
+      if (existingParticipant) {
+        authorName = `${existingParticipant.first_name} ${existingParticipant.last_name}`;
+        authorAvatar = existingParticipant.avatar_url;
+      } else {
+        const { data: authorProfile } = await supabase
+          .from("profiles")
+          .select("first_name, last_name, avatar_url")
+          .eq("user_id", userId)
+          .maybeSingle();
+        
+        if (authorProfile) {
+          authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+          authorAvatar = authorProfile.avatar_url;
+        }
+      }
 
       const newComment: Comment = {
         id: data.id,
@@ -479,8 +520,8 @@ const PilgrimageDetail = () => {
         content: data.content,
         created_at: data.created_at,
         parent_comment_id: data.parent_comment_id,
-        author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
-        author_avatar: authorProfile?.avatar_url || null,
+        author_name: authorName,
+        author_avatar: authorAvatar,
       };
 
       // Add comment to the post
@@ -505,41 +546,55 @@ const PilgrimageDetail = () => {
         }),
       );
 
-      // Clear comment input and reply state
-      setCommentTexts({ ...commentTexts, [postId]: "" });
-      setReplyingTo({ ...replyingTo, [postId]: null });
-
+      setCommentTexts((prev) => ({ ...prev, [postId]: "" }));
+      setReplyingTo((prev) => ({ ...prev, [postId]: null }));
+      setShowTopLevelComment((prev) => ({ ...prev, [postId]: false }));
       toast({
-        title: parentCommentId ? "Răspuns adăugat!" : "Comentariu adăugat!",
-        description: parentCommentId ? "Răspunsul tău a fost publicat." : "Comentariul tău a fost publicat.",
+        title: "Comentariu adăugat!",
+        description: "Răspunsul tău a fost publicat.",
       });
     } catch (error: any) {
       console.error("Error creating comment:", error);
       toast({
         title: "Eroare",
-        description: "Nu s-a putut publica comentariul.",
+        description: "Nu s-a putut adăuga comentariul.",
         variant: "destructive",
       });
     }
   };
 
+  const isPastPilgrimage = useMemo(() => {
+    if (!pilgrimage) return false;
+    return new Date(pilgrimage.start_date) < new Date(new Date().setHours(0, 0, 0, 0));
+  }, [pilgrimage]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background pb-20">
-        <header className="bg-primary text-primary-foreground p-4 glow-soft">
-          <div className="max-w-lg mx-auto">
-            <Skeleton className="h-8 w-20 mb-2 bg-primary-foreground/20" />
+        <header className="bg-primary text-primary-foreground p-6 glow-soft">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <Skeleton className="h-8 w-48 bg-primary-foreground/20" />
-            <Skeleton className="h-4 w-32 mt-1 bg-primary-foreground/20" />
           </div>
         </header>
         <div className="max-w-lg mx-auto p-4 space-y-4">
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
+          <Card className="glow-soft">
+            <CardContent className="p-4 space-y-4">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-20 w-full" />
+            </CardContent>
+          </Card>
+          <Card className="glow-soft">
+            <CardHeader>
               <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-32 w-full" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
             </CardContent>
           </Card>
         </div>
@@ -551,20 +606,24 @@ const PilgrimageDetail = () => {
   if (!pilgrimage) {
     return (
       <div className="min-h-screen bg-background pb-20">
-        <header className="bg-primary text-primary-foreground p-4 glow-soft">
-          <div className="max-w-lg mx-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/pilgrimages")}
-              className="text-primary-foreground hover:text-primary-foreground/80 mb-2"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Înapoi
+        <header className="bg-primary text-primary-foreground p-6 glow-soft">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
+              <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-2xl font-bold">Pelerinaj negăsit</h1>
+            <h1 className="text-xl font-bold">Pelerinaj</h1>
           </div>
         </header>
+        <div className="max-w-lg mx-auto p-4">
+          <Card className="glow-soft">
+            <CardContent className="p-6 text-center">
+              <p className="text-muted-foreground">Nu s-a găsit pelerinajul.</p>
+              <Button onClick={() => navigate("/pilgrimages")} className="mt-4">
+                Înapoi la pelerinaje
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
         <Navigation />
       </div>
     );
@@ -573,49 +632,37 @@ const PilgrimageDetail = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground p-4 glow-soft">
-        <div className="max-w-lg mx-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/pilgrimages")}
-            className="text-primary-foreground hover:text-primary-foreground/80 mb-2"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Înapoi
+      <header className="bg-primary text-primary-foreground p-6 glow-soft">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
+            <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold">{pilgrimage.title}</h1>
-          <p className="text-sm opacity-90 mt-1">{pilgrimage.location}</p>
+          <h1 className="text-xl font-bold line-clamp-1">{pilgrimage.title}</h1>
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto p-4 space-y-4">
-        {/* Details Card */}
+      <div className="max-w-lg mx-auto p-4 space-y-6">
+        {/* Pilgrimage Info Card */}
         <Card className="glow-soft">
-          <CardContent className="pt-6 space-y-4">
+          <CardContent className="p-4 space-y-4">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="w-5 h-5" />
-              <span>
-                {format(new Date(pilgrimage.start_date), "d MMMM yyyy", { locale: ro })}
-                {pilgrimage.end_date && ` - ${format(new Date(pilgrimage.end_date), "d MMMM yyyy", { locale: ro })}`}
-              </span>
+              <MapPin className="w-4 h-4" />
+              <span>{pilgrimage.location}</span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="w-5 h-5" />
+              <Calendar className="w-4 h-4" />
               <span>
-                {pilgrimage.location}
-                {pilgrimage.city && `, ${pilgrimage.city}`}
+                {safeFormatDate(pilgrimage.start_date, "d MMMM yyyy")}
+                {pilgrimage.end_date && ` - ${safeFormatDate(pilgrimage.end_date, "d MMMM yyyy")}`}
               </span>
             </div>
             <div className="flex items-center gap-2 text-accent font-medium">
-              <Users className="w-5 h-5" />
-              <span>{pilgrimage.participant_count} pelerini înregistrați</span>
+              <Users className="w-4 h-4" />
+              <span>{pilgrimage.participant_count.toLocaleString()} pelerini înscriși</span>
             </div>
 
             {pilgrimage.description && (
-              <div className="pt-4">
-                <p className="text-sm text-muted-foreground mb-4">{pilgrimage.description}</p>
-              </div>
+              <p className="text-sm text-muted-foreground pt-2 border-t">{pilgrimage.description}</p>
             )}
 
             {pilgrimage.map_url && (
@@ -624,54 +671,53 @@ const PilgrimageDetail = () => {
                   href={pilgrimage.map_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline flex items-center gap-1"
+                  className="text-sm text-primary underline"
                 >
-                  <MapPin className="w-4 h-4" />
                   Vezi pe hartă
                 </a>
               </div>
             )}
 
-            <div className="pt-4">
-              {!isRegistered ? (
-                pilgrimage && new Date(pilgrimage.start_date) >= new Date(new Date().setHours(0, 0, 0, 0)) ? (
-                  <Button onClick={handleRegister} className="w-full">
-                    Înscrie-te la acest pelerinaj
-                  </Button>
-                ) : (
-                  <div className="bg-muted border border-border rounded-lg p-4 text-center">
-                    <p className="text-muted-foreground font-medium">Înregistrarea nu este disponibilă</p>
-                    <p className="text-sm text-muted-foreground mt-1">Acest pelerinaj a avut loc în trecut</p>
-                  </div>
-                )
-              ) : (
-                <div className="bg-accent/10 border border-accent rounded-lg p-4 text-center">
-                  <p className="text-accent font-medium">Ești înregistrat pentru acest pelerinaj</p>
-                  <p className="text-sm text-muted-foreground mt-1">Drum bun pe calea ta spirituală!</p>
-                </div>
-              )}
-            </div>
+            {!isRegistered && !isPastPilgrimage && (
+              <Button onClick={handleRegister} className="w-full mt-4" disabled={!userId}>
+                {userId ? "Înscrie-te la pelerinaj" : "Autentifică-te pentru a te înscrie"}
+              </Button>
+            )}
+
+            {isPastPilgrimage && !isRegistered && (
+              <p className="text-sm text-muted-foreground text-center pt-2 border-t">
+                Acest pelerinaj a avut loc deja.
+              </p>
+            )}
+
+            {isRegistered && (
+              <div className="text-center text-sm text-accent font-medium pt-2 border-t">
+                ✓ Ești înscris la acest pelerinaj
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Participants List */}
-        {participants.length > 0 && (
-          <Card className="glow-soft">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <Users className="w-5 h-5" />
-                Pelerini Înscriși ({participants.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                {participants.slice(0, 8).map((participant) => (
-                  <div key={participant.id} className="flex items-center gap-2 p-2 border border-border rounded-lg">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={participant.avatar_url || ""} />
+        {/* Participants Card */}
+        <Card className="glow-soft">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Pelerini înscriși ({participants.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {participants.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nu sunt pelerini înscriși încă.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {participants.slice(0, 10).map((participant) => (
+                  <div key={participant.id} className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1.5">
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src={participant.avatar_url || undefined} loading="lazy" />
                       <AvatarFallback className="text-xs">
-                        {participant.first_name[0]}
-                        {participant.last_name[0]}
+                        {participant.first_name?.[0]}
+                        {participant.last_name?.[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -687,274 +733,256 @@ const PilgrimageDetail = () => {
                     </div>
                   </div>
                 ))}
+                {participants.length > 10 && (
+                  <span className="text-xs text-muted-foreground self-center">+{participants.length - 10} alții</span>
+                )}
               </div>
-              {participants.length > 8 && (
-                <p className="text-xs text-muted-foreground text-center mt-3">+{participants.length - 8} pelerini</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
 
-        {/* Community Discussion */}
+        {/* Community Wall */}
         <Card className="glow-soft">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
               <MessageCircle className="w-5 h-5" />
-              Comunitatea Pelerinilor
+              Comunitate
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Post Input */}
-            {isRegistered && (
-              <div className="space-y-2">
-                <Textarea
-                  placeholder="Împărtășește întrebări sau informații utile..."
-                  value={newPost}
-                  onChange={(e) => setNewPost(e.target.value)}
-                  rows={3}
-                />
-                <Button onClick={handlePostSubmit} className="w-full">
-                  Publică
-                </Button>
-              </div>
-            )}
-
-            {!isRegistered && userId && (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Înscrie-te la pelerinaj pentru a participa la discuții
-              </p>
-            )}
-
-            {!userId && (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Autentifică-te și înscrie-te pentru a participa la discuții
-              </p>
-            )}
-
-            {/* Posts - Only visible to enrolled users */}
             {isRegistered ? (
-              <div className="space-y-4 mt-6">
-                {posts.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Fii primul care împărtășește ceva cu comunitatea
-                  </p>
-                )}
-                {posts.map((post) => (
-                  <div key={post.id} className="border border-border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Avatar>
-                        <AvatarImage src={post.author_avatar || ""} />
-                        <AvatarFallback>
-                          {post.author_name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-medium text-sm">{post.author_name}</p>
-                          {userBadges[post.user_id] && (
-                            <UserBadge badge={userBadges[post.user_id]!} size="sm" />
-                          )}
+              <>
+                {/* New Post Form */}
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Scrie un mesaj pentru comunitate..."
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                  <Button onClick={handlePostSubmit} disabled={!newPost.trim()} size="sm">
+                    Publică
+                  </Button>
+                </div>
+
+                {/* Posts */}
+                <div className="space-y-4 pt-4 border-t">
+                  {posts.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Fii primul care postează în această comunitate!
+                    </p>
+                  ) : (
+                    posts.map((post) => (
+                      <div key={post.id} className="space-y-3 pb-4 border-b last:border-b-0">
+                        {/* Post Author */}
+                        <div className="flex items-start gap-3">
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={post.author_avatar || undefined} loading="lazy" />
+                            <AvatarFallback className="text-xs">
+                              {post.author_name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-1">
+                              <p className="text-sm font-medium">{post.author_name}</p>
+                              {userBadges[post.user_id] && (
+                                <UserBadge badge={userBadges[post.user_id]!} size="sm" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">{safeFormatDate(post.created_at, "d MMM, HH:mm")}</p>
+                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          {safeFormatDate(post.created_at, "d MMM yyyy, HH:mm")}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm">{post.content}</p>
 
-                    {/* Reply to post button */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setReplyingTo({ ...replyingTo, [post.id]: 'post' })}
-                      className="text-xs h-auto py-1 px-2 text-muted-foreground"
-                    >
-                      Răspunde
-                    </Button>
+                        {/* Post Content */}
+                        <p className="text-sm">{post.content}</p>
 
-                    {/* Reply input for post */}
-                    {replyingTo[post.id] === 'post' && (
-                      <div className="mt-2 space-y-2 pl-3 border-l border-accent">
-                        <Textarea
-                          placeholder="Scrie un comentariu..."
-                          value={commentTexts[post.id] || ""}
-                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                          rows={2}
-                          className="text-sm"
-                          autoFocus
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => {
-                              handleCommentSubmit(post.id, null);
-                              setReplyingTo({ ...replyingTo, [post.id]: null });
-                            }}
-                            size="sm"
-                            disabled={!commentTexts[post.id]?.trim()}
+                        {/* Post Actions */}
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleLike(post.id)}
+                            className={`flex items-center gap-1 text-sm ${
+                              post.user_has_liked ? "text-accent" : "text-muted-foreground"
+                            } hover:text-accent transition-colors`}
                           >
-                            Comentează
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
+                            <Flame className={`w-4 h-4 ${post.user_has_liked ? "fill-current" : ""}`} />
+                            <span>{post.likes_count}</span>
+                          </button>
+                          <button
+                            onClick={() =>
+                              setShowTopLevelComment((prev) => ({
+                                ...prev,
+                                [post.id]: !prev[post.id],
+                              }))
+                            }
+                            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            Anulează
-                          </Button>
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Răspunde</span>
+                          </button>
                         </div>
-                      </div>
-                    )}
 
-                    {/* Comments Section */}
-                    {post.comments.length > 0 && (
-                      <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
-                        {post.comments.map((comment) => (
-                          <div key={comment.id} className="space-y-2">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="w-6 h-6">
-                                  <AvatarImage src={comment.author_avatar || ""} />
-                                  <AvatarFallback className="text-xs">
-                                    {comment.author_name
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <p className="text-xs font-medium">{comment.author_name}</p>
-                                {userBadges[comment.user_id] && (
-                                  <UserBadge badge={userBadges[comment.user_id]!} size="sm" />
-                                )}
-                                <p className="text-xs text-muted-foreground">
-                                  {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
-                                </p>
-                              </div>
-                              <p className="text-sm">{comment.content}</p>
-                              {/* Reply button - available for all enrolled users */}
+                        {/* Top-level comment input */}
+                        {showTopLevelComment[post.id] && (
+                          <div className="flex gap-2 mt-2">
+                            <Textarea
+                              placeholder="Scrie un comentariu..."
+                              value={commentTexts[post.id] || ""}
+                              onChange={(e) =>
+                                setCommentTexts((prev) => ({
+                                  ...prev,
+                                  [post.id]: e.target.value,
+                                }))
+                              }
+                              className="min-h-[60px] text-sm"
+                            />
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                onClick={() => handleCommentSubmit(post.id, null)}
+                                disabled={!commentTexts[post.id]?.trim()}
+                                size="sm"
+                              >
+                                Comentează
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
-                                className="text-xs h-auto py-1 px-2"
+                                onClick={() =>
+                                  setShowTopLevelComment((prev) => ({
+                                    ...prev,
+                                    [post.id]: false,
+                                  }))
+                                }
                               >
-                                Răspunde
+                                Anulează
                               </Button>
                             </div>
+                          </div>
+                        )}
 
-                            {/* Inline Reply Input - appears right under the comment being replied to */}
-                            {replyingTo[post.id] === comment.id && (
-                              <div className="ml-6 mt-2 space-y-2 pl-3 border-l border-accent">
-                                <Textarea
-                                  placeholder="Scrie răspunsul tău..."
-                                  value={commentTexts[post.id] || ""}
-                                  onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                                  rows={2}
-                                  className="text-sm"
-                                  autoFocus
-                                />
-                                <div className="flex gap-2">
-                                  <Button
-                                    onClick={() => handleCommentSubmit(post.id, comment.id)}
-                                    size="sm"
-                                    disabled={!commentTexts[post.id]?.trim()}
-                                  >
-                                    Răspunde
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
-                                  >
-                                    Anulează
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Replies */}
-                            {comment.replies && comment.replies.length > 0 && (
-                              <div className="ml-6 space-y-3 pl-3 border-l border-border">
-                                {comment.replies.map((reply) => (
-                                  <div key={reply.id} className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                      <Avatar className="w-5 h-5">
-                                        <AvatarImage src={reply.author_avatar || ""} />
-                                        <AvatarFallback className="text-xs">
-                                          {reply.author_name
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <p className="text-xs font-medium">{reply.author_name}</p>
-                                      {userBadges[reply.user_id] && (
-                                        <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
+                        {/* Comments */}
+                        {post.comments.length > 0 && (
+                          <div className="pl-4 border-l-2 border-muted space-y-3 mt-3">
+                            {post.comments.map((comment) => (
+                              <div key={comment.id} className="space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <Avatar className="w-6 h-6">
+                                    <AvatarImage src={comment.author_avatar || undefined} loading="lazy" />
+                                    <AvatarFallback className="text-xs">
+                                      {comment.author_name
+                                        .split(" ")
+                                        .map((n) => n[0])
+                                        .join("")}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                      <p className="text-xs font-medium">{comment.author_name}</p>
+                                      {userBadges[comment.user_id] && (
+                                        <UserBadge badge={userBadges[comment.user_id]!} size="sm" />
                                       )}
-                                      <p className="text-xs text-muted-foreground">
-                                        {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
-                                      </p>
                                     </div>
-                                    <p className="text-sm">{reply.content}</p>
-                                    {/* Reply button for replies */}
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => setReplyingTo({ ...replyingTo, [post.id]: reply.id })}
-                                      className="text-xs h-auto py-1 px-2"
+                                    <p className="text-xs text-muted-foreground">
+                                      {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
+                                    </p>
+                                    <p className="text-sm mt-1">{comment.content}</p>
+                                    <button
+                                      onClick={() =>
+                                        setReplyingTo((prev) => ({
+                                          ...prev,
+                                          [post.id]: prev[post.id] === comment.id ? null : comment.id,
+                                        }))
+                                      }
+                                      className="text-xs text-muted-foreground hover:text-foreground mt-1"
                                     >
                                       Răspunde
-                                    </Button>
-                                    {/* Inline Reply Input for reply */}
-                                    {replyingTo[post.id] === reply.id && (
-                                      <div className="mt-2 space-y-2 pl-3 border-l border-accent">
-                                        <Textarea
-                                          placeholder="Scrie răspunsul tău..."
-                                          value={commentTexts[post.id] || ""}
-                                          onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
-                                          rows={2}
-                                          className="text-sm"
-                                          autoFocus
-                                        />
-                                        <div className="flex gap-2">
-                                          <Button
-                                            onClick={() => handleCommentSubmit(post.id, comment.id)}
-                                            size="sm"
-                                            disabled={!commentTexts[post.id]?.trim()}
-                                          >
-                                            Răspunde
-                                          </Button>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setReplyingTo({ ...replyingTo, [post.id]: null })}
-                                          >
-                                            Anulează
-                                          </Button>
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Reply input */}
+                                {replyingTo[post.id] === comment.id && (
+                                  <div className="flex gap-2 ml-8">
+                                    <Textarea
+                                      placeholder="Scrie un răspuns..."
+                                      value={commentTexts[post.id] || ""}
+                                      onChange={(e) =>
+                                        setCommentTexts((prev) => ({
+                                          ...prev,
+                                          [post.id]: e.target.value,
+                                        }))
+                                      }
+                                      className="min-h-[50px] text-sm"
+                                    />
+                                    <div className="flex flex-col gap-1">
+                                      <Button
+                                        onClick={() => handleCommentSubmit(post.id, comment.id)}
+                                        disabled={!commentTexts[post.id]?.trim()}
+                                        size="sm"
+                                      >
+                                        Trimite
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          setReplyingTo((prev) => ({
+                                            ...prev,
+                                            [post.id]: null,
+                                          }))
+                                        }
+                                      >
+                                        Anulează
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Replies */}
+                                {comment.replies && comment.replies.length > 0 && (
+                                  <div className="pl-4 border-l border-muted/50 space-y-2 mt-2">
+                                    {comment.replies.map((reply) => (
+                                      <div key={reply.id} className="flex items-start gap-2">
+                                        <Avatar className="w-5 h-5">
+                                          <AvatarImage src={reply.author_avatar || undefined} loading="lazy" />
+                                          <AvatarFallback className="text-xs">
+                                            {reply.author_name
+                                              .split(" ")
+                                              .map((n) => n[0])
+                                              .join("")}
+                                          </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                          <div className="flex items-center gap-1">
+                                            <p className="text-xs font-medium">{reply.author_name}</p>
+                                            {userBadges[reply.user_id] && (
+                                              <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
+                                            )}
+                                          </div>
+                                          <p className="text-xs text-muted-foreground">
+                                            {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
+                                          </p>
+                                          <p className="text-sm mt-1">{reply.content}</p>
                                         </div>
                                       </div>
-                                    )}
+                                    ))}
                                   </div>
-                                ))}
+                                )}
                               </div>
-                            )}
+                            ))}
                           </div>
-                        ))}
+                        )}
                       </div>
-                    )}
-
-                  </div>
-                ))}
-              </div>
+                    ))
+                  )}
+                </div>
+              </>
             ) : (
-              <div className="text-center py-6 mt-4 bg-muted/50 rounded-lg">
-                <MessageCircle className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Înscrie-te la pelerinaj pentru a vedea discuțiile comunității
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Înscrie-te la pelerinaj pentru a vedea discuțiile comunității.
+              </p>
             )}
           </CardContent>
         </Card>
