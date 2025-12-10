@@ -465,26 +465,24 @@ const Pilgrimages = () => {
 
       {/* City Filter Drawer */}
       <Drawer open={activeDrawer === "city"} onOpenChange={(open) => !open && setActiveDrawer(null)}>
-        <DrawerContent>
-          <DrawerHeader>
+        <DrawerContent className="max-h-[70vh]">
+          <DrawerHeader className="pb-2">
             <DrawerTitle>Selectează orașul</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-4">
-            {/* City search */}
-            <div className="relative mb-4">
+          <div className="px-4 pb-2">
+            <div className="relative mb-3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Caută oraș..."
                 value={citySearch}
                 onChange={(e) => setCitySearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-9"
               />
             </div>
-            {/* City list */}
-            <div className="max-h-60 overflow-y-auto space-y-1">
+            <div className="max-h-48 overflow-y-auto space-y-1">
               <button
                 onClick={() => setTempCity("all")}
-                className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                   tempCity === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                 }`}
               >
@@ -494,7 +492,7 @@ const Pilgrimages = () => {
                 <button
                   key={city}
                   onClick={() => setTempCity(city)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors ${
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                     tempCity === city ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                   }`}
                 >
@@ -503,10 +501,10 @@ const Pilgrimages = () => {
               ))}
             </div>
           </div>
-          <DrawerFooter>
-            <Button onClick={applyFilter}>Aplică filtrul</Button>
+          <DrawerFooter className="pt-2">
+            <Button onClick={applyFilter} size="sm">Aplică filtrul</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Anulează</Button>
+              <Button variant="outline" size="sm">Anulează</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -514,21 +512,21 @@ const Pilgrimages = () => {
 
       {/* Date Filter Drawer */}
       <Drawer open={activeDrawer === "date"} onOpenChange={(open) => !open && setActiveDrawer(null)}>
-        <DrawerContent>
-          <DrawerHeader>
+        <DrawerContent className="max-h-[80vh]">
+          <DrawerHeader className="pb-2">
             <DrawerTitle>Selectează perioada</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-4">
-            <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="px-4 pb-2">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <p className="text-sm font-medium mb-2">De la</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs font-medium mb-1">De la</p>
+                <p className="text-xs text-muted-foreground">
                   {tempStartDate ? format(tempStartDate, "d MMM yyyy", { locale: ro }) : "Neselectat"}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium mb-2">Până la</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs font-medium mb-1">Până la</p>
+                <p className="text-xs text-muted-foreground">
                   {tempEndDate ? format(tempEndDate, "d MMM yyyy", { locale: ro }) : "Neselectat"}
                 </p>
               </div>
@@ -552,17 +550,17 @@ const Pilgrimages = () => {
                   setTempStartDate(undefined);
                   setTempEndDate(undefined);
                 }}
-                className="w-full mt-3"
+                className="w-full mt-2 h-8 text-xs"
               >
-                <X className="w-4 h-4 mr-2" />
+                <X className="w-3 h-3 mr-1" />
                 Șterge datele
               </Button>
             )}
           </div>
-          <DrawerFooter>
-            <Button onClick={applyFilter}>Aplică filtrul</Button>
+          <DrawerFooter className="pt-2">
+            <Button onClick={applyFilter} size="sm">Aplică filtrul</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Anulează</Button>
+              <Button variant="outline" size="sm">Anulează</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -570,11 +568,11 @@ const Pilgrimages = () => {
 
       {/* Type Filter Drawer */}
       <Drawer open={activeDrawer === "type"} onOpenChange={(open) => !open && setActiveDrawer(null)}>
-        <DrawerContent>
-          <DrawerHeader>
+        <DrawerContent className="max-h-[50vh]">
+          <DrawerHeader className="pb-2">
             <DrawerTitle>Selectează tipul</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-4 space-y-2">
+          <div className="px-4 pb-2 space-y-1">
             {[
               { value: "all", label: "Toate tipurile" },
               { value: "national", label: "Naționale" },
@@ -583,7 +581,7 @@ const Pilgrimages = () => {
               <button
                 key={option.value}
                 onClick={() => setTempType(option.value)}
-                className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors text-sm ${
                   tempType === option.value ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                 }`}
               >
@@ -591,10 +589,10 @@ const Pilgrimages = () => {
               </button>
             ))}
           </div>
-          <DrawerFooter>
-            <Button onClick={applyFilter}>Aplică filtrul</Button>
+          <DrawerFooter className="pt-2">
+            <Button onClick={applyFilter} size="sm">Aplică filtrul</Button>
             <DrawerClose asChild>
-              <Button variant="outline">Anulează</Button>
+              <Button variant="outline" size="sm">Anulează</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
