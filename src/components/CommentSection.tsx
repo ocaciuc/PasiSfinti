@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { format, isValid, parseISO, subDays } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import UserBadge from "@/components/UserBadge";
 
@@ -36,7 +36,6 @@ interface CommentSectionProps {
 }
 
 const COMMENTS_LIMIT = 10;
-const DAYS_LIMIT = 10;
 
 const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
   if (!dateString) return "Data necunoscută";
@@ -68,15 +67,12 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
     }
 
     try {
-      const tenDaysAgo = subDays(new Date(), DAYS_LIMIT).toISOString();
-
-      // Fetch comments with pagination, limited to last 10 days
+      // Fetch comments with pagination - no date filter, all comments visible
       const { data: commentsData, error } = await supabase
         .from("comments")
         .select("id, post_id, user_id, content, created_at, parent_comment_id")
         .eq("post_id", postId)
         .is("parent_comment_id", null) // Only top-level comments for pagination
-        .gte("created_at", tenDaysAgo)
         .order("created_at", { ascending: false })
         .range(currentOffset, currentOffset + COMMENTS_LIMIT - 1);
 
@@ -87,8 +83,7 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
         .from("comments")
         .select("id", { count: "exact", head: true })
         .eq("post_id", postId)
-        .is("parent_comment_id", null)
-        .gte("created_at", tenDaysAgo);
+        .is("parent_comment_id", null);
 
       // Collect all user IDs for profiles
       const topLevelCommentIds = (commentsData || []).map((c) => c.id);
