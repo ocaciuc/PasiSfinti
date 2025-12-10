@@ -944,28 +944,79 @@ const PilgrimageDetail = () => {
                                 {comment.replies && comment.replies.length > 0 && (
                                   <div className="pl-4 border-l border-muted/50 space-y-2 mt-2">
                                     {comment.replies.map((reply) => (
-                                      <div key={reply.id} className="flex items-start gap-2">
-                                        <Avatar className="w-5 h-5">
-                                          <AvatarImage src={reply.author_avatar || undefined} loading="lazy" />
-                                          <AvatarFallback className="text-xs">
-                                            {reply.author_name
-                                              .split(" ")
-                                              .map((n) => n[0])
-                                              .join("")}
-                                          </AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-1">
-                                            <p className="text-xs font-medium">{reply.author_name}</p>
-                                            {userBadges[reply.user_id] && (
-                                              <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
-                                            )}
+                                      <div key={reply.id} className="space-y-2">
+                                        <div className="flex items-start gap-2">
+                                          <Avatar className="w-5 h-5">
+                                            <AvatarImage src={reply.author_avatar || undefined} loading="lazy" />
+                                            <AvatarFallback className="text-xs">
+                                              {reply.author_name
+                                                .split(" ")
+                                                .map((n) => n[0])
+                                                .join("")}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-1">
+                                              <p className="text-xs font-medium">{reply.author_name}</p>
+                                              {userBadges[reply.user_id] && (
+                                                <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                              {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
+                                            </p>
+                                            <p className="text-sm mt-1">{reply.content}</p>
+                                            <button
+                                              onClick={() =>
+                                                setReplyingTo((prev) => ({
+                                                  ...prev,
+                                                  [post.id]: prev[post.id] === reply.id ? null : reply.id,
+                                                }))
+                                              }
+                                              className="text-xs text-muted-foreground hover:text-foreground mt-1"
+                                            >
+                                              Răspunde
+                                            </button>
                                           </div>
-                                          <p className="text-xs text-muted-foreground">
-                                            {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
-                                          </p>
-                                          <p className="text-sm mt-1">{reply.content}</p>
                                         </div>
+
+                                        {/* Reply input for nested reply */}
+                                        {replyingTo[post.id] === reply.id && (
+                                          <div className="flex gap-2 ml-7">
+                                            <Textarea
+                                              placeholder="Scrie un răspuns..."
+                                              value={commentTexts[post.id] || ""}
+                                              onChange={(e) =>
+                                                setCommentTexts((prev) => ({
+                                                  ...prev,
+                                                  [post.id]: e.target.value,
+                                                }))
+                                              }
+                                              className="min-h-[50px] text-sm"
+                                            />
+                                            <div className="flex flex-col gap-1">
+                                              <Button
+                                                onClick={() => handleCommentSubmit(post.id, comment.id)}
+                                                disabled={!commentTexts[post.id]?.trim()}
+                                                size="sm"
+                                              >
+                                                Trimite
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                  setReplyingTo((prev) => ({
+                                                    ...prev,
+                                                    [post.id]: null,
+                                                  }))
+                                                }
+                                              >
+                                                Anulează
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     ))}
                                   </div>
