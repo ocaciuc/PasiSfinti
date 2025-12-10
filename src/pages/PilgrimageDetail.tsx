@@ -259,10 +259,14 @@ const PilgrimageDetail = () => {
 
       setIsRegistered(true);
       
-      // Update participant count locally instead of refetching everything
+      // Update participant count locally
       if (pilgrimage) {
         setPilgrimage({ ...pilgrimage, participant_count: pilgrimage.participant_count + 1 });
       }
+
+      // Refetch posts so the user can see all comments now that they're enrolled
+      // This is needed because RLS policies restrict post visibility to enrolled users
+      await fetchPilgrimageData();
 
       toast({
         title: "Înregistrare reușită!",
