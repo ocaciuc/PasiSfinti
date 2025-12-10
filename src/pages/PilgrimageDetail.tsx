@@ -7,11 +7,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame, ArrowUp } from "lucide-react";
+import { MapPin, Calendar, Users, ArrowLeft, MessageCircle, Flame, ArrowUp, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import UserBadge from "@/components/UserBadge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Badge {
   id: string;
@@ -94,6 +104,7 @@ const PilgrimageDetail = () => {
   const [showTopLevelComment, setShowTopLevelComment] = useState<Record<string, boolean>>({});
   const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -362,6 +373,43 @@ const PilgrimageDetail = () => {
       toast({
         title: "Eroare",
         description: "Nu s-a putut finaliza înregistrarea.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUnregister = async () => {
+    if (!userId || !id) return;
+
+    try {
+      const { error } = await supabase
+        .from("user_pilgrimages")
+        .delete()
+        .eq("user_id", userId)
+        .eq("pilgrimage_id", id);
+
+      if (error) throw error;
+
+      setIsRegistered(false);
+      setShowLeaveConfirmation(false);
+      
+      // Update participant count locally
+      if (pilgrimage) {
+        setPilgrimage({ ...pilgrimage, participant_count: Math.max(0, pilgrimage.participant_count - 1) });
+      }
+      
+      // Remove current user from participants list
+      setParticipants(prev => prev.filter(p => p.user_id !== userId));
+
+      toast({
+        title: "Succes",
+        description: "Ai părăsit pelerinajul cu succes.",
+      });
+    } catch (error: any) {
+      console.error("Error leaving pilgrimage:", error);
+      toast({
+        title: "Eroare",
+        description: "Nu s-a putut finaliza operațiunea.",
         variant: "destructive",
       });
     }
@@ -705,8 +753,21 @@ const PilgrimageDetail = () => {
             )}
 
             {isRegistered && (
-              <div className="text-center text-sm text-accent font-medium pt-2 border-t">
-                ✓ Ești înscris la acest pelerinaj
+              <div className="pt-2 border-t space-y-3">
+                <div className="text-center text-sm text-accent font-medium">
+                  ✓ Ești înscris la acest pelerinaj
+                </div>
+                {!isPastPilgrimage && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowLeaveConfirmation(true)}
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Părăsește pelerinajul
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -1063,6 +1124,24 @@ const PilgrimageDetail = () => {
       >
         <ArrowUp className="h-5 w-5" />
       </button>
+
+      {/* Leave Pilgrimage Confirmation Dialog */}
+      <AlertDialog open={showLeaveConfirmation} onOpenChange={setShowLeaveConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sigur vrei să părăsești acest pelerinaj?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Această acțiune te va elimina din lista de participanți.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Anulează</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnregister} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Confirmă
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Navigation />
     </div>
