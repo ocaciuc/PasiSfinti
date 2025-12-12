@@ -15,6 +15,8 @@ import Settings from "./pages/Settings";
 import AccountDeleted from "./pages/AccountDeleted";
 import UserDataDeletion from "./pages/UserDataDeletion";
 import SpiritualDiary from "./pages/SpiritualDiary";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
           <Route path="/settings" element={<Settings />} />
           <Route path="/account-deleted" element={<AccountDeleted />} />
           <Route path="/user-data-deletion" element={<UserDataDeletion />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
