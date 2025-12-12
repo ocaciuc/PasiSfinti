@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Flame, Mail, Loader2 } from "lucide-react";
 import { z } from "zod";
+import Footer from "@/components/Footer";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
@@ -221,184 +222,187 @@ const Auth = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Flame className="w-16 h-16 text-accent mx-auto mb-4 animate-flicker" />
-          <h1 className="text-3xl font-bold text-primary mb-2">Pași de Pelerin</h1>
-          <p className="text-muted-foreground">Bun venit pe drumul tău spiritual</p>
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Flame className="w-16 h-16 text-accent mx-auto mb-4 animate-flicker" />
+            <h1 className="text-3xl font-bold text-primary mb-2">Pași de Pelerin</h1>
+            <p className="text-muted-foreground">Bun venit pe drumul tău spiritual</p>
+          </div>
+
+          <Card className="glow-soft">
+            <CardHeader>
+              <CardTitle>Intră în comunitate</CardTitle>
+              <CardDescription>
+                Creează un cont nou sau autentifică-te pentru a continua
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Social Login Buttons */}
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  onClick={handleFacebookLogin}
+                  disabled={facebookLoading || loading}
+                  className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white"
+                >
+                  {facebookLoading ? (
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  ) : (
+                    <FacebookIcon />
+                  )}
+                  <span className="ml-2">Continuă cu Facebook</span>
+                </Button>
+              </div>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    sau continuă cu email
+                  </span>
+                </div>
+              </div>
+
+              {/* Email/Password Tabs */}
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="signin">Autentificare</TabsTrigger>
+                  <TabsTrigger value="signup">Înregistrare</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="signin" className="mt-4">
+                  <form onSubmit={handleSignIn} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-email">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="signin-email"
+                          type="email"
+                          placeholder="exemplu@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          disabled={loading || facebookLoading}
+                          maxLength={255}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-password">Parola</Label>
+                      <Input
+                        id="signin-password"
+                        type="password"
+                        placeholder="••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={loading || facebookLoading}
+                        maxLength={100}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Se încarcă...
+                        </>
+                      ) : (
+                        "Autentifică-te"
+                      )}
+                    </Button>
+                    <p className="text-center text-sm text-muted-foreground">
+                      Nu ai cont?{" "}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("signup")}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        Creează unul acum
+                      </button>
+                    </p>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="signup" className="mt-4">
+                  <form onSubmit={handleSignUp} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="signup-email"
+                          type="email"
+                          placeholder="exemplu@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          disabled={loading || facebookLoading}
+                          maxLength={255}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password">Parola</Label>
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={loading || facebookLoading}
+                        maxLength={100}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password">Confirmă parola</Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        disabled={loading || facebookLoading}
+                        maxLength={100}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Se încarcă...
+                        </>
+                      ) : (
+                        "Creează cont"
+                      )}
+                    </Button>
+                    <p className="text-center text-sm text-muted-foreground">
+                      Ai deja cont?{" "}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("signin")}
+                        className="text-primary hover:underline font-medium"
+                      >
+                        Autentifică-te
+                      </button>
+                    </p>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
-
-        <Card className="glow-soft">
-          <CardHeader>
-            <CardTitle>Intră în comunitate</CardTitle>
-            <CardDescription>
-              Creează un cont nou sau autentifică-te pentru a continua
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Social Login Buttons */}
-            <div className="space-y-3">
-              <Button
-                type="button"
-                onClick={handleFacebookLogin}
-                disabled={facebookLoading || loading}
-                className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white"
-              >
-                {facebookLoading ? (
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                ) : (
-                  <FacebookIcon />
-                )}
-                <span className="ml-2">Continuă cu Facebook</span>
-              </Button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  sau continuă cu email
-                </span>
-              </div>
-            </div>
-
-            {/* Email/Password Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Autentificare</TabsTrigger>
-                <TabsTrigger value="signup">Înregistrare</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="signin" className="mt-4">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="signin-email"
-                        type="email"
-                        placeholder="exemplu@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        disabled={loading || facebookLoading}
-                        maxLength={255}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Parola</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      placeholder="••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={loading || facebookLoading}
-                      maxLength={100}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Se încarcă...
-                      </>
-                    ) : (
-                      "Autentifică-te"
-                    )}
-                  </Button>
-                  <p className="text-center text-sm text-muted-foreground">
-                    Nu ai cont?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("signup")}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      Creează unul acum
-                    </button>
-                  </p>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup" className="mt-4">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="exemplu@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        disabled={loading || facebookLoading}
-                        maxLength={255}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Parola</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={loading || facebookLoading}
-                      maxLength={100}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirmă parola</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={loading || facebookLoading}
-                      maxLength={100}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading || facebookLoading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Se încarcă...
-                      </>
-                    ) : (
-                      "Creează cont"
-                    )}
-                  </Button>
-                  <p className="text-center text-sm text-muted-foreground">
-                    Ai deja cont?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("signin")}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      Autentifică-te
-                    </button>
-                  </p>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
       </div>
+      <Footer />
     </div>
   );
 };

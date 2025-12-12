@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { TodayCalendarCard } from "@/components/TodayCalendarCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -158,14 +159,14 @@ const Index = () => {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center mb-1">Pași de Pelerin</h1>
         <p className="text-center text-sm opacity-90">Bun venit pe drumul tău spiritual</p>
       </header>
 
-      <div className="max-w-lg mx-auto p-4 space-y-4">
+      <div className="flex-1 max-w-lg mx-auto p-4 space-y-4 pb-24">
         {/* Orthodox Calendar */}
         <TodayCalendarCard />
 
@@ -257,6 +258,7 @@ const Index = () => {
           </Card>
         </div>
 
+        <Footer />
       </div>
 
       <Navigation />
