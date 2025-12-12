@@ -29,22 +29,77 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState("signin");
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Handle OAuth callback - check URL hash/params for tokens
+    const handleOAuthCallback = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const queryParams = new URLSearchParams(window.location.search);
+      
+      // Check for error in callback
+      const error = hashParams.get('error') || queryParams.get('error');
+      const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
+      
+      if (error) {
+        console.error('OAuth error:', error, errorDescription);
+        toast({
+          title: "Eroare la autentificare",
+          description: errorDescription || "A apărut o eroare la autentificarea cu Facebook",
+          variant: "destructive",
+        });
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
+      // Check for access_token in hash (implicit flow) or code in query (auth code flow)
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const code = queryParams.get('code');
+      
+      if (accessToken && refreshToken) {
+        // Set session from hash tokens
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          toast({
+            title: "Eroare la autentificare",
+            description: sessionError.message,
+            variant: "destructive",
+          });
+        }
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else if (code) {
+        // Auth code flow - Supabase will handle this automatically
+        // Just clean the URL after a brief delay to allow Supabase to process
+        setTimeout(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 1000);
+      }
+    };
+
+    handleOAuthCallback();
+
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
+      if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        navigate("/");
+      }
+    });
+
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/");
       }
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && event === 'SIGNED_IN') {
-        navigate("/");
-      }
-    });
-
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const validateEmail = (email: string): string | null => {
     try {
@@ -76,24 +131,28 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth`,
+          skipBrowserRedirect: false,
         },
       });
 
       if (error) {
+        console.error('Facebook login error:', error);
         toast({
           title: "Eroare la autentificare",
           description: error.message,
           variant: "destructive",
         });
+        setFacebookLoading(false);
       }
+      // Don't set loading to false here - we're redirecting to Facebook
     } catch (error) {
+      console.error('Facebook login exception:', error);
       toast({
         title: "Eroare",
         description: "A apărut o eroare la autentificarea cu Facebook",
         variant: "destructive",
       });
-    } finally {
       setFacebookLoading(false);
     }
   };
