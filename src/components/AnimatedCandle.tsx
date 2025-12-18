@@ -2,11 +2,12 @@ import { cn } from "@/lib/utils";
 
 interface AnimatedCandleProps {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
   const sizeClasses = {
+    xs: "w-10 h-14",
     sm: "w-16 h-24",
     md: "w-24 h-36",
     lg: "w-32 h-48",
