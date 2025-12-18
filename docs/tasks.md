@@ -88,7 +88,7 @@
 - [x] Created `/auth` page for login/signup
 - [x] Implemented email/password signup flow
 - [x] Implemented email/password login flow
-- [x] Added Facebook OAuth integration
+- [x] Added Google OAuth integration (replaced Facebook OAuth)
 - [x] Added proper error handling and validation
 - [x] Added auth state management with `onAuthStateChange`
 - [x] Implemented session persistence
@@ -281,17 +281,17 @@
 
 ### Architecture Decisions:
 - Backend: External Supabase project (yanjhfqqdcevlzmwsrnj)
-- Authentication: Email/password + Facebook OAuth
+- Authentication: Email/password + Google OAuth
 - Storage: Supabase Storage for images
 - Calendar: Data stored in Supabase `orthodox_calendar_days` table
 - Payment: Placeholder for MVP, Stripe integration post-MVP
 - Soft Deletes: All user content uses soft deletes with `deleted_at` column
 - Views: Helper views created for clean queries with SECURITY INVOKER
 
-### Facebook Login & Data Deletion (Meta Compliance):
-- [x] Facebook OAuth integration
+### Account Management & Data Deletion:
+- [x] Google OAuth integration (replaced Facebook)
 - [x] Settings page with Delete Account functionality
-- [x] Public /user-data-deletion page for Meta compliance
+- [x] Public /user-data-deletion page for data deletion requests
 - [x] delete-account Edge Function for secure account deletion
 - [x] `delete_user_account()` database function for comprehensive cleanup
 - [x] Account deleted confirmation page
