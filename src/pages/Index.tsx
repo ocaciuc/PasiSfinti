@@ -5,6 +5,7 @@ import type { User, Session } from "@supabase/supabase-js";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { TodayCalendarCard } from "@/components/TodayCalendarCard";
+import AnimatedCandle from "@/components/AnimatedCandle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Flame, Map } from "lucide-react";
@@ -174,7 +175,7 @@ const Index = () => {
         {activeCandle && (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 to-background">
             <CardContent className="pt-6 text-center">
-              <Flame className="w-12 h-12 text-accent mx-auto mb-3 animate-flicker" />
+              <AnimatedCandle size="sm" className="mx-auto mb-2" />
               <p className="font-medium text-accent mb-1">Lumânarea ta arde</p>
               {activeCandle.purpose && (
                 <p className="text-sm text-muted-foreground mb-2 italic">
