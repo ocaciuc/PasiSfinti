@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -16,7 +16,7 @@ import {
   DrawerFooter,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { MapPin, Calendar, Users, ChevronRight, Search, X, Building2, CalendarDays, Tag, ArrowRight, History } from "lucide-react";
+import { MapPin, Calendar, Users, ChevronRight, Search, X, Building2, CalendarDays, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, startOfDay } from "date-fns";
@@ -40,7 +40,7 @@ type FilterDrawerType = "city" | "date" | "type" | null;
 
 const Pilgrimages = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("all");
+  
   const [pilgrimages, setPilgrimages] = useState<Pilgrimage[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -116,8 +116,6 @@ const Pilgrimages = () => {
         if (endDate_ >= today) return false;
       }
 
-      // Type filter (from tabs - this is the main tab)
-      if (activeTab !== "all" && p.type !== activeTab) return false;
 
       // Search filter (title or location)
       if (searchTerm) {
@@ -146,7 +144,7 @@ const Pilgrimages = () => {
 
       return true;
     });
-  }, [pilgrimages, activeTab, searchTerm, selectedCity, startDate, endDate, selectedType, timeFilter, today]);
+  }, [pilgrimages, searchTerm, selectedCity, startDate, endDate, selectedType, timeFilter, today]);
 
   // Open drawer with current values
   const openDrawer = (type: FilterDrawerType) => {
@@ -328,104 +326,96 @@ const Pilgrimages = () => {
           </div>
         )}
 
-        {/* Tab Selector (unchanged) */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="all">Toate</TabsTrigger>
-            <TabsTrigger value="national">Naționale</TabsTrigger>
-            <TabsTrigger value="local">Locale</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="space-y-4 mt-4">
-            {loading ? (
-              <>
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="glow-soft">
-                    <CardHeader>
-                      <Skeleton className="h-6 w-3/4 mb-4" />
-                      <Skeleton className="h-4 w-1/2 mb-2" />
-                      <Skeleton className="h-4 w-2/3 mb-2" />
-                      <Skeleton className="h-4 w-1/3" />
-                    </CardHeader>
-                    <CardContent>
-                      <Skeleton className="h-4 w-full mb-4" />
-                      <Skeleton className="h-10 w-full" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </>
-            ) : filteredPilgrimages.length === 0 ? (
-              <Card className="glow-soft">
-                <CardContent className="p-6 text-center text-muted-foreground">
-                  <p>
-                    {timeFilter === "upcoming" 
-                      ? "Nu există pelerinaje viitoare în acest moment."
-                      : "Nu există pelerinaje anterioare."}
-                  </p>
-                  {hasActiveFilters && (
-                    <Button
-                      variant="link"
-                      onClick={() => {
-                        setSelectedCity("all");
-                        setStartDate(undefined);
-                        setEndDate(undefined);
-                        setSelectedType("all");
-                      }}
-                      className="mt-2"
-                    >
-                      Șterge filtrele
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            ) : (
-              filteredPilgrimages.map((pilgrimage) => (
-                <Card
-                  key={pilgrimage.id}
-                  className="glow-soft cursor-pointer hover:border-accent transition-all"
-                  onClick={() => navigate(`/pilgrimage/${pilgrimage.id}`)}
-                >
+        {/* Pilgrimages List */}
+        <div className="space-y-4 mb-6">
+          {loading ? (
+            <>
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="glow-soft">
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-primary mb-2">
-                          {pilgrimage.title}
-                        </CardTitle>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="w-4 h-4" />
-                            <span>{pilgrimage.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(pilgrimage.start_date).toLocaleDateString("ro-RO", { 
-                              day: "numeric", 
-                              month: "long", 
-                              year: "numeric" 
-                            })}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-accent font-medium">
-                            <Users className="w-4 h-4" />
-                            <span>{(pilgrimage.participant_count || 0).toLocaleString()} pelerini</span>
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </div>
+                    <Skeleton className="h-6 w-3/4 mb-4" />
+                    <Skeleton className="h-4 w-1/2 mb-2" />
+                    <Skeleton className="h-4 w-2/3 mb-2" />
+                    <Skeleton className="h-4 w-1/3" />
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {pilgrimage.description}
-                    </p>
-                    <Button className="w-full mt-4">
-                      Vezi detalii și înscrie-te
-                    </Button>
+                    <Skeleton className="h-4 w-full mb-4" />
+                    <Skeleton className="h-10 w-full" />
                   </CardContent>
                 </Card>
-              ))
-            )}
-          </TabsContent>
-        </Tabs>
+              ))}
+            </>
+          ) : filteredPilgrimages.length === 0 ? (
+            <Card className="glow-soft">
+              <CardContent className="p-6 text-center text-muted-foreground">
+                <p>
+                  {timeFilter === "upcoming" 
+                    ? "Nu există pelerinaje viitoare în acest moment."
+                    : "Nu există pelerinaje anterioare."}
+                </p>
+                {hasActiveFilters && (
+                  <Button
+                    variant="link"
+                    onClick={() => {
+                      setSelectedCity("all");
+                      setStartDate(undefined);
+                      setEndDate(undefined);
+                      setSelectedType("all");
+                    }}
+                    className="mt-2"
+                  >
+                    Șterge filtrele
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            filteredPilgrimages.map((pilgrimage) => (
+              <Card
+                key={pilgrimage.id}
+                className="glow-soft cursor-pointer hover:border-accent transition-all"
+                onClick={() => navigate(`/pilgrimage/${pilgrimage.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-primary mb-2">
+                        {pilgrimage.title}
+                      </CardTitle>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="w-4 h-4" />
+                          <span>{pilgrimage.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="w-4 h-4" />
+                          <span>{new Date(pilgrimage.start_date).toLocaleDateString("ro-RO", { 
+                            day: "numeric", 
+                            month: "long", 
+                            year: "numeric" 
+                          })}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-accent font-medium">
+                          <Users className="w-4 h-4" />
+                          <span>{(pilgrimage.participant_count || 0).toLocaleString()} pelerini</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {pilgrimage.description}
+                  </p>
+                  <Button className="w-full mt-4">
+                    Vezi detalii și înscrie-te
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </div>
 
       {/* City Filter Drawer */}
