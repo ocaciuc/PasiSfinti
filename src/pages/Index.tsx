@@ -36,22 +36,22 @@ const Index = () => {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (!session) {
-          navigate("/auth");
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (!session) {
+        navigate("/auth");
       }
-    );
+    });
 
     // THEN check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (!session) {
         navigate("/auth");
         setLoading(false);
@@ -73,11 +73,8 @@ const Index = () => {
       }
 
       // Fetch dashboard data
-      await Promise.all([
-        checkActiveCandleStatus(session.user.id),
-        fetchNextPilgrimage(session.user.id)
-      ]);
-      
+      await Promise.all([checkActiveCandleStatus(session.user.id), fetchNextPilgrimage(session.user.id)]);
+
       setLoading(false);
     });
 
@@ -97,7 +94,6 @@ const Index = () => {
     setActiveCandle(data);
   };
 
-
   const fetchNextPilgrimage = async (userId: string) => {
     try {
       // First, get pilgrimages the user has joined
@@ -111,7 +107,10 @@ const Index = () => {
         const { data: joinedPilgrimage } = await supabase
           .from("pilgrimages")
           .select("id, title, start_date, location, participant_count")
-          .in("id", userPilgrimages.map(up => up.pilgrimage_id))
+          .in(
+            "id",
+            userPilgrimages.map((up) => up.pilgrimage_id),
+          )
           .gte("start_date", new Date().toISOString())
           .order("start_date", { ascending: true })
           .limit(1)
@@ -146,7 +145,7 @@ const Index = () => {
     const updateTimer = () => {
       const remaining = formatDistanceToNow(new Date(activeCandle.expires_at), {
         locale: ro,
-        addSuffix: true
+        addSuffix: true,
       });
       setTimeRemaining(remaining);
     };
@@ -175,16 +174,12 @@ const Index = () => {
         {activeCandle && (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 to-background">
             <CardContent className="pt-4 text-center">
-              <AnimatedCandle size="xs" className="mx-auto mb-1" />
+              <AnimatedCandle sizeClasses="xs" className="mx-auto mb-1" />
               <p className="font-medium text-accent mb-1">Lumânarea ta arde</p>
               {activeCandle.purpose && (
-                <p className="text-sm text-muted-foreground mb-2 italic">
-                  "{activeCandle.purpose}"
-                </p>
+                <p className="text-sm text-muted-foreground mb-2 italic">"{activeCandle.purpose}"</p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Se stinge {timeRemaining}
-              </p>
+              <p className="text-xs text-muted-foreground">Se stinge {timeRemaining}</p>
             </CardContent>
           </Card>
         )}
@@ -201,18 +196,16 @@ const Index = () => {
                 {new Date(nextPilgrimage.start_date).toLocaleDateString("ro-RO", {
                   day: "numeric",
                   month: "long",
-                  year: "numeric"
-                })} • {nextPilgrimage.location}
+                  year: "numeric",
+                })}{" "}
+                • {nextPilgrimage.location}
               </p>
               {nextPilgrimage.participant_count > 0 && (
                 <p className="text-xs text-muted-foreground mb-3">
                   {nextPilgrimage.participant_count} pelerini înregistrați
                 </p>
               )}
-              <Button 
-                onClick={() => navigate(`/pilgrimage/${nextPilgrimage.id}`)}
-                className="w-full"
-              >
+              <Button onClick={() => navigate(`/pilgrimage/${nextPilgrimage.id}`)} className="w-full">
                 Vezi detalii
               </Button>
             </CardContent>
@@ -223,13 +216,8 @@ const Index = () => {
               <CardTitle className="text-primary">Pelerinaje</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-3">
-                Descoperă următorul tău pelerinaj spiritual
-              </p>
-              <Button 
-                onClick={() => navigate("/pilgrimages")}
-                className="w-full"
-              >
+              <p className="text-sm text-muted-foreground mb-3">Descoperă următorul tău pelerinaj spiritual</p>
+              <Button onClick={() => navigate("/pilgrimages")} className="w-full">
                 Explorează pelerinaje
               </Button>
             </CardContent>
@@ -238,20 +226,14 @@ const Index = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
-          <Card 
-            className="cursor-pointer hover:glow-soft transition-all"
-            onClick={() => navigate("/pilgrimages")}
-          >
+          <Card className="cursor-pointer hover:glow-soft transition-all" onClick={() => navigate("/pilgrimages")}>
             <CardContent className="pt-6 text-center">
               <Map className="w-8 h-8 text-accent mx-auto mb-2" />
               <p className="font-medium text-sm">Pelerinaje</p>
             </CardContent>
           </Card>
 
-          <Card 
-            className="cursor-pointer hover:glow-soft transition-all"
-            onClick={() => navigate("/candle")}
-          >
+          <Card className="cursor-pointer hover:glow-soft transition-all" onClick={() => navigate("/candle")}>
             <CardContent className="pt-6 text-center">
               <Flame className="w-8 h-8 text-accent mx-auto mb-2" />
               <p className="font-medium text-sm">Aprinde Lumânare</p>
