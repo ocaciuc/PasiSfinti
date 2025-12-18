@@ -92,9 +92,9 @@ const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
           <div className="absolute right-2 top-6 w-1.5 h-4 bg-amber-50/50 rounded-full" />
         </div>
         {/* Base/holder */}
-        /* <div className="w-16 h-2 bg-gradient-to-b from-amber-700 to-amber-800 rounded-sm -mx-1 shadow-md" />
+        {/* <div className="w-16 h-2 bg-gradient-to-b from-amber-700 to-amber-800 rounded-sm -mx-1 shadow-md" />
         <div className="w-20 h-3 bg-gradient-to-b from-amber-800 to-amber-900 rounded-b-lg -mx-3 shadow-lg" />
-        */
+        */}
       </div>
 
       {/* Floating light particles */}
