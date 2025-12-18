@@ -14,9 +14,10 @@ const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
 
   return (
     <div className={cn("relative flex flex-col items-center", sizeClasses[size], className)}>
-      {/* Ambient glow behind flame */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-accent/30 rounded-full blur-2xl animate-candle-glow" />
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/40 rounded-full blur-xl animate-candle-glow-inner" />
+      {/* Ambient glow behind flame - enhanced for dark mode */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-accent/30 dark:bg-amber-500/40 rounded-full blur-2xl animate-candle-glow" />
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/40 dark:bg-yellow-300/50 rounded-full blur-xl animate-candle-glow-inner" />
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-orange-400/0 dark:bg-orange-400/30 rounded-full blur-2xl animate-candle-glow" />
 
       {/* Flame container */}
       <div className="relative z-10 flex flex-col items-center">
@@ -97,11 +98,11 @@ const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
         */}
       </div>
 
-      {/* Floating light particles */}
+      {/* Floating light particles - brighter in dark mode */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2">
-        <div className="absolute w-1 h-1 bg-yellow-200/60 rounded-full animate-particle-1" />
-        <div className="absolute w-0.5 h-0.5 bg-yellow-100/50 rounded-full animate-particle-2" />
-        <div className="absolute w-0.5 h-0.5 bg-orange-200/40 rounded-full animate-particle-3" />
+        <div className="absolute w-1 h-1 bg-yellow-200/60 dark:bg-yellow-200/80 rounded-full animate-particle-1" />
+        <div className="absolute w-0.5 h-0.5 bg-yellow-100/50 dark:bg-yellow-100/70 rounded-full animate-particle-2" />
+        <div className="absolute w-0.5 h-0.5 bg-orange-200/40 dark:bg-orange-300/60 rounded-full animate-particle-3" />
       </div>
     </div>
   );
