@@ -1,53 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Loader2, CheckCircle, Trash2 } from "lucide-react";
-import { z } from "zod";
-
-const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
+import { Flame, Loader2, Trash2 } from "lucide-react";
 
 const UserDataDeletion = () => {
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate email
-    try {
-      emailSchema.parse(email);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          title: "Eroare validare",
-          description: error.errors[0].message,
-          variant: "destructive",
-        });
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/auth");
         return;
       }
-    }
+      setUserEmail(user.email || null);
+      setCheckingAuth(false);
+    };
+    checkAuth();
+  }, [navigate]);
+
+  const handleDelete = async () => {
+    if (!userEmail) return;
 
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const response = await supabase.functions.invoke('delete-account', {
-        body: { email: email.trim() }
+        body: { user_id: user?.id, email: userEmail }
       });
 
       if (response.error) {
         throw new Error(response.error.message || 'Failed to process request');
       }
 
-      setSuccess(true);
-      toast({
-        title: "Cerere procesată",
-        description: "Dacă există un cont asociat cu acest email, acesta va fi șters.",
-      });
+      // Sign out and redirect to account deleted page
+      await supabase.auth.signOut();
+      navigate("/account-deleted");
     } catch (error: any) {
       console.error('Error processing deletion request:', error);
       toast({
@@ -60,30 +56,10 @@ const UserDataDeletion = () => {
     }
   };
 
-  if (success) {
+  if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <div className="mx-auto mb-4 w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-            <CardTitle>Cerere primită</CardTitle>
-            <CardDescription>
-              Cererea ta de ștergere a datelor a fost procesată.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Dacă există un cont asociat cu adresa de email furnizată, 
-              toate datele asociate au fost șterse permanent din sistemul nostru.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Această acțiune include ștergerea profilului, postărilor, comentariilor 
-              și a oricăror alte date personale.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -104,7 +80,7 @@ const UserDataDeletion = () => {
               Cerere de ștergere a datelor
             </CardTitle>
             <CardDescription>
-              Această pagină îți permite să soliciți ștergerea contului și a tuturor datelor personale asociate cu aplicația Pași de Pelerin.
+              Ești autentificat cu: <span className="font-medium">{userEmail}</span>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -120,48 +96,30 @@ const UserDataDeletion = () => {
                 </ul>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">
-                    Adresa de email asociată contului
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="exemplu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                    maxLength={255}
-                  />
-                </div>
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-destructive font-medium">
+                  ⚠️ Atenție: Această acțiune este permanentă și ireversibilă.
+                </p>
+              </div>
 
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                  <p className="text-sm text-destructive font-medium">
-                    ⚠️ Atenție: Această acțiune este permanentă și ireversibilă.
-                  </p>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  variant="destructive" 
-                  className="w-full" 
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Se procesează...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Șterge datele mele
-                    </>
-                  )}
-                </Button>
-              </form>
+              <Button 
+                onClick={handleDelete}
+                variant="destructive" 
+                className="w-full" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Se procesează...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Șterge datele mele
+                  </>
+                )}
+              </Button>
 
               <p className="text-xs text-center text-muted-foreground">
                 Dacă ai întrebări despre ștergerea datelor, ne poți contacta la{" "}
