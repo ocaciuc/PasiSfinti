@@ -69,25 +69,71 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "flame-sway": {
+          "0%, 100%": { transform: "rotate(-2deg) scaleY(1)" },
+          "25%": { transform: "rotate(1deg) scaleY(1.02)" },
+          "50%": { transform: "rotate(2deg) scaleY(0.98)" },
+          "75%": { transform: "rotate(-1deg) scaleY(1.01)" },
+        },
+        "flame-flicker": {
+          "0%, 100%": { opacity: "0.9", transform: "scaleX(1) scaleY(1)" },
+          "20%": { opacity: "0.95", transform: "scaleX(1.02) scaleY(0.98)" },
+          "40%": { opacity: "0.85", transform: "scaleX(0.98) scaleY(1.02)" },
+          "60%": { opacity: "0.92", transform: "scaleX(1.01) scaleY(0.99)" },
+          "80%": { opacity: "0.88", transform: "scaleX(0.99) scaleY(1.01)" },
+        },
+        "flame-flicker-inner": {
+          "0%, 100%": { opacity: "0.95", transform: "scaleY(1)" },
+          "33%": { opacity: "1", transform: "scaleY(1.03)" },
+          "66%": { opacity: "0.9", transform: "scaleY(0.97)" },
+        },
+        "flame-core": {
+          "0%, 100%": { opacity: "0.9", transform: "scale(1)" },
+          "50%": { opacity: "1", transform: "scale(1.1)" },
+        },
+        "candle-glow": {
+          "0%, 100%": { opacity: "0.3", transform: "translateX(-50%) scale(1)" },
+          "50%": { opacity: "0.5", transform: "translateX(-50%) scale(1.1)" },
+        },
+        "candle-glow-inner": {
+          "0%, 100%": { opacity: "0.4", transform: "translateX(-50%) scale(1)" },
+          "50%": { opacity: "0.6", transform: "translateX(-50%) scale(1.15)" },
+        },
+        "particle-1": {
+          "0%": { opacity: "0", transform: "translateY(0) translateX(0)" },
+          "20%": { opacity: "0.6" },
+          "100%": { opacity: "0", transform: "translateY(-40px) translateX(10px)" },
+        },
+        "particle-2": {
+          "0%": { opacity: "0", transform: "translateY(0) translateX(0)" },
+          "30%": { opacity: "0.5" },
+          "100%": { opacity: "0", transform: "translateY(-35px) translateX(-8px)" },
+        },
+        "particle-3": {
+          "0%": { opacity: "0", transform: "translateY(0) translateX(0)" },
+          "25%": { opacity: "0.4" },
+          "100%": { opacity: "0", transform: "translateY(-45px) translateX(5px)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "flame-sway": "flame-sway 3s ease-in-out infinite",
+        "flame-flicker": "flame-flicker 2s ease-in-out infinite",
+        "flame-flicker-inner": "flame-flicker-inner 1.5s ease-in-out infinite",
+        "flame-core": "flame-core 1s ease-in-out infinite",
+        "candle-glow": "candle-glow 4s ease-in-out infinite",
+        "candle-glow-inner": "candle-glow-inner 3s ease-in-out infinite",
+        "particle-1": "particle-1 4s ease-out infinite",
+        "particle-2": "particle-2 5s ease-out infinite 1s",
+        "particle-3": "particle-3 4.5s ease-out infinite 2s",
       },
     },
   },

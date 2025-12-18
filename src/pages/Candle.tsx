@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import AnimatedCandle from "@/components/AnimatedCandle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -169,11 +170,10 @@ const Candle = () => {
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
         {activeCandle ? (
-          <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background">
+          <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background overflow-hidden">
             <CardContent className="pt-8 text-center space-y-6">
-              <div className="relative">
-                <Flame className="w-32 h-32 text-accent mx-auto animate-flicker" />
-                <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full" />
+              <div className="relative flex justify-center">
+                <AnimatedCandle size="lg" />
               </div>
               
               <div className="space-y-2">
