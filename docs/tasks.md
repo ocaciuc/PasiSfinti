@@ -148,6 +148,8 @@
 - [x] Implement Smart Filter Bar with date, location, type filters
 - [x] Show participant count
 - [x] Add loading and error states
+- [x] Implement time filter (Upcoming vs Previous pilgrimages)
+- [x] Default to showing upcoming/current pilgrimages only
 
 ### 4.2 Pilgrimage Detail Page
 - [x] Fetch pilgrimage details

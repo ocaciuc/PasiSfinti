@@ -16,11 +16,13 @@ import {
   DrawerFooter,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { MapPin, Calendar, Users, ChevronRight, Search, X, Clock, Flame, Building2, CalendarDays, Tag } from "lucide-react";
+import { MapPin, Calendar, Users, ChevronRight, Search, X, Building2, CalendarDays, Tag, ArrowRight, History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, addDays, isWithinInterval } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import { ro } from "date-fns/locale";
+
+type TimeFilter = "upcoming" | "previous";
 
 interface Pilgrimage {
   id: string;
@@ -49,9 +51,8 @@ const Pilgrimages = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [selectedType, setSelectedType] = useState<string>("all");
   
-  // Quick filters
-  const [upcomingThisWeek, setUpcomingThisWeek] = useState(false);
-  const [popularThisMonth, setPopularThisMonth] = useState(false);
+  // Time filter (upcoming vs previous)
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("upcoming");
   
   // Drawer state
   const [activeDrawer, setActiveDrawer] = useState<FilterDrawerType>(null);
@@ -95,16 +96,26 @@ const Pilgrimages = () => {
     return cities.filter(city => city.toLowerCase().includes(citySearch.toLowerCase()));
   }, [cities, citySearch]);
 
-  // Date helpers for quick filters
-  const today = new Date();
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-  const monthStart = startOfMonth(today);
-  const monthEnd = endOfMonth(today);
+  // Today's date at start of day for consistent comparisons
+  const today = startOfDay(new Date());
 
   // Apply all filters
   const filteredPilgrimages = useMemo(() => {
     return pilgrimages.filter((p) => {
+      const startDate_ = startOfDay(new Date(p.start_date));
+      const endDate_ = p.end_date ? startOfDay(new Date(p.end_date)) : startDate_;
+      
+      // Time filter: upcoming vs previous
+      if (timeFilter === "upcoming") {
+        // Upcoming: start_date >= today OR currently ongoing (today between start and end)
+        const isUpcoming = startDate_ >= today;
+        const isOngoing = startDate_ <= today && endDate_ >= today;
+        if (!isUpcoming && !isOngoing) return false;
+      } else {
+        // Previous: end_date < today
+        if (endDate_ >= today) return false;
+      }
+
       // Type filter (from tabs - this is the main tab)
       if (activeTab !== "all" && p.type !== activeTab) return false;
 
@@ -124,34 +135,18 @@ const Pilgrimages = () => {
 
       // Date range filter
       if (startDate) {
-        const pilgrimageDate = new Date(p.start_date);
-        if (pilgrimageDate < startDate) return false;
+        if (startDate_ < startDate) return false;
       }
       if (endDate) {
-        const pilgrimageDate = new Date(p.start_date);
-        if (pilgrimageDate > endDate) return false;
+        if (startDate_ > endDate) return false;
       }
 
       // Type filter from Smart Filter
       if (selectedType !== "all" && p.type !== selectedType) return false;
 
-      // Quick filter: Upcoming this week
-      if (upcomingThisWeek) {
-        const pilgrimageDate = new Date(p.start_date);
-        if (!isWithinInterval(pilgrimageDate, { start: weekStart, end: weekEnd })) return false;
-      }
-
-      // Quick filter: Popular this month
-      if (popularThisMonth) {
-        const pilgrimageDate = new Date(p.start_date);
-        const isThisMonth = isWithinInterval(pilgrimageDate, { start: monthStart, end: monthEnd });
-        const isPopular = (p.participant_count || 0) >= 100;
-        if (!isThisMonth || !isPopular) return false;
-      }
-
       return true;
     });
-  }, [pilgrimages, activeTab, searchTerm, selectedCity, startDate, endDate, selectedType, upcomingThisWeek, popularThisMonth, weekStart, weekEnd, monthStart, monthEnd]);
+  }, [pilgrimages, activeTab, searchTerm, selectedCity, startDate, endDate, selectedType, timeFilter, today]);
 
   // Open drawer with current values
   const openDrawer = (type: FilterDrawerType) => {
@@ -193,12 +188,6 @@ const Pilgrimages = () => {
       case "type":
         setSelectedType("all");
         break;
-      case "upcomingWeek":
-        setUpcomingThisWeek(false);
-        break;
-      case "popularMonth":
-        setPopularThisMonth(false);
-        break;
     }
   };
 
@@ -216,8 +205,8 @@ const Pilgrimages = () => {
     return "";
   };
 
-  // Check if filters are active
-  const hasActiveFilters = selectedCity !== "all" || startDate || endDate || selectedType !== "all" || upcomingThisWeek || popularThisMonth;
+  // Check if filters are active (excluding time filter since it's always active)
+  const hasActiveFilters = selectedCity !== "all" || startDate || endDate || selectedType !== "all";
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -280,25 +269,25 @@ const Pilgrimages = () => {
           </Button>
         </div>
 
-        {/* Quick Filters */}
+        {/* Time Filter - Upcoming vs Previous */}
         <div className="flex gap-2 mb-3">
           <Button
-            variant={upcomingThisWeek ? "default" : "outline"}
+            variant={timeFilter === "upcoming" ? "default" : "outline"}
             size="sm"
-            onClick={() => setUpcomingThisWeek(!upcomingThisWeek)}
-            className="text-xs"
+            onClick={() => setTimeFilter("upcoming")}
+            className="flex-1"
           >
-            <Clock className="w-3.5 h-3.5 mr-1.5" />
-            Săptămâna asta
+            <ArrowRight className="w-4 h-4 mr-1.5" />
+            Pelerinaje viitoare
           </Button>
           <Button
-            variant={popularThisMonth ? "default" : "outline"}
+            variant={timeFilter === "previous" ? "default" : "outline"}
             size="sm"
-            onClick={() => setPopularThisMonth(!popularThisMonth)}
-            className="text-xs"
+            onClick={() => setTimeFilter("previous")}
+            className="flex-1"
           >
-            <Flame className="w-3.5 h-3.5 mr-1.5" />
-            Populare luna asta
+            <History className="w-4 h-4 mr-1.5" />
+            Pelerinaje anterioare
           </Button>
         </div>
 
@@ -338,30 +327,6 @@ const Pilgrimages = () => {
                 </button>
               </Badge>
             )}
-            {upcomingThisWeek && (
-              <Badge variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                <span>Săptămâna asta</span>
-                <button
-                  onClick={() => removeFilter("upcomingWeek")}
-                  className="ml-1 hover:bg-muted rounded-full p-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            )}
-            {popularThisMonth && (
-              <Badge variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
-                <Flame className="w-3 h-3" />
-                <span>Populare luna asta</span>
-                <button
-                  onClick={() => removeFilter("popularMonth")}
-                  className="ml-1 hover:bg-muted rounded-full p-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            )}
           </div>
         )}
 
@@ -394,7 +359,11 @@ const Pilgrimages = () => {
             ) : filteredPilgrimages.length === 0 ? (
               <Card className="glow-soft">
                 <CardContent className="p-6 text-center text-muted-foreground">
-                  <p>Nu există pelerinaje care să corespundă filtrelor.</p>
+                  <p>
+                    {timeFilter === "upcoming" 
+                      ? "Nu există pelerinaje viitoare în acest moment."
+                      : "Nu există pelerinaje anterioare."}
+                  </p>
                   {hasActiveFilters && (
                     <Button
                       variant="link"
@@ -403,8 +372,6 @@ const Pilgrimages = () => {
                         setStartDate(undefined);
                         setEndDate(undefined);
                         setSelectedType("all");
-                        setUpcomingThisWeek(false);
-                        setPopularThisMonth(false);
                       }}
                       className="mt-2"
                     >
