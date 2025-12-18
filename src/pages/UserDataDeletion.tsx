@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Flame, Loader2, Trash2 } from "lucide-react";
 
@@ -12,6 +23,7 @@ const UserDataDeletion = () => {
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -102,24 +114,43 @@ const UserDataDeletion = () => {
                 </p>
               </div>
 
-              <Button 
-                onClick={handleDelete}
-                variant="destructive" 
-                className="w-full" 
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Se procesează...
-                  </>
-                ) : (
-                  <>
+              <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full" 
+                    disabled={loading}
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Șterge datele mele
-                  </>
-                )}
-              </Button>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Ești sigur că vrei să ștergi contul?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Această acțiune este permanentă și ireversibilă. Toate datele tale vor fi șterse definitiv, inclusiv profilul, postările, comentariile și istoricul lumânărilor.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={loading}>Anulează</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDelete}
+                      disabled={loading}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Se procesează...
+                        </>
+                      ) : (
+                        "Da, șterge contul"
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
 
               <p className="text-xs text-center text-muted-foreground">
                 Dacă ai întrebări despre ștergerea datelor, ne poți contacta la{" "}
