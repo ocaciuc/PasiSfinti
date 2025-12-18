@@ -277,7 +277,6 @@ const Pilgrimages = () => {
             onClick={() => setTimeFilter("upcoming")}
             className="flex-1"
           >
-            <ArrowRight className="w-4 h-4 mr-1.5" />
             Pelerinaje viitoare
           </Button>
           <Button
@@ -286,7 +285,6 @@ const Pilgrimages = () => {
             onClick={() => setTimeFilter("previous")}
             className="flex-1"
           >
-            <History className="w-4 h-4 mr-1.5" />
             Pelerinaje anterioare
           </Button>
         </div>
