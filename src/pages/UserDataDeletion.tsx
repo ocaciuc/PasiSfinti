@@ -114,17 +114,18 @@ const UserDataDeletion = () => {
                 </p>
               </div>
 
-              <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    variant="destructive" 
-                    className="w-full" 
-                    disabled={loading}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Șterge datele mele
-                  </Button>
-                </AlertDialogTrigger>
+              <div className="flex flex-col gap-3">
+                <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive" 
+                      className="w-full" 
+                      disabled={loading}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Șterge datele mele
+                    </Button>
+                  </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Ești sigur că vrei să ștergi contul?</AlertDialogTitle>
@@ -151,6 +152,16 @@ const UserDataDeletion = () => {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => navigate("/settings")}
+                  disabled={loading}
+                >
+                  Anulează și revino la setări
+                </Button>
+              </div>
 
               <p className="text-xs text-center text-muted-foreground">
                 Dacă ai întrebări despre ștergerea datelor, ne poți contacta la{" "}
