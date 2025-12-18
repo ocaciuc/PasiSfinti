@@ -1,10 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 
 const AccountDeleted = () => {
   const navigate = useNavigate();
+
+  const handleBackToAuth = async () => {
+    // Sign out any stale session before navigating to auth
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -26,7 +33,7 @@ const AccountDeleted = () => {
           <p className="text-sm text-muted-foreground italic">
             "Drum bun pe calea ta spirituală."
           </p>
-          <Button onClick={() => navigate("/auth")} className="w-full mt-4">
+          <Button onClick={handleBackToAuth} className="w-full mt-4">
             Înapoi la pagina de autentificare
           </Button>
         </CardContent>
