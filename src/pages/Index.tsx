@@ -174,7 +174,7 @@ const Index = () => {
         {activeCandle && (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 to-background">
             <CardContent className="pt-4 text-center">
-              <AnimatedCandle size="lg" className="mx-auto mb-1" />
+              <AnimatedCandle size="xs" className="mx-auto mb-1" />
               <p className="font-medium text-accent mb-1">Lumânarea ta arde</p>
               {activeCandle.purpose && (
                 <p className="text-sm text-muted-foreground mb-2 italic">"{activeCandle.purpose}"</p>
