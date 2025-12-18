@@ -27,7 +27,9 @@ const UserDataDeletion = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
@@ -43,21 +45,23 @@ const UserDataDeletion = () => {
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const response = await supabase.functions.invoke('delete-account', {
-        body: { user_id: user?.id, email: userEmail }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const response = await supabase.functions.invoke("delete-account", {
+        body: { user_id: user?.id, email: userEmail },
       });
 
       if (response.error) {
-        throw new Error(response.error.message || 'Failed to process request');
+        throw new Error(response.error.message || "Failed to process request");
       }
 
       // Sign out and redirect to account deleted page
       await supabase.auth.signOut();
       navigate("/account-deleted");
     } catch (error: any) {
-      console.error('Error processing deletion request:', error);
+      console.error("Error processing deletion request:", error);
       toast({
         title: "Eroare",
         description: error.message || "A apărut o eroare la procesarea cererii",
@@ -117,56 +121,48 @@ const UserDataDeletion = () => {
               <div className="flex flex-col gap-3">
                 <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="destructive" 
-                      className="w-full" 
-                      disabled={loading}
-                    >
+                    <Button variant="destructive" className="w-full" disabled={loading}>
                       <Trash2 className="w-4 h-4 mr-2" />
                       Șterge datele mele
                     </Button>
                   </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Ești sigur că vrei să ștergi contul?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Această acțiune este permanentă și ireversibilă. Toate datele tale vor fi șterse definitiv, inclusiv profilul, postările, comentariile și istoricul lumânărilor.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Anulează</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleDelete}
-                      disabled={loading}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Se procesează...
-                        </>
-                      ) : (
-                        "Da, șterge contul"
-                      )}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Ești sigur că vrei să ștergi contul?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Această acțiune este permanentă și ireversibilă. Toate datele tale vor fi șterse definitiv,
+                        inclusiv profilul, postările, comentariile și istoricul lumânărilor.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={loading}>Anulează</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        disabled={loading}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Se procesează...
+                          </>
+                        ) : (
+                          "Da, șterge contul"
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-                <Button 
-                  variant="outline" 
-                  className="w-full" 
-                  onClick={() => navigate("/settings")}
-                  disabled={loading}
-                >
-                  Anulează și revino la setări
+                <Button variant="outline" className="w-full" onClick={() => navigate("/profile")} disabled={loading}>
+                  Anulează și revino la profil
                 </Button>
               </div>
 
               <p className="text-xs text-center text-muted-foreground">
                 Dacă ai întrebări despre ștergerea datelor, ne poți contacta la{" "}
-                <a href="mailto:support@pasidepelerin.ro" className="text-primary hover:underline">
-                  support@pasidepelerin.ro
+                <a href="mailto:pelerinulapp@gmail.com" className="text-primary hover:underline">
+                  pelerinulapp@gmail.com
                 </a>
               </p>
             </div>
