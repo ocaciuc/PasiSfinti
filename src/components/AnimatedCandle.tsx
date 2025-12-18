@@ -6,19 +6,69 @@ interface AnimatedCandleProps {
 }
 
 const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
-  const sizeClasses = {
-    xs: "w-10 h-14",
-    sm: "w-16 h-24",
-    md: "w-24 h-36",
-    lg: "w-32 h-48",
+  const sizeConfig = {
+    xs: {
+      container: "w-10 h-14",
+      glow1: "w-6 h-6",
+      glow2: "w-4 h-4",
+      glow3: "w-5 h-5",
+      flame: "w-4 h-6",
+      wick: "w-0.5 h-1",
+      waxPool: "w-4 h-1",
+      candleBody: "w-4 h-6",
+      drip1: "w-0.5 h-1.5 left-0.5 top-1",
+      drip2: "w-0.5 h-1 right-0.5 top-1.5",
+      particles: "top-2",
+    },
+    sm: {
+      container: "w-16 h-24",
+      glow1: "w-12 h-12",
+      glow2: "w-8 h-8",
+      glow3: "w-10 h-10",
+      flame: "w-8 h-12",
+      wick: "w-0.5 h-2",
+      waxPool: "w-8 h-2",
+      candleBody: "w-8 h-14",
+      drip1: "w-1 h-3 left-0.5 top-2",
+      drip2: "w-1 h-2 right-1 top-3",
+      particles: "top-4",
+    },
+    md: {
+      container: "w-24 h-36",
+      glow1: "w-16 h-16",
+      glow2: "w-10 h-10",
+      glow3: "w-14 h-14",
+      flame: "w-10 h-16",
+      wick: "w-1 h-2",
+      waxPool: "w-12 h-2.5",
+      candleBody: "w-12 h-20",
+      drip1: "w-1.5 h-5 left-1 top-3",
+      drip2: "w-1 h-3 right-1.5 top-5",
+      particles: "top-6",
+    },
+    lg: {
+      container: "w-32 h-48",
+      glow1: "w-20 h-20",
+      glow2: "w-12 h-12",
+      glow3: "w-16 h-16",
+      flame: "w-12 h-20",
+      wick: "w-1 h-3",
+      waxPool: "w-14 h-3",
+      candleBody: "w-14 h-24",
+      drip1: "w-2 h-6 left-1 top-4",
+      drip2: "w-1.5 h-4 right-2 top-6",
+      particles: "top-8",
+    },
   };
 
+  const s = sizeConfig[size];
+
   return (
-    <div className={cn("relative flex flex-col items-center", sizeClasses[size], className)}>
+    <div className={cn("relative flex flex-col items-center", s.container, className)}>
       {/* Ambient glow behind flame - enhanced for dark mode */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 bg-accent/30 dark:bg-amber-500/40 rounded-full blur-2xl animate-candle-glow" />
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-12 bg-yellow-400/40 dark:bg-yellow-300/50 rounded-full blur-xl animate-candle-glow-inner" />
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-orange-400/0 dark:bg-orange-400/30 rounded-full blur-2xl animate-candle-glow" />
+      <div className={cn("absolute top-0 left-1/2 -translate-x-1/2 bg-accent/30 dark:bg-amber-500/40 rounded-full blur-2xl animate-candle-glow", s.glow1)} />
+      <div className={cn("absolute top-1 left-1/2 -translate-x-1/2 bg-yellow-400/40 dark:bg-yellow-300/50 rounded-full blur-xl animate-candle-glow-inner", s.glow2)} />
+      <div className={cn("absolute top-2 left-1/2 -translate-x-1/2 bg-orange-400/0 dark:bg-orange-400/30 rounded-full blur-2xl animate-candle-glow", s.glow3)} />
 
       {/* Flame container */}
       <div className="relative z-10 flex flex-col items-center">
@@ -26,7 +76,7 @@ const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
         <div className="relative">
           <svg
             viewBox="0 0 60 100"
-            className="w-12 h-20 animate-flame-sway"
+            className={cn("animate-flame-sway", s.flame)}
             style={{ filter: "drop-shadow(0 0 8px rgba(255, 180, 50, 0.6))" }}
           >
             {/* Outer flame - warm orange */}
@@ -80,27 +130,23 @@ const AnimatedCandle = ({ className, size = "lg" }: AnimatedCandleProps) => {
         </div>
 
         {/* Wick */}
-        <div className="w-1 h-3 bg-stone-800 rounded-t-sm -mt-1" />
+        <div className={cn("bg-stone-800 rounded-t-sm -mt-0.5", s.wick)} />
       </div>
 
       {/* Candle body */}
-      <div className="relative z-0 -mt-1">
+      <div className="relative z-0 -mt-0.5">
         {/* Wax pool (melted top) */}
-        <div className="w-14 h-3 bg-gradient-to-b from-amber-100 to-amber-200 rounded-t-full shadow-inner" />
+        <div className={cn("bg-gradient-to-b from-amber-100 to-amber-200 rounded-t-full shadow-inner", s.waxPool)} />
         {/* Candle stick */}
-        <div className="w-14 h-24 bg-gradient-to-b from-amber-100 via-amber-50 to-amber-100 rounded-b-lg shadow-lg">
+        <div className={cn("bg-gradient-to-b from-amber-100 via-amber-50 to-amber-100 rounded-b-lg shadow-lg relative", s.candleBody)}>
           {/* Subtle wax drips */}
-          <div className="absolute left-1 top-4 w-2 h-6 bg-amber-50/60 rounded-full" />
-          <div className="absolute right-2 top-6 w-1.5 h-4 bg-amber-50/50 rounded-full" />
+          <div className={cn("absolute bg-amber-50/60 rounded-full", s.drip1)} />
+          <div className={cn("absolute bg-amber-50/50 rounded-full", s.drip2)} />
         </div>
-        {/* Base/holder */}
-        {/* <div className="w-16 h-2 bg-gradient-to-b from-amber-700 to-amber-800 rounded-sm -mx-1 shadow-md" />
-        <div className="w-20 h-3 bg-gradient-to-b from-amber-800 to-amber-900 rounded-b-lg -mx-3 shadow-lg" />
-        */}
       </div>
 
       {/* Floating light particles - brighter in dark mode */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2">
+      <div className={cn("absolute left-1/2 -translate-x-1/2", s.particles)}>
         <div className="absolute w-1 h-1 bg-yellow-200/60 dark:bg-yellow-200/80 rounded-full animate-particle-1" />
         <div className="absolute w-0.5 h-0.5 bg-yellow-100/50 dark:bg-yellow-100/70 rounded-full animate-particle-2" />
         <div className="absolute w-0.5 h-0.5 bg-orange-200/40 dark:bg-orange-300/60 rounded-full animate-particle-3" />
