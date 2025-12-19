@@ -508,11 +508,11 @@ const PilgrimageDetail = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
+        <div className="flex items-center relative">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground absolute left-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold line-clamp-1">{pilgrimage.title}</h1>
+          <h1 className="text-xl font-bold line-clamp-1 w-full text-center px-10">{pilgrimage.title}</h1>
         </div>
       </header>
 
