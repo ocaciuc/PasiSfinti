@@ -36,6 +36,7 @@ interface CommentSectionProps {
 }
 
 const COMMENTS_LIMIT = 10;
+const COMMENT_MAX_LENGTH = 2000;
 
 const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
   if (!dateString) return "Data necunoscută";
@@ -275,12 +276,18 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
       {/* Reply input */}
       {replyingTo === comment.id && (
         <div className="flex gap-2 ml-8">
-          <Textarea
-            placeholder="Scrie un răspuns..."
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="min-h-[50px] text-sm"
-          />
+          <div className="flex-1 space-y-1">
+            <Textarea
+              placeholder="Scrie un răspuns..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value.slice(0, COMMENT_MAX_LENGTH))}
+              maxLength={COMMENT_MAX_LENGTH}
+              className="min-h-[50px] text-sm"
+            />
+            <p className="text-xs text-muted-foreground text-right">
+              {commentText.length}/{COMMENT_MAX_LENGTH}
+            </p>
+          </div>
           <div className="flex flex-col gap-1">
             <Button
               onClick={() => handleSubmitComment(comment.id)}
@@ -335,12 +342,18 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
       {/* Top-level comment input */}
       {showTopLevelComment && (
         <div className="flex gap-2">
-          <Textarea
-            placeholder="Scrie un comentariu..."
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            className="min-h-[60px] text-sm"
-          />
+          <div className="flex-1 space-y-1">
+            <Textarea
+              placeholder="Scrie un comentariu..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value.slice(0, COMMENT_MAX_LENGTH))}
+              maxLength={COMMENT_MAX_LENGTH}
+              className="min-h-[60px] text-sm"
+            />
+            <p className="text-xs text-muted-foreground text-right">
+              {commentText.length}/{COMMENT_MAX_LENGTH}
+            </p>
+          </div>
           <div className="flex flex-col gap-1">
             <Button
               onClick={() => handleSubmitComment(null)}

@@ -621,12 +621,18 @@ const PilgrimageDetail = () => {
                   <Textarea
                     placeholder="Scrie un mesaj pentru comunitate..."
                     value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
+                    onChange={(e) => setNewPost(e.target.value.slice(0, 5000))}
+                    maxLength={5000}
                     className="min-h-[80px]"
                   />
-                  <Button onClick={handlePostSubmit} disabled={!newPost.trim()} size="sm">
-                    Publică
-                  </Button>
+                  <div className="flex justify-between items-center">
+                    <Button onClick={handlePostSubmit} disabled={!newPost.trim()} size="sm">
+                      Publică
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {newPost.length}/5000
+                    </span>
+                  </div>
                 </div>
 
                 {/* Posts */}

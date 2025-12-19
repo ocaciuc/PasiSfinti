@@ -103,14 +103,8 @@ const SpiritualDiary = () => {
         setVisitedPlaces(diaryData.visited_places || "");
         setPeopleMet(diaryData.people_met || "");
 
-        // Fetch diary photos
-        const { data: photosData } = await supabase
-          .from("spiritual_diary_photos")
-          .select("*")
-          .eq("diary_id", diaryData.id)
-          .order("created_at", { ascending: true });
-
-        setPhotos(photosData || []);
+        // Fetch diary photos with signed URLs
+        await refreshPhotosWithSignedUrls(diaryData.id);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -118,6 +112,44 @@ const SpiritualDiary = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to refresh photos with signed URLs
+  const refreshPhotosWithSignedUrls = async (diaryId: string) => {
+    const { data: photosData } = await supabase
+      .from("spiritual_diary_photos")
+      .select("*")
+      .eq("diary_id", diaryId)
+      .order("created_at", { ascending: true });
+
+    if (!photosData || photosData.length === 0) {
+      setPhotos([]);
+      return;
+    }
+
+    // Generate signed URLs for each photo (1 hour expiry)
+    const photosWithSignedUrls = await Promise.all(
+      photosData.map(async (photo) => {
+        // Check if the image_url is a path (new format) or full URL (legacy)
+        const isPath = !photo.image_url.startsWith("http");
+        
+        if (isPath) {
+          const { data } = await supabase.storage
+            .from("diary-photos")
+            .createSignedUrl(photo.image_url, 3600); // 1 hour expiry
+          
+          return {
+            ...photo,
+            image_url: data?.signedUrl || photo.image_url,
+          };
+        }
+        
+        // Legacy: already a full URL, keep as is (for backwards compatibility)
+        return photo;
+      })
+    );
+
+    setPhotos(photosWithSignedUrls);
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,25 +240,16 @@ const SpiritualDiary = () => {
             continue;
           }
 
-          const { data: { publicUrl } } = supabase.storage
-            .from("diary-photos")
-            .getPublicUrl(fileName);
-
-          // Save photo reference to database
+          // Store the file path instead of public URL (bucket is now private)
+          // We'll generate signed URLs when displaying
           await supabase.from("spiritual_diary_photos").insert({
             diary_id: diaryId,
-            image_url: publicUrl,
+            image_url: fileName, // Store path, not public URL
           });
         }
 
-        // Refresh photos
-        const { data: photosData } = await supabase
-          .from("spiritual_diary_photos")
-          .select("*")
-          .eq("diary_id", diaryId)
-          .order("created_at", { ascending: true });
-
-        setPhotos(photosData || []);
+        // Refresh photos with signed URLs
+        await refreshPhotosWithSignedUrls(diaryId);
         setNewPhotos([]);
         setPreviewUrls([]);
       }
@@ -411,14 +434,18 @@ const SpiritualDiary = () => {
               Reflecții Personale
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <Textarea
               placeholder="Gânduri, sentimente și învățăminte din acest pelerinaj..."
               value={reflections}
-              onChange={(e) => setReflections(e.target.value)}
+              onChange={(e) => setReflections(e.target.value.slice(0, 5000))}
               rows={5}
+              maxLength={5000}
               className="resize-none"
             />
+            <p className="text-xs text-muted-foreground text-right">
+              {reflections.length}/5000
+            </p>
           </CardContent>
         </Card>
 
@@ -430,14 +457,18 @@ const SpiritualDiary = () => {
               Locuri Vizitate
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <Textarea
               placeholder="Mănăstiri, biserici, locuri sfinte vizitate..."
               value={visitedPlaces}
-              onChange={(e) => setVisitedPlaces(e.target.value)}
+              onChange={(e) => setVisitedPlaces(e.target.value.slice(0, 2000))}
               rows={4}
+              maxLength={2000}
               className="resize-none"
             />
+            <p className="text-xs text-muted-foreground text-right">
+              {visitedPlaces.length}/2000
+            </p>
           </CardContent>
         </Card>
 
@@ -449,14 +480,18 @@ const SpiritualDiary = () => {
               Persoane Întâlnite
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <Textarea
               placeholder="Pelerini, călugări sau duhovnici cu care ai interacționat..."
               value={peopleMet}
-              onChange={(e) => setPeopleMet(e.target.value)}
+              onChange={(e) => setPeopleMet(e.target.value.slice(0, 2000))}
               rows={4}
+              maxLength={2000}
               className="resize-none"
             />
+            <p className="text-xs text-muted-foreground text-right">
+              {peopleMet.length}/2000
+            </p>
           </CardContent>
         </Card>
 
