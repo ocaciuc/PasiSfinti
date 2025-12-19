@@ -15,8 +15,43 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     
-    // Create admin client with service role key
+    // Get the authorization header to verify the user
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create a client with the user's JWT to get their identity
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      },
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
+    // Get the authenticated user from the JWT
+    const { data: { user: authenticatedUser }, error: authError } = await supabaseUser.auth.getUser();
+    
+    if (authError || !authenticatedUser) {
+      console.error('Authentication error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const authenticatedUserId = authenticatedUser.id;
+    console.log('Authenticated user requesting deletion:', authenticatedUserId);
+
+    // Create admin client with service role key for actual deletion
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -24,43 +59,27 @@ serve(async (req) => {
       }
     });
 
-    const { user_id, email } = await req.json();
+    // Parse request body to check if user_id matches (optional validation)
+    const body = await req.json().catch(() => ({}));
+    const { user_id: requestedUserId } = body;
     
-    console.log('Delete account request received:', { user_id, email });
-
-    let targetUserId = user_id;
-
-    // If email provided instead of user_id, look up the user
-    if (!targetUserId && email) {
-      console.log('Looking up user by email:', email);
-      const { data: users, error: lookupError } = await supabaseAdmin.auth.admin.listUsers();
-      
-      if (lookupError) {
-        console.error('Error looking up users:', lookupError);
-        throw new Error('Failed to look up user');
-      }
-
-      const user = users.users.find(u => u.email === email);
-      if (!user) {
-        console.log('No user found with email:', email);
-        return new Response(
-          JSON.stringify({ success: true, message: 'If an account exists with this email, it will be deleted.' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      targetUserId = user.id;
-    }
-
-    if (!targetUserId) {
+    // If a user_id was provided, verify it matches the authenticated user
+    if (requestedUserId && requestedUserId !== authenticatedUserId) {
+      console.error('User attempted to delete another account:', { 
+        authenticatedUserId, 
+        requestedUserId 
+      });
       return new Response(
-        JSON.stringify({ error: 'Either user_id or email is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'You can only delete your own account' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Deleting user data for user_id:', targetUserId);
+    // Use the authenticated user's ID for deletion
+    const targetUserId = authenticatedUserId;
+    console.log('Proceeding with account deletion for user:', targetUserId);
 
-    // Delete user data from all tables (cascade will handle most, but let's be explicit)
+    // Delete user data from all tables
     const tablesToClean = [
       'candle_purchases',
       'post_likes',
@@ -68,6 +87,11 @@ serve(async (req) => {
       'posts',
       'user_pilgrimages',
       'past_pilgrimages',
+      'spiritual_diary_photos',
+      'spiritual_diaries',
+      'notification_settings',
+      'notifications',
+      'user_badges',
       'profiles',
       'user_roles'
     ];
