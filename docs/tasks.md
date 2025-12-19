@@ -260,7 +260,7 @@
   - Navigation: "Jurnal Spiritual" button on past pilgrimages in Profile
 - [x] Gamification Badge System (Insigne)
   - Database: badges, user_badges tables with 4 predefined badges
-  - Badges: Primul Pelerinaj, 5 Mănăstiri Vizitate, Pelerin Săptămânal, Ajutătorul Comunității
+  - Badges: Primul Pelerinaj, 5 Mănăstiri Vizitate, Purtător de Lumină (10+ candles/month), Ajutătorul Comunității
   - Function: evaluate_and_award_badges() for automated badge awarding
   - UI: BadgesSection component on Profile page showing earned/locked badges
 

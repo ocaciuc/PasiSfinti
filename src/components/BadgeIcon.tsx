@@ -1,7 +1,7 @@
 import { 
   Footprints, 
   Church, 
-  CalendarCheck, 
+  Flame, 
   HeartHandshake,
   Award,
   LucideIcon
@@ -17,7 +17,7 @@ interface BadgeIconProps {
 const iconMap: Record<string, LucideIcon> = {
   footprints: Footprints,
   church: Church,
-  "calendar-check": CalendarCheck,
+  flame: Flame,
   "heart-handshake": HeartHandshake,
 };
 
