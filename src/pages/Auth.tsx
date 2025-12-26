@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Flame, Mail, Loader2 } from "lucide-react";
 import { z } from "zod";
 import Footer from "@/components/Footer";
+import { translateAuthError } from "@/lib/onboarding-error-handler";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
@@ -143,7 +144,7 @@ const Auth = () => {
         console.error('Google login error:', error);
         toast({
           title: "Eroare la autentificare",
-          description: error.message,
+          description: translateAuthError(error),
           variant: "destructive",
         });
         setGoogleLoading(false);
@@ -207,19 +208,11 @@ const Auth = () => {
     setLoading(false);
 
     if (error) {
-      if (error.message.includes("already registered")) {
-        toast({
-          title: "Cont existent",
-          description: "Acest email este deja înregistrat. Te rugăm să te autentifici.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Eroare la înregistrare",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Eroare la înregistrare",
+        description: translateAuthError(error),
+        variant: "destructive",
+      });
     } else {
       toast({
         title: "Înregistrare reușită",
@@ -261,19 +254,11 @@ const Auth = () => {
     setLoading(false);
 
     if (error) {
-      if (error.message.includes("Invalid login credentials")) {
-        toast({
-          title: "Autentificare eșuată",
-          description: "Email sau parolă incorectă",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Eroare",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Autentificare eșuată",
+        description: translateAuthError(error),
+        variant: "destructive",
+      });
     }
   };
 
