@@ -138,12 +138,14 @@ const Onboarding = () => {
           variant: errorResult.shouldBlock ? "destructive" : "default",
         });
 
-        // Execute recovery action
+        // Execute recovery action with delay to show toast
         const recovery = errorResult.recovery;
         if (recovery.type === "redirect") {
-          navigate(recovery.to);
+          setTimeout(() => {
+            navigate(recovery.to);
+          }, 1500);
+          return; // Don't reset isSubmitting - we're redirecting
         } else if (recovery.type === "retry") {
-          // Allow user to retry by resetting submission state
           setIsSubmitting(false);
         }
         return;
@@ -167,15 +169,16 @@ const Onboarding = () => {
         description: errorResult.userMessage,
       });
 
-      // Execute recovery action
+      // Execute recovery action with delay to show toast
       const recovery = errorResult.recovery;
       if (recovery.type === "redirect") {
-        navigate(recovery.to);
+        setTimeout(() => {
+          navigate(recovery.to);
+        }, 1500);
+        return; // Don't reset isSubmitting - we're redirecting
       } else if (recovery.type === "retry") {
         setIsSubmitting(false);
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
