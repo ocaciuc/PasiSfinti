@@ -216,9 +216,15 @@
 - [ ] Optimize database queries
 
 ### 7.3 Error Handling & Edge Cases
-- [ ] Review all error states
-- [ ] Add user-friendly error messages
-- [ ] Handle network failures gracefully
+- [x] Robust onboarding error handling implemented
+  - UPSERT logic to prevent duplicate profile errors
+  - Reusable error handler with recovery actions (onboarding-error-handler.ts)
+  - Graceful redirect on duplicate key constraint errors
+  - Check for existing profile on mount (handles refresh, re-login)
+  - Double-submit prevention with loading state
+  - Network error handling with retry capability
+- [ ] Review remaining error states
+- [ ] Handle network failures gracefully (partially done for onboarding)
 
 ### 7.4 Accessibility
 - [ ] Add proper ARIA labels
