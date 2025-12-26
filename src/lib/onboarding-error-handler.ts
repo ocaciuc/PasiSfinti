@@ -33,6 +33,29 @@ export function translateSupabaseError(error: PostgrestError | AuthError | Error
     "PGRST204": "Cerere invalidă.",
   };
 
+  // Supabase Auth error codes (returned as error.code)
+  const authErrorCodeMap: Record<string, string> = {
+    "weak_password": "Parola este prea slabă. Trebuie să conțină cel puțin 8 caractere, incluzând: literă mică, literă mare, cifră și caracter special (!@#$%^&* etc.).",
+    "email_address_invalid": "Adresa de email nu este validă. Te rugăm să verifici și să încerci din nou.",
+    "invalid_credentials": "Email sau parolă incorectă.",
+    "email_not_confirmed": "Te rugăm să îți confirmi adresa de email înainte de autentificare.",
+    "user_already_exists": "Acest email este deja înregistrat. Încerci să te autentifici?",
+    "user_not_found": "Nu am găsit un cont asociat acestui email.",
+    "email_exists": "Acest email este deja înregistrat.",
+    "over_request_rate_limit": "Prea multe încercări. Te rugăm să aștepți câteva minute.",
+    "over_email_send_rate_limit": "Prea multe emailuri trimise. Te rugăm să aștepți câteva minute.",
+    "signup_disabled": "Înregistrările sunt dezactivate momentan.",
+    "validation_failed": "Datele introduse nu sunt valide.",
+    "bad_json": "Eroare la procesarea datelor.",
+    "bad_jwt": "Sesiune invalidă. Te rugăm să te autentifici din nou.",
+    "session_not_found": "Sesiunea a expirat. Te rugăm să te autentifici din nou.",
+  };
+
+  // Check for Supabase Auth error code first
+  if (errorCode && authErrorCodeMap[errorCode]) {
+    return authErrorCodeMap[errorCode];
+  }
+
   // Check for PostgreSQL error code
   if (errorCode && pgErrorMap[errorCode]) {
     return pgErrorMap[errorCode];
@@ -40,6 +63,16 @@ export function translateSupabaseError(error: PostgrestError | AuthError | Error
 
   // Message pattern matching for Romanian translation
   const messagePatterns: Array<[RegExp | string, string]> = [
+    // Weak password specific patterns
+    [/Password should be at least 8 characters/i, "Parola trebuie să aibă cel puțin 8 caractere."],
+    [/Password should contain at least one character of each/i, "Parola trebuie să conțină cel puțin: o literă mică, o literă mare, o cifră și un caracter special (!@#$%^&* etc.)."],
+    [/weak_password/i, "Parola este prea slabă. Folosește cel puțin 8 caractere cu litere mari, mici, cifre și caractere speciale."],
+    
+    // Email validation patterns
+    [/email.*invalid/i, "Adresa de email nu este validă."],
+    [/invalid email/i, "Adresa de email nu este validă."],
+    [/Unable to validate email address/i, "Nu am putut valida adresa de email. Verifică formatul."],
+    
     // Duplicate key errors
     [/duplicate key value violates unique constraint/i, "Această înregistrare există deja."],
     [/profiles_user_id_key/i, "Profilul tău există deja."],
@@ -60,9 +93,10 @@ export function translateSupabaseError(error: PostgrestError | AuthError | Error
     [/Email not confirmed/i, "Te rugăm să îți confirmi adresa de email."],
     [/already registered/i, "Acest email este deja înregistrat."],
     [/User not found/i, "Utilizatorul nu a fost găsit."],
-    [/Password should be at least/i, "Parola trebuie să aibă cel puțin 6 caractere."],
+    [/User already registered/i, "Acest email este deja înregistrat. Încerci să te autentifici?"],
     [/Email rate limit exceeded/i, "Prea multe încercări. Te rugăm să aștepți câteva minute."],
     [/For security purposes/i, "Din motive de securitate, te rugăm să aștepți înainte de a încerca din nou."],
+    [/Signups not allowed/i, "Înregistrările nu sunt permise momentan."],
     
     // Network errors
     [/Failed to fetch/i, "Eroare de conexiune. Verifică conexiunea la internet."],

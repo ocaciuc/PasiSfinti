@@ -16,8 +16,12 @@ import { translateAuthError } from "@/lib/onboarding-error-handler";
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
 const passwordSchema = z
   .string()
-  .min(6, { message: "Parola trebuie să aibă cel puțin 6 caractere" })
-  .max(100, { message: "Parola este prea lungă" });
+  .min(8, { message: "Parola trebuie să aibă cel puțin 8 caractere" })
+  .max(100, { message: "Parola este prea lungă" })
+  .refine((val) => /[a-z]/.test(val), { message: "Parola trebuie să conțină cel puțin o literă mică" })
+  .refine((val) => /[A-Z]/.test(val), { message: "Parola trebuie să conțină cel puțin o literă mare" })
+  .refine((val) => /[0-9]/.test(val), { message: "Parola trebuie să conțină cel puțin o cifră" })
+  .refine((val) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(val), { message: "Parola trebuie să conțină cel puțin un caracter special (!@#$%^&* etc.)" });
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -417,13 +421,16 @@ const Auth = () => {
                       <Input
                         id="signup-password"
                         type="password"
-                        placeholder="••••••"
+                        placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         disabled={loading || googleLoading}
                         maxLength={100}
                       />
+                      <p className="text-xs text-muted-foreground">
+                        Minim 8 caractere, cu literă mică, literă mare, cifră și caracter special
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirm-password">Confirmă parola</Label>
