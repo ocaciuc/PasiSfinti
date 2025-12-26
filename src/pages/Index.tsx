@@ -63,9 +63,19 @@ const Index = () => {
         .from("profiles")
         .select("id")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !profile) {
+      if (profileError) {
+        // Database error - could be user account was deleted
+        // Sign out to clear stale session and redirect to auth
+        console.error("Profile check error:", profileError);
+        await supabase.auth.signOut();
+        navigate("/auth");
+        setLoading(false);
+        return;
+      }
+
+      if (!profile) {
         // No profile found, redirect to onboarding
         navigate("/onboarding");
         setLoading(false);

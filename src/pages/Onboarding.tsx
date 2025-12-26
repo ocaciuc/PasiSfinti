@@ -30,17 +30,28 @@ const Onboarding = () => {
   useEffect(() => {
     const checkExistingProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        // If there's an auth error or no user, clear session and redirect to auth
+        if (userError || !user) {
+          console.error("Auth error in onboarding:", userError);
+          await supabase.auth.signOut();
           navigate("/auth");
           return;
         }
 
-        const { data: existingProfile } = await supabase
+        const { data: existingProfile, error: profileError } = await supabase
           .from("profiles")
           .select("id")
           .eq("user_id", user.id)
           .maybeSingle();
+
+        // Handle database errors (e.g., RLS policy errors from deleted user)
+        if (profileError) {
+          console.error("Profile check error:", profileError);
+          // Don't block, let them try onboarding - could be new user
+          return;
+        }
 
         if (existingProfile) {
           // Profile already exists, redirect to dashboard
@@ -52,7 +63,9 @@ const Onboarding = () => {
         }
       } catch (error) {
         console.error("Error checking existing profile:", error);
-        // Don't block user, let them try onboarding
+        // Clear session on unexpected errors and redirect
+        await supabase.auth.signOut();
+        navigate("/auth");
       }
     };
 
