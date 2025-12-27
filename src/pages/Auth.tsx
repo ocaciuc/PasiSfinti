@@ -28,12 +28,15 @@ const Auth = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [activeTab, setActiveTab] = useState("signin");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   useEffect(() => {
     // Handle OAuth callback - check URL hash/params for tokens
@@ -268,6 +271,48 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      toast({
+        title: "Eroare validare",
+        description: emailError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    setResetLoading(false);
+
+    if (error) {
+      toast({
+        title: "Eroare",
+        description: translateAuthError(error),
+        variant: "destructive",
+      });
+    } else {
+      setResetEmailSent(true);
+      toast({
+        title: "Email trimis",
+        description: "Verifică-ți căsuța de email pentru linkul de resetare a parolei.",
+      });
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShowForgotPassword(false);
+    setResetEmailSent(false);
+    setEmail("");
+  };
+
   const GoogleIcon = () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
       <path
@@ -301,43 +346,108 @@ const Auth = () => {
 
           <Card className="glow-soft">
             <CardHeader>
-              <CardTitle>Intră în comunitate</CardTitle>
+              <CardTitle>
+                {showForgotPassword 
+                  ? (resetEmailSent ? "Verifică-ți emailul" : "Resetează parola") 
+                  : "Intră în comunitate"}
+              </CardTitle>
               <CardDescription>
-                Creează un cont nou sau autentifică-te pentru a continua
+                {showForgotPassword 
+                  ? (resetEmailSent 
+                      ? "Ți-am trimis un email cu instrucțiuni pentru resetarea parolei" 
+                      : "Introdu adresa de email pentru a primi linkul de resetare")
+                  : "Creează un cont nou sau autentifică-te pentru a continua"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Social Login Buttons */}
-              <div className="space-y-3">
-                <Button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={googleLoading || loading}
-                  variant="outline"
-                  className="w-full bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
-                >
-                  {googleLoading ? (
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  ) : (
-                    <GoogleIcon />
-                  )}
-                  <span className="ml-2">Continuă cu Google</span>
-                </Button>
-              </div>
+              {showForgotPassword ? (
+                resetEmailSent ? (
+                  <div className="space-y-4">
+                    <div className="text-center py-4">
+                      <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
+                      <p className="text-sm text-muted-foreground">
+                        Dacă există un cont asociat cu <strong>{email}</strong>, vei primi un email cu un link pentru resetarea parolei.
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Nu ai primit emailul? Verifică și folderul de spam.
+                      </p>
+                    </div>
+                    <Button onClick={handleBackToLogin} variant="outline" className="w-full">
+                      Înapoi la autentificare
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          placeholder="exemplu@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          disabled={resetLoading}
+                          maxLength={255}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <Button type="submit" className="w-full" disabled={resetLoading}>
+                      {resetLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Se trimite...
+                        </>
+                      ) : (
+                        "Trimite link de resetare"
+                      )}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      onClick={handleBackToLogin} 
+                      variant="ghost" 
+                      className="w-full"
+                    >
+                      Înapoi la autentificare
+                    </Button>
+                  </form>
+                )
+              ) : (
+                <>
+                  {/* Social Login Buttons */}
+                  <div className="space-y-3">
+                    <Button
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={googleLoading || loading}
+                      variant="outline"
+                      className="w-full bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+                    >
+                      {googleLoading ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <GoogleIcon />
+                      )}
+                      <span className="ml-2">Continuă cu Google</span>
+                    </Button>
+                  </div>
 
-              {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    sau continuă cu email
-                  </span>
-                </div>
-              </div>
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">
+                        sau continuă cu email
+                      </span>
+                    </div>
+                  </div>
 
-              {/* Email/Password Tabs */}
+                  {/* Email/Password Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="signin">Autentificare</TabsTrigger>
@@ -386,6 +496,13 @@ const Auth = () => {
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Ai uitat parola?
+                      </button>
                     </div>
                     <Button type="submit" className="w-full" disabled={loading || googleLoading}>
                       {loading ? (
@@ -502,7 +619,9 @@ const Auth = () => {
                     </p>
                   </form>
                 </TabsContent>
-              </Tabs>
+                  </Tabs>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
