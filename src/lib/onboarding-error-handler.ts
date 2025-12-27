@@ -49,6 +49,11 @@ export function translateSupabaseError(error: PostgrestError | AuthError | Error
     "bad_json": "Eroare la procesarea datelor.",
     "bad_jwt": "Sesiune invalidă. Te rugăm să te autentifici din nou.",
     "session_not_found": "Sesiunea a expirat. Te rugăm să te autentifici din nou.",
+    "same_password": "Noua parolă trebuie să fie diferită de parola actuală.",
+    "reauthentication_needed": "Te rugăm să te autentifici din nou pentru a continua.",
+    "otp_expired": "Linkul de resetare a expirat. Te rugăm să soliciți un nou link.",
+    "flow_state_expired": "Linkul de resetare a expirat. Te rugăm să soliciți un nou link.",
+    "flow_state_not_found": "Linkul de resetare este invalid. Te rugăm să soliciți un nou link.",
   };
 
   // Check for Supabase Auth error code first
@@ -95,6 +100,10 @@ export function translateSupabaseError(error: PostgrestError | AuthError | Error
     [/User not found/i, "Utilizatorul nu a fost găsit."],
     [/User already registered/i, "Acest email este deja înregistrat. Încerci să te autentifici?"],
     [/Email rate limit exceeded/i, "Prea multe încercări. Te rugăm să aștepți câteva minute."],
+    [/same_password/i, "Noua parolă trebuie să fie diferită de parola actuală."],
+    [/New password should be different/i, "Noua parolă trebuie să fie diferită de parola actuală."],
+    [/recovery token/i, "Linkul de resetare este invalid sau a expirat."],
+    [/otp.*expired/i, "Linkul de resetare a expirat. Te rugăm să soliciți un nou link."],
     [/For security purposes/i, "Din motive de securitate, te rugăm să aștepți înainte de a încerca din nou."],
     [/Signups not allowed/i, "Înregistrările nu sunt permise momentan."],
     
