@@ -105,16 +105,31 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
         }
       });
 
-      // Fetch profiles
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, first_name, last_name, avatar_url")
-        .in("user_id", userIds.length > 0 ? userIds : ['no-match']);
+      // Get current user ID for fetching co-pilgrim profiles
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserId = user?.id;
 
-      const profileMap = new Map<string, any>();
-      (profilesData || []).forEach((p) => {
-        profileMap.set(p.user_id, p);
-      });
+      // Fetch co-pilgrim profiles using secure function (only returns first_name and avatar)
+      const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
+      
+      if (currentUserId) {
+        const { data: coProfilesData } = await supabase.rpc("get_co_pilgrim_profiles", { 
+          requesting_user_id: currentUserId 
+        });
+        (coProfilesData || []).forEach((p: any) => {
+          profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
+        });
+
+        // Also fetch own profile (allowed by RLS)
+        const { data: ownProfile } = await supabase
+          .from("profiles")
+          .select("first_name, avatar_url")
+          .eq("user_id", currentUserId)
+          .maybeSingle();
+        if (ownProfile) {
+          profileMap.set(currentUserId, { first_name: ownProfile.first_name, avatar_url: ownProfile.avatar_url });
+        }
+      }
 
       // Build comments with author info
       const commentsWithAuthors: Comment[] = (commentsData || []).map((comment) => {
@@ -129,7 +144,7 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
               content: reply.content,
               created_at: reply.created_at,
               parent_comment_id: reply.parent_comment_id,
-              author_name: replyAuthor ? `${replyAuthor.first_name} ${replyAuthor.last_name}` : "Utilizator",
+              author_name: replyAuthor?.first_name || "Utilizator",
               author_avatar: replyAuthor?.avatar_url || null,
             };
           });
@@ -140,7 +155,7 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
           content: comment.content,
           created_at: comment.created_at,
           parent_comment_id: comment.parent_comment_id,
-          author_name: author ? `${author.first_name} ${author.last_name}` : "Utilizator",
+          author_name: author?.first_name || "Utilizator",
           author_avatar: author?.avatar_url || null,
           replies: commentReplies,
         };
@@ -190,18 +205,18 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
 
       if (error) throw error;
 
-      // Fetch current user profile
+      // Fetch current user profile (own profile - allowed by RLS)
       let authorName = "Utilizator";
       let authorAvatar: string | null = null;
 
       const { data: authorProfile } = await supabase
         .from("profiles")
-        .select("first_name, last_name, avatar_url")
+        .select("first_name, avatar_url")
         .eq("user_id", userId)
         .maybeSingle();
 
       if (authorProfile) {
-        authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+        authorName = authorProfile.first_name;
         authorAvatar = authorProfile.avatar_url;
       }
 
