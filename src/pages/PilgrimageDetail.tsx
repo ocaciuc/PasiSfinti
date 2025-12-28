@@ -135,11 +135,12 @@ const PilgrimageDetail = () => {
       const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
       const allUserIdsForProfiles = [...new Set(postUserIds)];
 
-      // Fetch profiles and user likes in parallel
-      const [profilesResult, userLikesResult] = await Promise.all([
-        // Batch fetch all profiles we need for posts
-        allUserIdsForProfiles.length > 0
-          ? supabase.from("profiles").select("id, user_id, first_name, last_name, avatar_url").in("user_id", allUserIdsForProfiles)
+      // Fetch co-pilgrim profiles using secure function (only returns first_name and avatar)
+      // and user likes in parallel
+      const [coProfilesResult, userLikesResult] = await Promise.all([
+        // Use the secure function that only exposes minimal profile data
+        currentUserId
+          ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
           : Promise.resolve({ data: [], error: null }),
         // Fetch user's likes for all posts in one query
         currentUserId && postsResult.data && postsResult.data.length > 0
@@ -147,11 +148,23 @@ const PilgrimageDetail = () => {
           : Promise.resolve({ data: [], error: null }),
       ]);
 
-      // Create a profile lookup map for O(1) access
-      const profileMap = new Map<string, any>();
-      (profilesResult.data || []).forEach((p: any) => {
-        profileMap.set(p.user_id, p);
+      // Create a profile lookup map for O(1) access (includes co-pilgrims with minimal data)
+      const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
+      (coProfilesResult.data || []).forEach((p: any) => {
+        profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
       });
+
+      // Also fetch current user's own profile for their posts
+      if (currentUserId) {
+        const { data: ownProfile } = await supabase
+          .from("profiles")
+          .select("first_name, avatar_url")
+          .eq("user_id", currentUserId)
+          .maybeSingle();
+        if (ownProfile) {
+          profileMap.set(currentUserId, { first_name: ownProfile.first_name, avatar_url: ownProfile.avatar_url });
+        }
+      }
 
       // Create liked posts set for O(1) lookup
       const likedPostIds = new Set((userLikesResult.data || []).map((l: any) => l.post_id));
@@ -166,7 +179,7 @@ const PilgrimageDetail = () => {
           content: post.content,
           likes_count: post.likes_count || 0,
           created_at: post.created_at,
-          author_name: authorProfile ? `${authorProfile.first_name} ${authorProfile.last_name}` : "Utilizator",
+          author_name: authorProfile?.first_name || "Utilizator",
           author_avatar: authorProfile?.avatar_url || null,
           user_has_liked: likedPostIds.has(post.id),
         };
@@ -332,18 +345,18 @@ const PilgrimageDetail = () => {
 
       if (error) throw error;
 
-      // Fetch current user profile for the new post
+      // Fetch current user profile for the new post (own profile - allowed by RLS)
       let authorName = "Utilizator";
       let authorAvatar: string | null = null;
 
       const { data: authorProfile } = await supabase
         .from("profiles")
-        .select("first_name, last_name, avatar_url")
+        .select("first_name, avatar_url")
         .eq("user_id", userId)
         .maybeSingle();
       
       if (authorProfile) {
-        authorName = `${authorProfile.first_name} ${authorProfile.last_name}`;
+        authorName = authorProfile.first_name;
         authorAvatar = authorProfile.avatar_url;
       }
 
