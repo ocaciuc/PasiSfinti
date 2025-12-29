@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import ConfirmareCont from "./pages/ConfirmareCont";
 import Onboarding from "./pages/Onboarding";
 import Pilgrimages from "./pages/Pilgrimages";
 import PilgrimageDetail from "./pages/PilgrimageDetail";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/confirmare-cont" element={<ConfirmareCont />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/pilgrimages" element={<Pilgrimages />} />
           <Route path="/pilgrimage/:id" element={<PilgrimageDetail />} />

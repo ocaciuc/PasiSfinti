@@ -212,7 +212,7 @@ const Auth = () => {
 
     setLoading(true);
 
-    const redirectUrl = `${window.location.origin}/auth/callback`;
+    const redirectUrl = `${window.location.origin}/confirmare-cont`;
 
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
