@@ -233,8 +233,15 @@ const Auth = () => {
     } else {
       toast({
         title: "Înregistrare reușită",
-        description: "Verifică-ți emailul pentru a confirma contul.",
+        description: "Contul a fost creat. Verifică emailul pentru confirmare, apoi autentifică-te.",
       });
+      
+      // Clear form and redirect to login tab after a short delay
+      setPassword("");
+      setConfirmPassword("");
+      setTimeout(() => {
+        setActiveTab("signin");
+      }, 1500);
     }
   };
 
