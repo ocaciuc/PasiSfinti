@@ -242,7 +242,14 @@ const PilgrimageDetail = () => {
     }
   };
 
+  const [isRegistering, setIsRegistering] = useState(false);
+
   const handleRegister = async () => {
+    // Prevent double-click registration
+    if (isRegistering || isRegistered) {
+      return;
+    }
+
     if (!userId) {
       toast({
         title: "Eroare",
@@ -262,7 +269,28 @@ const PilgrimageDetail = () => {
       return;
     }
 
+    setIsRegistering(true);
+
     try {
+      // Double-check enrollment status before inserting to prevent duplicate key errors
+      const { data: existingEnrollment } = await supabase
+        .from("user_pilgrimages")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("pilgrimage_id", id!)
+        .maybeSingle();
+
+      if (existingEnrollment) {
+        // User is already enrolled, just update the state
+        setIsRegistered(true);
+        toast({
+          title: "Deja înscris",
+          description: "Ești deja înscris la acest pelerinaj.",
+        });
+        setIsRegistering(false);
+        return;
+      }
+
       const { error } = await supabase.from("user_pilgrimages").insert({
         user_id: userId,
         pilgrimage_id: id!,
@@ -287,11 +315,22 @@ const PilgrimageDetail = () => {
       });
     } catch (error: any) {
       console.error("Error registering for pilgrimage:", error);
-      toast({
-        title: "Eroare",
-        description: "Nu s-a putut finaliza înregistrarea.",
-        variant: "destructive",
-      });
+      // Handle duplicate key error gracefully
+      if (error.code === "23505") {
+        setIsRegistered(true);
+        toast({
+          title: "Deja înscris",
+          description: "Ești deja înscris la acest pelerinaj.",
+        });
+      } else {
+        toast({
+          title: "Eroare",
+          description: "Nu s-a putut finaliza înregistrarea.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -567,8 +606,8 @@ const PilgrimageDetail = () => {
             )}
 
             {!isRegistered && !isPastPilgrimage && (
-              <Button onClick={handleRegister} className="w-full mt-4" disabled={!userId}>
-                {userId ? "Înscrie-te la pelerinaj" : "Autentifică-te pentru a te înscrie"}
+              <Button onClick={handleRegister} className="w-full mt-4" disabled={!userId || isRegistering}>
+                {isRegistering ? "Se înregistrează..." : userId ? "Înscrie-te la pelerinaj" : "Autentifică-te pentru a te înscrie"}
               </Button>
             )}
 

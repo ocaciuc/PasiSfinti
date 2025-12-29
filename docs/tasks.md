@@ -163,7 +163,9 @@
 - [x] Implement "Join Pilgrimage" functionality with date validation
 - [x] Display participant list
 - [x] Show map link if available
-- [ ] Implement "Leave Pilgrimage" functionality (optional)
+- [x] Implement "Leave Pilgrimage" functionality
+- [x] Fixed RLS policy for user_pilgrimages to allow users to see own enrollment
+- [x] Added double-click prevention for enrollment button
 
 ### 4.3 Pilgrimage Community Wall
 - [x] Fetch posts for specific pilgrimage
