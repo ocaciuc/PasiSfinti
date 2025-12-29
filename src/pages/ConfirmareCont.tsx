@@ -32,9 +32,12 @@ const ConfirmareCont = () => {
             <p className="text-muted-foreground">
               Te poți întoarce acum în aplicație și te poți autentifica.
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Revino în aplicație pentru a te autentifica.
-            </p>
+            <Button 
+              onClick={() => navigate("/auth")} 
+              className="mt-4 w-full"
+            >
+              Mergi la autentificare
+            </Button>
           </CardContent>
         </Card>
       </div>
