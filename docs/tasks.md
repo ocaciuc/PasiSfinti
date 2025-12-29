@@ -95,6 +95,12 @@
 - [x] Added logout functionality
 - [x] Added protected route logic
 - [x] Added auto-redirect to dashboard if already logged in
+- [x] Created `/auth/callback` page for email confirmation handling
+  - Properly exchanges confirmation code for session using `exchangeCodeForSession()`
+  - Redirects to onboarding if no profile exists
+  - Redirects to dashboard if profile exists
+  - Handles expired/invalid tokens with friendly messages
+  - Prevents "Invalid token" error from showing
 
 ---
 

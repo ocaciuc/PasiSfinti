@@ -49,21 +49,35 @@ const Auth = () => {
       const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
       
       if (error) {
-        console.error('OAuth error:', error, errorDescription);
-        toast({
-          title: "Eroare la autentificare",
-          description: errorDescription || "A apărut o eroare la autentificarea cu Google",
-          variant: "destructive",
-        });
+        // Only show error if it's not a signature/token error (those should go to /auth/callback)
+        const isTokenError = error.toLowerCase().includes('token') || 
+                            errorDescription?.toLowerCase().includes('token') ||
+                            errorDescription?.toLowerCase().includes('signature');
+        
+        if (!isTokenError) {
+          console.error('OAuth error:', error, errorDescription);
+          toast({
+            title: "Eroare la autentificare",
+            description: errorDescription || "A apărut o eroare la autentificare",
+            variant: "destructive",
+          });
+        }
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
 
-      // Check for access_token in hash (implicit flow) or code in query (auth code flow)
+      // Check for code in query params - if present, redirect to callback handler
+      const code = queryParams.get('code');
+      if (code) {
+        // Redirect to the callback handler to properly exchange the code
+        navigate(`/auth/callback?code=${code}`, { replace: true });
+        return;
+      }
+
+      // Check for access_token in hash (implicit flow from OAuth)
       const accessToken = hashParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token');
-      const code = queryParams.get('code');
       
       if (accessToken && refreshToken) {
         // Set session from hash tokens
@@ -82,12 +96,6 @@ const Auth = () => {
         }
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
-      } else if (code) {
-        // Auth code flow - Supabase will handle this automatically
-        // Just clean the URL after a brief delay to allow Supabase to process
-        setTimeout(() => {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }, 1000);
       }
     };
 
@@ -204,7 +212,7 @@ const Auth = () => {
 
     setLoading(true);
 
-    const redirectUrl = `${window.location.origin}/onboarding`;
+    const redirectUrl = `${window.location.origin}/auth/callback`;
 
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
