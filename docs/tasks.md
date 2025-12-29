@@ -95,12 +95,12 @@
 - [x] Added logout functionality
 - [x] Added protected route logic
 - [x] Added auto-redirect to dashboard if already logged in
-- [x] Created `/auth/callback` page for email confirmation handling
-  - Properly exchanges confirmation code for session using `exchangeCodeForSession()`
-  - Redirects to onboarding if no profile exists
-  - Redirects to dashboard if profile exists
-  - Handles expired/invalid tokens with friendly messages
-  - Prevents "Invalid token" error from showing
+- [x] Created `/auth/callback` page for OAuth code exchange
+- [x] Created `/confirmare-cont` page for email confirmation links
+  - Standalone confirmation page with Romanian success message
+  - No auth/session logic, no auto-login, no onboarding trigger
+  - Users can navigate to login when ready
+- [x] Updated sign-up emailRedirectTo to point to /confirmare-cont
 
 ---
 
