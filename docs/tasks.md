@@ -101,6 +101,14 @@
   - No auth/session logic, no auto-login, no onboarding trigger
   - Users can navigate to login when ready
 - [x] Updated sign-up emailRedirectTo to point to /confirmare-cont
+- [x] Created `/reset-password` page for password reset flow
+  - Reads recovery tokens from URL hash
+  - Validates session with proper error handling
+  - Romanian UI messages for all states (loading, expired link, success)
+  - Password complexity validation (8+ chars, mixed case, digit, special)
+  - Show/hide password toggle
+  - "Mergi la autentificare" button after successful reset
+  - No onboarding or dashboard interference
 
 ---
 
