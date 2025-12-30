@@ -104,6 +104,14 @@ const Auth = () => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
+      
+      // Don't redirect on PASSWORD_RECOVERY - let the reset password page handle it
+      if (event === 'PASSWORD_RECOVERY') {
+        // Redirect to reset password page with the current hash
+        navigate(`/reset-password${window.location.hash}`, { replace: true });
+        return;
+      }
+      
       if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
         navigate("/");
       }
@@ -111,6 +119,14 @@ const Auth = () => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // Don't redirect if we're handling password recovery
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get('type');
+      if (type === 'recovery') {
+        navigate(`/reset-password${window.location.hash}`, { replace: true });
+        return;
+      }
+      
       if (session) {
         navigate("/");
       }
