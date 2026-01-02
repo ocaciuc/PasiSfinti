@@ -236,6 +236,7 @@ const Onboarding = () => {
                   onChange={(e) => handleInputChange("firstName", e.target.value)}
                   placeholder="Ion"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
@@ -246,6 +247,7 @@ const Onboarding = () => {
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
                   placeholder="Popescu"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
@@ -257,6 +259,7 @@ const Onboarding = () => {
                   onChange={(e) => handleInputChange("age", e.target.value)}
                   placeholder="25"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
             </>
@@ -271,6 +274,7 @@ const Onboarding = () => {
                   value={formData.religion}
                   onChange={(e) => handleInputChange("religion", e.target.value)}
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
@@ -281,6 +285,7 @@ const Onboarding = () => {
                   onChange={(e) => handleInputChange("city", e.target.value)}
                   placeholder="București"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
@@ -291,6 +296,7 @@ const Onboarding = () => {
                   onChange={(e) => handleInputChange("parish", e.target.value)}
                   placeholder="Biserica Sfântul Nicolae"
                   disabled={isSubmitting}
+                  autoComplete="off"
                 />
               </div>
             </>
