@@ -234,7 +234,6 @@ const Onboarding = () => {
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => handleInputChange("firstName", e.target.value)}
-                  placeholder="Ion"
                   disabled={isSubmitting}
                   autoComplete="off"
                 />
@@ -245,7 +244,6 @@ const Onboarding = () => {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  placeholder="Popescu"
                   disabled={isSubmitting}
                   autoComplete="off"
                 />
@@ -257,7 +255,6 @@ const Onboarding = () => {
                   type="number"
                   value={formData.age}
                   onChange={(e) => handleInputChange("age", e.target.value)}
-                  placeholder="25"
                   disabled={isSubmitting}
                   autoComplete="off"
                 />
@@ -283,7 +280,6 @@ const Onboarding = () => {
                   id="city"
                   value={formData.city}
                   onChange={(e) => handleInputChange("city", e.target.value)}
-                  placeholder="București"
                   disabled={isSubmitting}
                   autoComplete="off"
                 />
@@ -294,7 +290,6 @@ const Onboarding = () => {
                   id="parish"
                   value={formData.parish}
                   onChange={(e) => handleInputChange("parish", e.target.value)}
-                  placeholder="Biserica Sfântul Nicolae"
                   disabled={isSubmitting}
                   autoComplete="off"
                 />
