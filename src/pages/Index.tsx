@@ -106,11 +106,12 @@ const Index = () => {
 
   const fetchNextPilgrimage = async (userId: string) => {
     try {
-      // First, get pilgrimages the user has joined
+      // Get pilgrimages the user has joined (only enrolled ones)
       const { data: userPilgrimages } = await supabase
         .from("user_pilgrimages")
         .select("pilgrimage_id")
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .is("deleted_at", null);
 
       if (userPilgrimages && userPilgrimages.length > 0) {
         // Get the next upcoming pilgrimage the user has joined
@@ -122,29 +123,19 @@ const Index = () => {
             userPilgrimages.map((up) => up.pilgrimage_id),
           )
           .gte("start_date", new Date().toISOString())
+          .is("deleted_at", null)
           .order("start_date", { ascending: true })
           .limit(1)
           .maybeSingle();
 
-        if (joinedPilgrimage) {
-          setNextPilgrimage(joinedPilgrimage);
-          return;
-        }
+        setNextPilgrimage(joinedPilgrimage);
+      } else {
+        // User is not enrolled in any pilgrimage - show nothing
+        setNextPilgrimage(null);
       }
-
-      // If user hasn't joined any, get the next major pilgrimage
-      const { data: majorPilgrimage } = await supabase
-        .from("pilgrimages")
-        .select("id, title, start_date, location, participant_count")
-        .eq("type", "national")
-        .gte("start_date", new Date().toISOString())
-        .order("start_date", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-
-      setNextPilgrimage(majorPilgrimage);
     } catch (error) {
       console.error("Error fetching next pilgrimage:", error);
+      setNextPilgrimage(null);
     }
   };
 
