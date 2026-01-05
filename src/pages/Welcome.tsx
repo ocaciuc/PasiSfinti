@@ -22,10 +22,6 @@ const Welcome = () => {
       
       {/* Content positioned at bottom */}
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-md">
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 drop-shadow-lg">
-          Pași de Pelerin
-        </h1>
         
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-white/90 mb-10 drop-shadow-md">
