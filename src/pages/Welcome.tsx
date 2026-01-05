@@ -74,7 +74,7 @@ const Welcome = () => {
           href="/privacy" 
           className="text-white/70 hover:text-white text-sm transition-colors"
         >
-          Politica de confidențialitate
+          Confidențialitate
         </a>
         <span className="text-white/50">•</span>
         <a 
