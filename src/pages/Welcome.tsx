@@ -45,6 +45,23 @@ const Welcome = () => {
       {/* Decorative warm glow at bottom corners */}
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-candle-glow/30 blur-2xl rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-32 h-32 bg-candle-glow/30 blur-2xl rounded-full pointer-events-none" />
+      
+      {/* Footer links */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4 z-10">
+        <a 
+          href="/privacy" 
+          className="text-white/70 hover:text-white text-sm transition-colors"
+        >
+          Politica de confidențialitate
+        </a>
+        <span className="text-white/50">•</span>
+        <a 
+          href="/terms" 
+          className="text-white/70 hover:text-white text-sm transition-colors"
+        >
+          Termeni și condiții
+        </a>
+      </div>
     </div>
   );
 };
