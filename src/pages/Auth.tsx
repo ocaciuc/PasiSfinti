@@ -113,7 +113,7 @@ const Auth = () => {
       }
       
       if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 
@@ -128,7 +128,7 @@ const Auth = () => {
       }
       
       if (session) {
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 

@@ -6,6 +6,8 @@
 - ✅ Authentication system (email/password + Facebook OAuth)
 - ✅ Database schema with production-ready features
 - ✅ Persistent storage configured
+- ✅ Public landing page (Welcome) as default entry point (/)
+- ✅ Dashboard moved to /dashboard route
 
 ---
 

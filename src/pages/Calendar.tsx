@@ -25,7 +25,7 @@ const Calendar = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="text-primary-foreground hover:bg-primary-foreground/10"
           >
             <ChevronLeft className="w-5 h-5" />

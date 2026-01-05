@@ -25,7 +25,7 @@ interface NextPilgrimage {
   participant_count: number;
 }
 
-const Index = () => {
+const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -250,4 +250,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dashboard;
