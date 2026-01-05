@@ -5,7 +5,7 @@ const Navigation = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: Home, label: "Acasă", path: "/" },
+    { icon: Home, label: "Acasă", path: "/dashboard" },
     { icon: Map, label: "Pelerinaje", path: "/pilgrimages" },
     { icon: Flame, label: "Lumânare", path: "/candle" },
     { icon: User, label: "Profil", path: "/profile" },

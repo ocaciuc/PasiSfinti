@@ -59,7 +59,7 @@ const Onboarding = () => {
             title: "Profilul există deja",
             description: "Te redirecționăm către pagina principală.",
           });
-          navigate("/");
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("Error checking existing profile:", error);
@@ -138,7 +138,7 @@ const Onboarding = () => {
             title: "Profilul există deja",
             description: "Te redirecționăm către pagina principală.",
           });
-          navigate("/");
+          navigate("/dashboard");
           return;
         }
 
@@ -169,7 +169,7 @@ const Onboarding = () => {
         title: "Bun venit în comunitate!",
         description: "Profilul tău a fost creat cu succes.",
       });
-      navigate("/");
+      navigate("/dashboard");
       
     } catch (error) {
       console.error("Onboarding error:", error);

@@ -52,7 +52,7 @@ const AuthCallback = () => {
             window.history.replaceState({}, document.title, window.location.pathname);
             
             if (profile) {
-              navigate("/", { replace: true });
+              navigate("/dashboard", { replace: true });
             } else {
               navigate("/onboarding", { replace: true });
             }
@@ -73,7 +73,7 @@ const AuthCallback = () => {
           setStatus("success");
           
           if (profile) {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
           } else {
             navigate("/onboarding", { replace: true });
           }
