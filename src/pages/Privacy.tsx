@@ -97,8 +97,14 @@ const Privacy = () => {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold text-foreground">8. Contact</h2>
             <p>
-              Pentru orice întrebări privind această politică de confidențialitate, ne puteți 
-              contacta prin intermediul aplicației sau la adresa de email de suport.
+              Pentru orice întrebări privind această politică de confidențialitate sau pentru 
+              solicitări legate de protecția datelor, ne puteți contacta la adresa de email:{" "}
+              <a 
+                href="mailto:pelerinulapp@gmail.com" 
+                className="text-primary hover:underline font-medium"
+              >
+                pelerinulapp@gmail.com
+              </a>
             </p>
           </section>
         </div>
