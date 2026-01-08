@@ -21,7 +21,7 @@ const Privacy = () => {
         
         <div className="prose prose-lg max-w-none space-y-6 text-foreground/90">
           <p className="text-muted-foreground">
-            Ultima actualizare: 12 Decembrie 2025
+            Ultima actualizare: 8 Ianuarie 2026
           </p>
 
           <section className="space-y-4">
