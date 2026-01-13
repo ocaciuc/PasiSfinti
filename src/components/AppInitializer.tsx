@@ -24,6 +24,8 @@ const SKIP_INIT_ROUTES = [
   "/reset-password",
 ];
 
+const MIN_SPLASH_DURATION = 1500; // 1.5 seconds minimum
+
 const AppInitializer = ({ children }: AppInitializerProps) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const navigate = useNavigate();
@@ -31,6 +33,13 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
 
   useEffect(() => {
     const currentPath = location.pathname;
+    const startTime = Date.now();
+
+    const finishInitialization = () => {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_SPLASH_DURATION - elapsed);
+      setTimeout(() => setIsInitializing(false), remaining);
+    };
 
     // Skip initialization for routes that handle their own auth logic
     if (SKIP_INIT_ROUTES.some(route => currentPath.startsWith(route))) {
@@ -44,7 +53,7 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
       if (currentPath === "/") {
         checkSessionAndRedirect();
       } else {
-        setIsInitializing(false);
+        finishInitialization();
       }
       return;
     }
@@ -89,7 +98,7 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
           navigate("/auth", { replace: true });
         }
       } finally {
-        setIsInitializing(false);
+        finishInitialization();
       }
     }
   }, [location.pathname, navigate]);
