@@ -167,7 +167,7 @@ const Dashboard = () => {
         <p className="text-center text-sm opacity-90">Bun venit pe drumul tău spiritual</p>
       </header>
 
-      <div className="flex-1 max-w-lg mx-auto p-4 space-y-4 pb-32">
+      <div className="flex-1 max-w-lg mx-auto p-4 space-y-4 pb-safe">
         {/* Orthodox Calendar */}
         <TodayCalendarCard />
 
