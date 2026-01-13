@@ -497,7 +497,7 @@ const PilgrimageDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-32">
         <header className="bg-primary text-primary-foreground p-6 glow-soft">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
@@ -532,7 +532,7 @@ const PilgrimageDetail = () => {
 
   if (!pilgrimage) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-32">
         <header className="bg-primary text-primary-foreground p-6 glow-soft">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-primary-foreground">
@@ -557,7 +557,7 @@ const PilgrimageDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <div className="flex items-center relative">
