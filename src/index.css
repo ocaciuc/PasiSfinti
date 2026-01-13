@@ -117,6 +117,11 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Safe area spacing for mobile navigation */
+  .pb-safe {
+    padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
+  }
+
   /* Spiritual glow effects */
   .glow-candle {
     box-shadow: 0 0 20px hsl(var(--candle-glow) / 0.4),
