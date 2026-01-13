@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.ee3834849f11481bad7f08d619b104bd',
-  appName: 'pasi-comunitate-sfanta',
+  appName: 'Pași de Pelerin',
   webDir: 'dist',
   // Deep link configuration for OAuth callbacks
   plugins: {
