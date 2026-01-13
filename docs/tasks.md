@@ -96,6 +96,10 @@
 - [x] Implemented session persistence
 - [x] Added logout functionality
 - [x] Added protected route logic
+- [x] Added session check on app start with splash screen
+  - Shows splash screen while checking for existing session
+  - Redirects authenticated users to Dashboard (or Onboarding if no profile)
+  - Shows Welcome/Auth only if no active session
 - [x] Added auto-redirect to dashboard if already logged in
 - [x] Created `/auth/callback` page for OAuth code exchange
 - [x] Created `/confirmare-cont` page for email confirmation links
