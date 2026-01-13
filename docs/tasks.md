@@ -117,14 +117,6 @@
   - In-app browser for OAuth flow on mobile
   - Deep link listener to capture OAuth callback tokens
   - Automatic session restoration from callback URL
-- [x] Configured Capacitor for production release build
-  - Removed server.url for bundled dist folder loading
-  - Removed allowMixedContent for security
-- [x] Created production app icons and splash screen
-  - `public/app-icon.png` (1024x1024) - main app icon
-  - `public/app-icon-foreground.png` (1024x1024) - adaptive icon foreground
-  - `public/splash.png` (1280x1920) - splash screen
-  - Created `docs/android-app-assets-setup.md` with setup instructions
 
 ---
 
