@@ -207,7 +207,7 @@ const Pilgrimages = () => {
   const hasActiveFilters = selectedCity !== "all" || startDate || endDate || selectedType !== "all";
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-safe">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center">Pelerinaje</h1>

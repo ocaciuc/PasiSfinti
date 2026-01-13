@@ -252,7 +252,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-32">
+      <div className="min-h-screen bg-background pb-safe">
         <header className="bg-primary text-primary-foreground p-6 glow-soft">
           <h1 className="text-2xl font-bold text-center">Profilul Meu</h1>
         </header>
@@ -274,7 +274,7 @@ const Profile = () => {
   if (!profile) return null;
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-safe">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center">Profilul Meu</h1>

@@ -343,3 +343,4 @@
 - Secondary: Earth Gold, Soft Clay, Stone Grey, White
 - Design: Simple, sacred, thin lines, elegant icons, soft glows
 - All colors must use HSL format and semantic tokens
+- Safe area CSS: `.pb-safe` utility class for consistent bottom padding (8rem + safe-area-inset)

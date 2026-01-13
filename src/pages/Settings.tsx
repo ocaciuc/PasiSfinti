@@ -96,7 +96,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-safe">
       {/* Header */}
       <div className="bg-primary text-primary-foreground p-4 pb-6">
         <div className="flex items-center gap-3 mb-2">

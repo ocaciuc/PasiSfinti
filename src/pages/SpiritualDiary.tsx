@@ -271,7 +271,7 @@ const SpiritualDiary = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-32">
+      <div className="min-h-screen bg-background pb-safe">
         <header className="bg-primary text-primary-foreground p-6 glow-soft">
           <Skeleton className="h-8 w-48 bg-primary-foreground/20" />
         </header>
@@ -287,7 +287,7 @@ const SpiritualDiary = () => {
 
   if (!pilgrimage) {
     return (
-      <div className="min-h-screen bg-background pb-32">
+      <div className="min-h-screen bg-background pb-safe">
         <header className="bg-primary text-primary-foreground p-4 glow-soft">
           <div className="max-w-lg mx-auto">
             <Button
@@ -310,7 +310,7 @@ const SpiritualDiary = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-safe">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-4 glow-soft">
         <div className="max-w-lg mx-auto">
