@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
+import AppInitializer from "./components/AppInitializer";
 import Welcome from "./pages/Welcome";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
@@ -33,28 +34,30 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/confirmare-cont" element={<ConfirmareCont />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/pilgrimages" element={<Pilgrimages />} />
-          <Route path="/pilgrimage/:id" element={<PilgrimageDetail />} />
-          <Route path="/pilgrimage/:pilgrimageId/diary" element={<SpiritualDiary />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/candle" element={<Candle />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/account-deleted" element={<AccountDeleted />} />
-          <Route path="/user-data-deletion" element={<UserDataDeletion />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppInitializer>
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/confirmare-cont" element={<ConfirmareCont />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/pilgrimages" element={<Pilgrimages />} />
+            <Route path="/pilgrimage/:id" element={<PilgrimageDetail />} />
+            <Route path="/pilgrimage/:pilgrimageId/diary" element={<SpiritualDiary />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/candle" element={<Candle />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/account-deleted" element={<AccountDeleted />} />
+            <Route path="/user-data-deletion" element={<UserDataDeletion />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AppInitializer>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
