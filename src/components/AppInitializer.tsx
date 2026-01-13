@@ -25,9 +25,11 @@ const SKIP_INIT_ROUTES = [
 ];
 
 const MIN_SPLASH_DURATION = 1500; // 1.5 seconds minimum
+const FADE_OUT_DURATION = 400; // 0.4 seconds fade out
 
 const AppInitializer = ({ children }: AppInitializerProps) => {
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,7 +40,13 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
     const finishInitialization = () => {
       const elapsed = Date.now() - startTime;
       const remaining = Math.max(0, MIN_SPLASH_DURATION - elapsed);
-      setTimeout(() => setIsInitializing(false), remaining);
+      
+      // Start fade out after minimum duration
+      setTimeout(() => {
+        setIsExiting(true);
+        // Actually hide splash after fade animation completes
+        setTimeout(() => setIsInitializing(false), FADE_OUT_DURATION);
+      }, remaining);
     };
 
     // Skip initialization for routes that handle their own auth logic
@@ -104,7 +112,7 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
   }, [location.pathname, navigate]);
 
   if (isInitializing) {
-    return <SplashScreen />;
+    return <SplashScreen isExiting={isExiting} />;
   }
 
   return <>{children}</>;
