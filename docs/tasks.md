@@ -100,9 +100,8 @@
 - [x] Created `/auth/callback` page for OAuth code exchange
 - [x] Created `/confirmare-cont` page for email confirmation links
   - Standalone confirmation page with Romanian success message
-  - Signs out user before navigating to auth (prevents session from auto-redirecting)
-  - No onboarding trigger - users must explicitly log in after confirmation
-  - Consistent behavior on first and subsequent confirmation clicks
+  - No auth/session logic, no auto-login, no onboarding trigger
+  - Users can navigate to login when ready
 - [x] Updated sign-up emailRedirectTo to point to /confirmare-cont
 - [x] Created `/reset-password` page for password reset flow
   - Reads recovery tokens from URL hash

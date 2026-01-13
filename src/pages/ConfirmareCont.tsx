@@ -1,32 +1,10 @@
-import { useState } from "react";
-import { CheckCircle, Flame, Loader2 } from "lucide-react";
+import { CheckCircle, Flame } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 const ConfirmareCont = () => {
   const navigate = useNavigate();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  /**
-   * Clear any session created by email confirmation before navigating to auth.
-   * This ensures users must explicitly log in after confirming their email.
-   * Without this, the session created during confirmation would auto-redirect
-   * to dashboard/onboarding when visiting /auth.
-   */
-  const handleGoToAuth = async () => {
-    setIsRedirecting(true);
-    try {
-      // Sign out to clear any session from email confirmation
-      await supabase.auth.signOut();
-    } catch (error) {
-      // Ignore errors - we just want to ensure clean state
-      console.warn("Sign out during redirect:", error);
-    }
-    // Navigate to auth page
-    navigate("/auth", { replace: true });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex flex-col items-center justify-center p-4">
@@ -55,18 +33,10 @@ const ConfirmareCont = () => {
               Te poți întoarce acum în aplicație și te poți autentifica.
             </p>
             <Button 
-              onClick={handleGoToAuth} 
+              onClick={() => navigate("/auth")} 
               className="mt-4 w-full"
-              disabled={isRedirecting}
             >
-              {isRedirecting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redirecționare...
-                </>
-              ) : (
-                "Mergi la autentificare"
-              )}
+              Mergi la autentificare
             </Button>
           </CardContent>
         </Card>
