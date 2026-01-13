@@ -112,6 +112,11 @@
   - Show/hide password toggle
   - "Mergi la autentificare" button after successful reset
   - No onboarding or dashboard interference
+- [x] Configured mobile deep linking for Google OAuth (Capacitor)
+  - Custom URL scheme: pelerinaj://auth/callback
+  - In-app browser for OAuth flow on mobile
+  - Deep link listener to capture OAuth callback tokens
+  - Automatic session restoration from callback URL
 
 ---
 

@@ -11,6 +11,7 @@ import { Flame, Mail, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import Footer from "@/components/Footer";
 import { translateAuthError } from "@/lib/onboarding-error-handler";
+import { initializeDeepLinkListener, performGoogleOAuth } from "@/lib/capacitor-auth";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
@@ -101,6 +102,12 @@ const Auth = () => {
 
     handleOAuthCallback();
 
+    // Set up deep link listener for mobile OAuth callback
+    const cleanupDeepLink = initializeDeepLinkListener(() => {
+      console.log('Deep link auth success, navigating to dashboard');
+      navigate("/dashboard");
+    });
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
@@ -132,7 +139,10 @@ const Auth = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      cleanupDeepLink();
+    };
   }, [navigate, toast]);
 
   const validateEmail = (email: string): string | null => {
@@ -162,16 +172,7 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
+      const { error } = await performGoogleOAuth();
 
       if (error) {
         console.error('Google login error:', error);
