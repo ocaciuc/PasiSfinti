@@ -145,7 +145,7 @@ const Candle = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="min-h-screen bg-background pb-32">
         <header className="bg-primary text-primary-foreground p-6 glow-soft">
           <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>
         </header>
@@ -159,7 +159,7 @@ const Candle = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>

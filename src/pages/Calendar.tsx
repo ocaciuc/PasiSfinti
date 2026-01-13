@@ -18,7 +18,7 @@ const Calendar = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <div className="flex items-center justify-between max-w-lg mx-auto">
