@@ -38,22 +38,24 @@ const Candle = () => {
       const interval = setInterval(() => {
         const expiresAt = new Date(activeCandle.expires_at);
         const now = new Date();
-        
+
         if (expiresAt > now) {
-          setTimeRemaining("circa " + formatDistanceToNow(expiresAt, { locale: ro }));
+          setTimeRemaining("" + formatDistanceToNow(expiresAt, { locale: ro }));
         } else {
           setActiveCandle(null);
           fetchCandles();
         }
       }, 1000);
-      
+
       return () => clearInterval(interval);
     }
   }, [activeCandle]);
 
   const fetchCandles = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
@@ -99,8 +101,10 @@ const Candle = () => {
   const handleLightCandle = async () => {
     try {
       setSubmitting(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         navigate("/auth");
         return;
@@ -126,7 +130,7 @@ const Candle = () => {
 
       setActiveCandle(data);
       setPrayer("");
-      
+
       toast({
         title: "Lumânarea ta arde",
         description: "Rugăciunea ta a fost primită. Lumânarea va arde 24 de ore.",
@@ -163,9 +167,7 @@ const Candle = () => {
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>
-        <p className="text-center text-sm opacity-90 mt-1">
-          Ridică o rugăciune către cer
-        </p>
+        <p className="text-center text-sm opacity-90 mt-1">Ridică o rugăciune către cer</p>
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
@@ -175,23 +177,15 @@ const Candle = () => {
               <div className="relative flex justify-center">
                 <AnimatedCandle size="lg" />
               </div>
-              
+
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-accent">
-                  Lumânarea ta arde
-                </h2>
-                <p className="text-muted-foreground">
-                  Rugăciunea ta luminează calea
-                </p>
+                <h2 className="text-2xl font-bold text-accent">Lumânarea ta arde</h2>
+                <p className="text-muted-foreground">Rugăciunea ta luminează calea</p>
               </div>
 
               <div className="bg-card rounded-lg p-4 border border-accent/20">
-                <p className="text-sm text-muted-foreground mb-1">
-                  Timp rămas
-                </p>
-                <p className="text-2xl font-bold text-accent">
-                  {timeRemaining}
-                </p>
+                <p className="text-sm text-muted-foreground mb-1">Timp rămas</p>
+                <p className="text-2xl font-bold text-accent">{timeRemaining}</p>
               </div>
 
               <div className="pt-4">
@@ -207,18 +201,12 @@ const Candle = () => {
               <div className="flex justify-center mb-4">
                 <Flame className="w-16 h-16 text-accent/40" />
               </div>
-              <CardTitle className="text-primary">
-                Aprinde o Lumânare Virtuală
-              </CardTitle>
-              <CardDescription>
-                Lumânarea ta va arde 24 de ore și va simboliza rugăciunea ta
-              </CardDescription>
+              <CardTitle className="text-primary">Aprinde o Lumânare Virtuală</CardTitle>
+              <CardDescription>Lumânarea ta va arde 24 de ore și va simboliza rugăciunea ta</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Rugăciunea ta (opțional)
-                </label>
+                <label className="text-sm font-medium">Rugăciunea ta (opțional)</label>
                 <Textarea
                   value={prayer}
                   onChange={(e) => setPrayer(e.target.value)}
@@ -230,19 +218,12 @@ const Candle = () => {
 
               <div className="bg-secondary rounded-lg p-4 text-sm text-muted-foreground">
                 <p className="mb-2">
-                  Aprinderea unei lumânări virtuale este un gest simbolic de rugăciune 
-                  și contemplare spirituală.
+                  Aprinderea unei lumânări virtuale este un gest simbolic de rugăciune și contemplare spirituală.
                 </p>
-                <p className="text-accent font-medium">
-                  Donație sugerată: 5 RON
-                </p>
+                <p className="text-accent font-medium">Donație sugerată: 5 RON</p>
               </div>
 
-              <Button
-                onClick={handleLightCandle}
-                disabled={submitting}
-                className="w-full h-12 text-lg"
-              >
+              <Button onClick={handleLightCandle} disabled={submitting} className="w-full h-12 text-lg">
                 <Flame className="w-5 h-5 mr-2" />
                 {submitting ? "Se aprinde..." : "Aprinde Lumânarea"}
               </Button>
@@ -257,18 +238,15 @@ const Candle = () => {
         {/* Info Card */}
         <Card className="glow-soft">
           <CardHeader>
-            <CardTitle className="text-lg text-primary">
-              Despre Lumânarea Virtuală
-            </CardTitle>
+            <CardTitle className="text-lg text-primary">Despre Lumânarea Virtuală</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>
-              În tradiția ortodoxă, lumânarea aprinsă simbolizează rugăciunea 
-              credinciosului care se înalță către cer.
+              În tradiția ortodoxă, lumânarea aprinsă simbolizează rugăciunea credinciosului care se înalță către cer.
             </p>
             <p>
-              Prin aprinderea unei lumânări virtuale, îți manifești intenția 
-              spirituală și sprijini comunitatea de pelerini.
+              Prin aprinderea unei lumânări virtuale, îți manifești intenția spirituală și sprijini comunitatea de
+              pelerini.
             </p>
           </CardContent>
         </Card>
@@ -277,12 +255,8 @@ const Candle = () => {
         {candleHistory.length > 0 && (
           <Card className="glow-soft">
             <CardHeader>
-              <CardTitle className="text-lg text-primary">
-                Istoricul Lumânărilor
-              </CardTitle>
-              <CardDescription>
-                Rugăciunile tale anterioare
-              </CardDescription>
+              <CardTitle className="text-lg text-primary">Istoricul Lumânărilor</CardTitle>
+              <CardDescription>Rugăciunile tale anterioare</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {candleHistory.map((candle) => (
