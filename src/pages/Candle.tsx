@@ -40,7 +40,7 @@ const Candle = () => {
         const now = new Date();
         
         if (expiresAt > now) {
-          setTimeRemaining(formatDistanceToNow(expiresAt, { locale: ro, addSuffix: true }));
+          setTimeRemaining("circa " + formatDistanceToNow(expiresAt, { locale: ro }));
         } else {
           setActiveCandle(null);
           fetchCandles();
