@@ -1,6 +1,7 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useDeepLinkHandler } from "@/hooks/useDeepLinkHandler";
 import SplashScreen from "./SplashScreen";
 
 interface AppInitializerProps {
@@ -32,6 +33,9 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
   const [isExiting, setIsExiting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Set up global deep link handler for mobile OAuth and password recovery
+  useDeepLinkHandler();
 
   useEffect(() => {
     const currentPath = location.pathname;

@@ -103,9 +103,15 @@ const Auth = () => {
     handleOAuthCallback();
 
     // Set up deep link listener for mobile OAuth callback
-    const cleanupDeepLink = initializeDeepLinkListener(() => {
-      console.log('Deep link auth success, navigating to dashboard');
-      navigate("/dashboard");
+    const cleanupDeepLink = initializeDeepLinkListener({
+      onAuthSuccess: () => {
+        console.log('Deep link auth success, navigating to dashboard');
+        navigate("/dashboard");
+      },
+      onRecoverySuccess: () => {
+        console.log('Deep link recovery success, navigating to reset-password');
+        navigate("/reset-password");
+      },
     });
 
     // Set up auth state listener FIRST

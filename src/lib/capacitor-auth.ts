@@ -60,7 +60,19 @@ export const closeOAuthBrowser = async (): Promise<void> => {
 /**
  * Parse OAuth tokens from a deep link URL
  */
-const parseOAuthTokensFromUrl = (url: string): { accessToken: string | null; refreshToken: string | null } => {
+/**
+ * Result type for deep link parsing
+ */
+interface DeepLinkResult {
+  accessToken: string | null;
+  refreshToken: string | null;
+  isRecovery: boolean;
+}
+
+/**
+ * Parse OAuth tokens and recovery type from a deep link URL
+ */
+const parseOAuthTokensFromUrl = (url: string): DeepLinkResult => {
   try {
     // Parse the URL - tokens can be in hash or query params
     const urlObj = new URL(url);
@@ -69,6 +81,7 @@ const parseOAuthTokensFromUrl = (url: string): { accessToken: string | null; ref
     const hashParams = new URLSearchParams(urlObj.hash.substring(1));
     let accessToken = hashParams.get('access_token');
     let refreshToken = hashParams.get('refresh_token');
+    const type = hashParams.get('type');
     
     // If not in hash, check query params
     if (!accessToken) {
@@ -77,32 +90,49 @@ const parseOAuthTokensFromUrl = (url: string): { accessToken: string | null; ref
       refreshToken = queryParams.get('refresh_token');
     }
     
-    return { accessToken, refreshToken };
+    return { 
+      accessToken, 
+      refreshToken,
+      isRecovery: type === 'recovery'
+    };
   } catch (error) {
     console.error('Error parsing OAuth tokens from URL:', error);
-    return { accessToken: null, refreshToken: null };
+    return { accessToken: null, refreshToken: null, isRecovery: false };
   }
 };
 
 /**
- * Handle deep link callback from OAuth
+ * Result of handling a deep link callback
  */
-const handleDeepLinkCallback = async (url: string): Promise<boolean> => {
+export interface DeepLinkCallbackResult {
+  success: boolean;
+  isRecovery: boolean;
+}
+
+/**
+ * Handle deep link callback from OAuth or password recovery
+ */
+const handleDeepLinkCallback = async (url: string): Promise<DeepLinkCallbackResult> => {
   console.log('Handling deep link:', url);
   
-  // Check if this is an auth callback URL
-  if (!url.includes('auth/callback') && !url.includes('access_token')) {
+  // Check if this is an auth callback URL (OAuth or password recovery)
+  // Password recovery URLs contain type=recovery in the hash
+  const isAuthUrl = url.includes('auth/callback') || 
+                    url.includes('access_token') || 
+                    url.includes('type=recovery');
+  
+  if (!isAuthUrl) {
     console.log('Not an auth callback URL, ignoring');
-    return false;
+    return { success: false, isRecovery: false };
   }
 
   // Close the in-app browser if it's open
   await closeOAuthBrowser();
   
-  const { accessToken, refreshToken } = parseOAuthTokensFromUrl(url);
+  const { accessToken, refreshToken, isRecovery } = parseOAuthTokensFromUrl(url);
   
   if (accessToken && refreshToken) {
-    console.log('Found OAuth tokens, setting session...');
+    console.log('Found OAuth tokens, setting session... isRecovery:', isRecovery);
     
     const { error } = await supabase.auth.setSession({
       access_token: accessToken,
@@ -111,22 +141,30 @@ const handleDeepLinkCallback = async (url: string): Promise<boolean> => {
     
     if (error) {
       console.error('Error setting session from deep link:', error);
-      return false;
+      return { success: false, isRecovery };
     }
     
     console.log('Session set successfully from deep link');
-    return true;
+    return { success: true, isRecovery };
   }
   
   console.log('No OAuth tokens found in URL');
-  return false;
+  return { success: false, isRecovery: false };
 };
 
 /**
- * Initialize deep link listener for OAuth callbacks
+ * Callback type for deep link authentication
+ */
+export interface DeepLinkAuthCallback {
+  onAuthSuccess?: () => void;
+  onRecoverySuccess?: () => void;
+}
+
+/**
+ * Initialize deep link listener for OAuth and password recovery callbacks
  * Should be called once when the app starts
  */
-export const initializeDeepLinkListener = (onAuthSuccess?: () => void): (() => void) => {
+export const initializeDeepLinkListener = (callbacks?: DeepLinkAuthCallback): (() => void) => {
   if (!isNativePlatform()) {
     console.log('Not a native platform, skipping deep link listener setup');
     return () => {};
@@ -136,24 +174,32 @@ export const initializeDeepLinkListener = (onAuthSuccess?: () => void): (() => v
   
   let listenerHandle: { remove: () => void } | null = null;
   
+  const handleResult = (result: DeepLinkCallbackResult) => {
+    if (result.success) {
+      if (result.isRecovery && callbacks?.onRecoverySuccess) {
+        console.log('Recovery flow detected, calling onRecoverySuccess');
+        callbacks.onRecoverySuccess();
+      } else if (!result.isRecovery && callbacks?.onAuthSuccess) {
+        console.log('Auth success, calling onAuthSuccess');
+        callbacks.onAuthSuccess();
+      }
+    }
+  };
+  
   // Handle app opened with URL (cold start)
   App.getLaunchUrl().then(async (launchUrl) => {
     if (launchUrl?.url) {
       console.log('App launched with URL:', launchUrl.url);
-      const success = await handleDeepLinkCallback(launchUrl.url);
-      if (success && onAuthSuccess) {
-        onAuthSuccess();
-      }
+      const result = await handleDeepLinkCallback(launchUrl.url);
+      handleResult(result);
     }
   });
   
   // Handle app opened while running (warm start)
   App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
     console.log('App URL opened:', event.url);
-    const success = await handleDeepLinkCallback(event.url);
-    if (success && onAuthSuccess) {
-      onAuthSuccess();
-    }
+    const result = await handleDeepLinkCallback(event.url);
+    handleResult(result);
   }).then((handle) => {
     listenerHandle = handle;
   });
