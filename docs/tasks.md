@@ -118,14 +118,22 @@
   - No onboarding or dashboard interference
 - [x] Configured mobile deep linking for Google OAuth (Capacitor)
   - Custom URL scheme: pelerinaj://auth/callback
-  - In-app browser for OAuth flow on mobile
+  - In-app browser for OAuth flow on mobile (fullscreen presentation)
   - Deep link listener to capture OAuth callback tokens
   - Automatic session restoration from callback URL
+  - Browser auto-closes when deep link is received
 - [x] Fixed password reset deep link handling for mobile
   - Deep link listener now correctly detects `type=recovery` in URL
   - Recovery links route to `/reset-password` instead of `/dashboard`
   - Global deep link handler in AppInitializer catches cold-start recovery links
   - Separate callbacks for auth success vs. recovery success
+- [x] Fixed Google OAuth returning to browser instead of app
+  - Changed Browser presentation style from 'popover' to 'fullscreen' for Android compatibility
+  - Added proper browser event listeners (browserFinished, browserPageLoaded)
+  - Browser auto-closes immediately upon receiving deep link callback
+  - Added cleanup for browser listeners to prevent memory leaks
+  - Singleton pattern for deep link listener to prevent duplicate handlers
+  - Updated AndroidManifest.xml requirements: launchMode="singleTask", exported="true"
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
