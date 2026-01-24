@@ -121,8 +121,11 @@
   - In-app browser for OAuth flow on mobile
   - Deep link listener to capture OAuth callback tokens
   - Automatic session restoration from callback URL
-
----
+- [x] Fixed password reset deep link handling for mobile
+  - Deep link listener now correctly detects `type=recovery` in URL
+  - Recovery links route to `/reset-password` instead of `/dashboard`
+  - Global deep link handler in AppInitializer catches cold-start recovery links
+  - Separate callbacks for auth success vs. recovery success
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
