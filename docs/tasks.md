@@ -134,6 +134,9 @@
   - Added cleanup for browser listeners to prevent memory leaks
   - Singleton pattern for deep link listener to prevent duplicate handlers
   - Updated AndroidManifest.xml requirements: launchMode="singleTask", exported="true"
+  - Removed duplicate deep link listener from Auth.tsx (now only in AppInitializer)
+  - Added detailed logging for platform detection debugging
+  - **CRITICAL**: User must add `pelerinaj://auth/callback` to Supabase redirect URLs
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**

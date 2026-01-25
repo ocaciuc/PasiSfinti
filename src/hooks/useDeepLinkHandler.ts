@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { initializeDeepLinkListener, isNativePlatform, cleanupAllListeners } from "@/lib/capacitor-auth";
 
 /**
@@ -12,7 +12,6 @@ import { initializeDeepLinkListener, isNativePlatform, cleanupAllListeners } fro
  */
 export const useDeepLinkHandler = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const isInitialized = useRef(false);
 
   useEffect(() => {

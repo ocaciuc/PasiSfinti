@@ -286,7 +286,13 @@ export const cleanupAllListeners = async (): Promise<void> => {
 export const performGoogleOAuth = async (): Promise<{ error: Error | null }> => {
   try {
     const redirectUrl = getOAuthRedirectUrl();
-    console.log('[capacitor-auth] Starting Google OAuth with redirect:', redirectUrl, 'isNative:', isNativePlatform());
+    const nativePlatform = isNativePlatform();
+    console.log('[capacitor-auth] Starting Google OAuth with redirect:', redirectUrl, 'isNative:', nativePlatform);
+    console.log('[capacitor-auth] Platform info:', {
+      platform: Capacitor.getPlatform(),
+      isNative: nativePlatform,
+      redirectUrl: redirectUrl,
+    });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -297,7 +303,7 @@ export const performGoogleOAuth = async (): Promise<{ error: Error | null }> => 
           prompt: 'consent',
         },
         // Don't auto-redirect on native - we'll open in in-app browser
-        skipBrowserRedirect: isNativePlatform(),
+        skipBrowserRedirect: nativePlatform,
       },
     });
 
@@ -307,9 +313,13 @@ export const performGoogleOAuth = async (): Promise<{ error: Error | null }> => 
     }
 
     // On native platform, open the OAuth URL in in-app browser
-    if (isNativePlatform() && data?.url) {
+    if (nativePlatform && data?.url) {
       console.log('[capacitor-auth] Opening OAuth URL in in-app browser:', data.url.substring(0, 100) + '...');
       await openOAuthInBrowser(data.url);
+    } else if (!nativePlatform && data?.url) {
+      // On web, redirect normally
+      console.log('[capacitor-auth] Web platform - redirecting to OAuth URL');
+      window.location.href = data.url;
     }
 
     return { error: null };
