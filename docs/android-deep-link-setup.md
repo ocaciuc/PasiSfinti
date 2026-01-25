@@ -99,10 +99,21 @@ This is usually caused by one of these issues:
 3. **Redirect URL not added to Supabase**
    - Go to Supabase Dashboard > Authentication > URL Configuration
    - Add `pelerinaj://auth/callback` to the redirect URLs list
+   - **This is CRITICAL** - without this, the OAuth flow won't redirect to the app
 
 4. **App not rebuilt after changes**
    - Always run `npx cap sync android` after any code changes
    - Then rebuild and reinstall the app
+
+5. **Capacitor not detecting native platform**
+   - Make sure you ran `npm run build` before `npx cap sync android`
+   - Check that `@capacitor/core`, `@capacitor/app`, and `@capacitor/browser` are installed
+   - Verify the app is running on the device, not in a web view that simulates mobile
+
+6. **External browser opens instead of in-app browser**
+   - Ensure `@capacitor/browser` plugin is properly installed
+   - Run `npx cap sync android` to sync the plugin
+   - The in-app browser should open with `presentationStyle: 'fullscreen'`
 
 ### OAuth tokens not being parsed
 - Check the console logs in Android Studio for `[capacitor-auth]` messages

@@ -11,7 +11,7 @@ import { Flame, Mail, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import Footer from "@/components/Footer";
 import { translateAuthError } from "@/lib/onboarding-error-handler";
-import { initializeDeepLinkListener, performGoogleOAuth } from "@/lib/capacitor-auth";
+import { performGoogleOAuth } from "@/lib/capacitor-auth";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
@@ -101,18 +101,9 @@ const Auth = () => {
     };
 
     handleOAuthCallback();
-
-    // Set up deep link listener for mobile OAuth callback
-    const cleanupDeepLink = initializeDeepLinkListener({
-      onAuthSuccess: () => {
-        console.log('Deep link auth success, navigating to dashboard');
-        navigate("/dashboard");
-      },
-      onRecoverySuccess: () => {
-        console.log('Deep link recovery success, navigating to reset-password');
-        navigate("/reset-password");
-      },
-    });
+    
+    // NOTE: Deep link listener is now handled globally in AppInitializer via useDeepLinkHandler
+    // Do NOT set up a duplicate listener here - it causes race conditions and duplicate handling
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -147,7 +138,6 @@ const Auth = () => {
 
     return () => {
       subscription.unsubscribe();
-      cleanupDeepLink();
     };
   }, [navigate, toast]);
 
