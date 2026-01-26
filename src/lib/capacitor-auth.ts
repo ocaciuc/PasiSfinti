@@ -166,9 +166,17 @@ const handleDeepLinkCallback = async (url: string): Promise<DeepLinkCallbackResu
     return { success: false, isRecovery: false };
   }
 
-  // CRITICAL: Close the in-app browser immediately when we receive the deep link
-  // This prevents the browser from continuing to show the OAuth flow
-  await closeOAuthBrowser();
+  // CRITICAL: Close the in-app browser FIRST and IMMEDIATELY
+  // This is essential for proper UX - the browser should close before we process tokens
+  console.log('[capacitor-auth] Closing browser before processing tokens...');
+  try {
+    await Browser.close();
+    console.log('[capacitor-auth] Browser.close() called successfully');
+  } catch (e) {
+    console.log('[capacitor-auth] Browser.close() error (may already be closed):', e);
+  }
+  
+  // Also remove listeners to prevent any lingering callbacks
   await removeAllBrowserListeners();
   
   const { accessToken, refreshToken, isRecovery } = parseOAuthTokensFromUrl(url);
