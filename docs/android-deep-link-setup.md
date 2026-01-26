@@ -2,11 +2,25 @@
 
 This document explains how to configure Android deep linking for Google OAuth to redirect back into the mobile app.
 
+## How Google OAuth Works on Mobile
+
+1. User taps "Continuă cu Google" in the app
+2. App opens Google OAuth in **Chrome Custom Tab** (in-app browser)
+3. User authenticates with Google
+4. Google redirects to Supabase callback (`https://<PROJECT_ID>.supabase.co/auth/v1/callback`)
+5. Supabase processes the auth and redirects to our custom scheme: `pelerinaj://auth/callback#access_token=...`
+6. **Android intercepts this custom URL scheme** via the intent-filter
+7. The `appUrlOpen` event fires in the app with the URL
+8. App parses tokens, sets session, and closes the browser
+9. User is navigated to the Dashboard inside the native app
+
+**The key is that the redirect URL must be `pelerinaj://auth/callback`** - this triggers Android's intent-filter.
+
 ## 1. Configure Android Intent Filters
 
-After running `npx cap add android`, you need to add the following intent filter to your `android/app/src/main/AndroidManifest.xml` file.
+After running `npx cap add android`, add the following intent filter to `android/app/src/main/AndroidManifest.xml`.
 
-Find the `<activity>` tag for your main activity and add this intent filter inside it:
+Find the `<activity>` tag for MainActivity and add:
 
 ```xml
 <activity
@@ -15,13 +29,13 @@ Find the `<activity>` tag for your main activity and add this intent filter insi
     android:launchMode="singleTask"
     ...>
     
-    <!-- Existing intent-filter -->
+    <!-- Existing launcher intent-filter -->
     <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
     </intent-filter>
 
-    <!-- ADD THIS: Deep link intent filter for OAuth callback -->
+    <!-- Deep link intent filter for OAuth callback -->
     <intent-filter android:autoVerify="false">
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -33,106 +47,81 @@ Find the `<activity>` tag for your main activity and add this intent filter insi
 </activity>
 ```
 
-**IMPORTANT NOTES:**
-- `android:launchMode="singleTask"` is CRITICAL - it ensures the app reuses the existing instance instead of creating a new one
-- `android:exported="true"` is required for deep links to work on Android 12+
-- `android:autoVerify="false"` since we're using a custom scheme, not HTTPS app links
+**CRITICAL SETTINGS:**
+- `android:launchMode="singleTask"` - **REQUIRED** - ensures the app reuses the existing instance
+- `android:exported="true"` - Required for deep links on Android 12+
+- `android:autoVerify="false"` - We use a custom scheme, not HTTPS App Links
 
 ## 2. Configure Supabase OAuth Redirect URLs
 
-In your Supabase dashboard, go to **Authentication > URL Configuration** and add the following redirect URLs:
+In Supabase Dashboard → **Authentication → URL Configuration**, add:
 
 ```
-https://pasi-comunitate-sfanta.lovable.app/auth/callback
 pelerinaj://auth/callback
+https://pasi-comunitate-sfanta.lovable.app/auth/callback
 ```
 
-**IMPORTANT:** 
-- The **web URL** (`https://pasi-comunitate-sfanta.lovable.app/auth/callback`) is used as the primary redirect because Chrome Custom Tabs on Android don't properly redirect to custom URL schemes directly.
-- The **custom scheme** (`pelerinaj://auth/callback`) is still needed as a fallback and for the secondary redirect from the web callback page back to the app.
+**CRITICAL:** The custom scheme URL (`pelerinaj://auth/callback`) MUST be added. This is what Supabase redirects to after OAuth.
 
 ## 3. Configure Google Cloud Console
 
-In the Google Cloud Console for your OAuth credentials:
+In Google Cloud Console → APIs & Services → Credentials:
 
-1. Go to **APIs & Services > Credentials**
-2. Edit your OAuth 2.0 Client ID
-3. Under **Authorized redirect URIs**, add:
-   - `https://yanjhfqqdcevlzmwsrnj.supabase.co/auth/v1/callback` (for Supabase)
+1. Edit your OAuth 2.0 Client ID
+2. Under **Authorized redirect URIs**, ensure this is present:
+   - `https://yanjhfqqdcevlzmwsrnj.supabase.co/auth/v1/callback`
 
-## 4. How It Works
+Note: You do NOT need to add the custom scheme to Google - only Supabase handles the final redirect.
 
-1. User taps "Continuă cu Google" in the app
-2. App opens Google OAuth in **in-app browser** (Capacitor Browser plugin)
-3. User authenticates with Google
-4. Google redirects to Supabase callback
-5. Supabase redirects to `pelerinaj://auth/callback#access_token=...`
-6. Android intercepts this custom URL scheme and sends it to the app
-7. App's deep link listener (`appUrlOpen` event) receives the URL
-8. The in-app browser is automatically closed
-9. App parses the tokens and sets the session
-10. User is navigated to the dashboard
+## 4. Testing Deep Links
 
-## 5. Testing
-
-To test deep links on Android:
+Test the URL scheme from command line:
 
 ```bash
-# Test the URL scheme from command line
-adb shell am start -W -a android.intent.action.VIEW -d "pelerinaj://auth/callback#access_token=test&refresh_token=test" app.lovable.ee3834849f11481bad7f08d619b104bd
+adb shell am start -W -a android.intent.action.VIEW \
+  -d "pelerinaj://auth/callback#access_token=test&refresh_token=test" \
+  app.lovable.ee3834849f11481bad7f08d619b104bd
 ```
 
-## 6. Troubleshooting
+If the app opens, the intent-filter is correctly configured.
 
-### App doesn't open from redirect / stays in browser
-This is usually caused by one of these issues:
+## 5. Troubleshooting
 
-1. **Missing `launchMode="singleTask"`** in AndroidManifest.xml
-   - Add `android:launchMode="singleTask"` to the main activity
+### Browser stays open after OAuth / Dashboard appears in browser
 
-2. **Intent filter not added correctly**
-   - Verify the intent filter is correctly added to AndroidManifest.xml
-   - Make sure the URL scheme matches exactly: `pelerinaj`
-   - Rebuild the app after making changes:
-     ```bash
-     npx cap sync android
-     npx cap run android
-     ```
+This is the most common issue. Check:
 
-3. **Redirect URL not added to Supabase**
-   - Go to Supabase Dashboard > Authentication > URL Configuration
-   - Add `pelerinaj://auth/callback` to the redirect URLs list
-   - **This is CRITICAL** - without this, the OAuth flow won't redirect to the app
+1. **Supabase redirect URL must include the custom scheme**
+   - Go to Supabase Dashboard → Authentication → URL Configuration
+   - Ensure `pelerinaj://auth/callback` is in the redirect URLs list
+   - **This is the #1 cause** - if Supabase doesn't have this URL, it won't redirect to the app
 
-4. **App not rebuilt after changes**
-   - Always run `npx cap sync android` after any code changes
-   - Then rebuild and reinstall the app
+2. **AndroidManifest.xml must have correct settings**
+   - `android:launchMode="singleTask"` on MainActivity
+   - Intent-filter with `android:scheme="pelerinaj"`
+   - Rebuild after changes: `npx cap sync android && npx cap run android`
 
-5. **Capacitor not detecting native platform**
-   - Make sure you ran `npm run build` before `npx cap sync android`
-   - Check that `@capacitor/core`, `@capacitor/app`, and `@capacitor/browser` are installed
-   - Verify the app is running on the device, not in a web view that simulates mobile
-
-6. **External browser opens instead of in-app browser**
-   - Ensure `@capacitor/browser` plugin is properly installed
-   - Run `npx cap sync android` to sync the plugin
-   - The in-app browser should open with `presentationStyle: 'fullscreen'`
+3. **App not rebuilt after code changes**
+   ```bash
+   npm run build
+   npx cap sync android
+   npx cap run android
+   ```
 
 ### OAuth tokens not being parsed
-- Check the console logs in Android Studio for `[capacitor-auth]` messages
-- Look for "App URL opened event:" to see if the deep link was received
-- Verify the redirect URL in Supabase includes the custom scheme
+
+Check Android Studio logcat for `[capacitor-auth]` messages:
+- "App URL opened event:" - Deep link was received
+- "Found OAuth tokens, setting session" - Tokens were parsed
+- "Session set successfully" - Auth completed
 
 ### Session not persisting
-- Make sure `localStorage` is working in the WebView
-- Check for any errors in the Capacitor logs related to Supabase
 
-### Browser doesn't close after OAuth
-- The `Browser.close()` call happens automatically when the deep link is received
-- Check console logs for "[capacitor-auth] Closing in-app browser"
-- If the browser shows a blank page, ensure `launchMode="singleTask"` is set
+- The app uses `@capacitor/preferences` for persistent storage
+- Check that `hydrateStorageCache()` is called in main.tsx before React renders
+- Check logcat for storage-related errors
 
-## 7. Full AndroidManifest.xml Example
+## 6. Full AndroidManifest.xml Example
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -194,25 +183,31 @@ This is usually caused by one of these issues:
 </manifest>
 ```
 
-## 8. Verifying the Setup
+## 7. Quick Verification Checklist
 
-After making all changes:
+Before testing, verify:
 
-1. Pull the latest code: `git pull`
-2. Install dependencies: `npm install`
-3. Build the web assets: `npm run build`
-4. Sync with Capacitor: `npx cap sync android`
-5. Open in Android Studio: `npx cap open android`
-6. Build and run on device/emulator
-7. Test the "Continuă cu Google" button
+- [ ] `pelerinaj://auth/callback` is in Supabase redirect URLs
+- [ ] AndroidManifest.xml has `android:launchMode="singleTask"`
+- [ ] AndroidManifest.xml has intent-filter with `android:scheme="pelerinaj"`
+- [ ] You've run `npm run build && npx cap sync android`
+- [ ] You've rebuilt the app in Android Studio or via `npx cap run android`
 
-The logs should show:
+## 8. Expected Log Output
+
+When OAuth works correctly, you should see in Android Studio logcat:
+
 ```
 [capacitor-auth] Starting Google OAuth with redirect: pelerinaj://auth/callback isNative: true
 [capacitor-auth] Opening OAuth URL in in-app browser
+[capacitor-auth] Browser opened successfully
+... user authenticates in browser ...
 [capacitor-auth] App URL opened event: pelerinaj://auth/callback#access_token=...
-[capacitor-auth] Closing in-app browser
+[capacitor-auth] *** CLOSING BROWSER IMMEDIATELY ***
+[capacitor-auth] Browser.close() succeeded
 [capacitor-auth] Found OAuth tokens, setting session...
 [capacitor-auth] Session set successfully from deep link
 [useDeepLinkHandler] Auth success, navigating to dashboard
 ```
+
+If you don't see "App URL opened event", the deep link isn't being received - check Supabase redirect URLs.
