@@ -40,13 +40,16 @@ Find the `<activity>` tag for your main activity and add this intent filter insi
 
 ## 2. Configure Supabase OAuth Redirect URLs
 
-In your Supabase dashboard, go to **Authentication > URL Configuration** and add the following redirect URL:
+In your Supabase dashboard, go to **Authentication > URL Configuration** and add the following redirect URLs:
 
 ```
+https://pasi-comunitate-sfanta.lovable.app/auth/callback
 pelerinaj://auth/callback
 ```
 
-This tells Supabase to redirect back to your mobile app after Google OAuth is complete.
+**IMPORTANT:** 
+- The **web URL** (`https://pasi-comunitate-sfanta.lovable.app/auth/callback`) is used as the primary redirect because Chrome Custom Tabs on Android don't properly redirect to custom URL schemes directly.
+- The **custom scheme** (`pelerinaj://auth/callback`) is still needed as a fallback and for the secondary redirect from the web callback page back to the app.
 
 ## 3. Configure Google Cloud Console
 

@@ -127,16 +127,15 @@
   - Recovery links route to `/reset-password` instead of `/dashboard`
   - Global deep link handler in AppInitializer catches cold-start recovery links
   - Separate callbacks for auth success vs. recovery success
-- [x] Fixed Google OAuth returning to browser instead of app
-  - Changed Browser presentation style from 'popover' to 'fullscreen' for Android compatibility
-  - Added proper browser event listeners (browserFinished, browserPageLoaded)
-  - Browser auto-closes immediately upon receiving deep link callback
-  - Added cleanup for browser listeners to prevent memory leaks
-  - Singleton pattern for deep link listener to prevent duplicate handlers
-  - Updated AndroidManifest.xml requirements: launchMode="singleTask", exported="true"
-  - Removed duplicate deep link listener from Auth.tsx (now only in AppInitializer)
-  - Added detailed logging for platform detection debugging
-  - **CRITICAL**: User must add `pelerinaj://auth/callback` to Supabase redirect URLs
+- [x] Fixed Google OAuth Chrome Custom Tab deep link issue
+  - Chrome Custom Tabs on Android don't properly redirect to custom URL schemes
+  - Solution: OAuth now redirects to web callback URL first
+  - AuthCallback page detects mobile browser context
+  - Web page exchanges code for session, then redirects to custom scheme
+  - Custom scheme triggers app's deep link listener with tokens
+  - Works with: cold start, warm start, first click, subsequent clicks
+  - **CRITICAL**: Published URL (https://pasi-comunitate-sfanta.lovable.app/auth/callback) 
+    must be in Supabase redirect URLs
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
