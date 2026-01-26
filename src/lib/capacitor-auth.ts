@@ -16,14 +16,17 @@ export const isNativePlatform = (): boolean => {
 
 /**
  * Get the appropriate redirect URL based on platform
+ * 
+ * IMPORTANT: On mobile, we use the WEB callback URL instead of the custom scheme.
+ * This is because Chrome Custom Tabs on Android don't properly redirect to custom 
+ * URL schemes directly. Instead, we let the web callback page detect the mobile 
+ * platform and redirect to the custom scheme from there.
  */
 export const getOAuthRedirectUrl = (): string => {
-  if (isNativePlatform()) {
-    // Use custom URL scheme for mobile apps
-    return APP_CALLBACK_URL;
-  }
-  // Use web URL for browser
-  return `${window.location.origin}/auth`;
+  // Always use web callback URL - it will handle mobile redirect
+  // The published URL is used because it's more reliable across environments
+  const baseUrl = 'https://pasi-comunitate-sfanta.lovable.app';
+  return `${baseUrl}/auth/callback`;
 };
 
 /**
