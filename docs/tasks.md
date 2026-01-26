@@ -133,13 +133,15 @@
   - Separate callbacks for auth success vs. recovery success
 - [x] Fixed Google OAuth Chrome Custom Tab browser closing issue
   - **Root cause**: OAuth was redirecting to web callback URL instead of custom scheme
-  - **Solution**: Changed redirect URL to use custom scheme directly (`pelerinaj://auth/callback`)
-  - The custom scheme triggers Android's intent-filter which routes URL to the app
-  - Deep link listener receives URL, closes browser immediately, then sets session
-  - Browser uses `presentationStyle: 'popover'` for better Android compatibility
-  - Browser.close() called FIRST before any token processing
-  - **CRITICAL**: Supabase must have `pelerinaj://auth/callback` in redirect URLs
-  - No web-to-app bridge needed - direct custom scheme redirect works
+  - **Solution 1**: Changed redirect URL to use custom scheme directly (`pelerinaj://auth/callback`)
+  - **Solution 2**: Web callback page now detects mobile browser and redirects to app with tokens
+  - The web callback extracts session tokens and redirects using `pelerinaj://auth/callback#access_token=...`
+  - Multiple redirect methods (location.href, link click, window.open) for browser compatibility
+  - Manual "Deschide în aplicație" button shown after 3 seconds as fallback
+  - Browser.close() called FIRST before any token processing in native flow
+  - **CRITICAL**: Supabase must have BOTH URLs in redirect list:
+    - `pelerinaj://auth/callback` (for direct native redirect)
+    - `https://pasi-comunitate-sfanta.lovable.app/auth/callback` (for web bridge fallback)
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
