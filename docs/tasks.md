@@ -131,18 +131,15 @@
   - Recovery links route to `/reset-password` instead of `/dashboard`
   - Global deep link handler in AppInitializer catches cold-start recovery links
   - Separate callbacks for auth success vs. recovery success
-- [x] Fixed Google OAuth Chrome Custom Tab deep link issue
-  - Chrome Custom Tabs on Android don't properly redirect to custom URL schemes
-  - Solution: OAuth now redirects to web callback URL first
-  - AuthCallback page detects mobile in-app browser context (improved detection)
-  - Web page exchanges code for session, then redirects to custom scheme
-  - Custom scheme triggers app's deep link listener with tokens
-  - Browser.close() called FIRST before processing tokens
-  - Fallback "Open in app" button shown if auto-redirect fails
-  - Multiple redirect methods tried (location.href + hidden link click)
-  - Works with: cold start, warm start, first click, subsequent clicks
-  - **CRITICAL**: Published URL (https://pasi-comunitate-sfanta.lovable.app/auth/callback) 
-    must be in Supabase redirect URLs
+- [x] Fixed Google OAuth Chrome Custom Tab browser closing issue
+  - **Root cause**: OAuth was redirecting to web callback URL instead of custom scheme
+  - **Solution**: Changed redirect URL to use custom scheme directly (`pelerinaj://auth/callback`)
+  - The custom scheme triggers Android's intent-filter which routes URL to the app
+  - Deep link listener receives URL, closes browser immediately, then sets session
+  - Browser uses `presentationStyle: 'popover'` for better Android compatibility
+  - Browser.close() called FIRST before any token processing
+  - **CRITICAL**: Supabase must have `pelerinaj://auth/callback` in redirect URLs
+  - No web-to-app bridge needed - direct custom scheme redirect works
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**

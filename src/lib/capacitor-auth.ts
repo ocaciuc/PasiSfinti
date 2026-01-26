@@ -17,49 +17,51 @@ export const isNativePlatform = (): boolean => {
 /**
  * Get the appropriate redirect URL based on platform
  * 
- * IMPORTANT: On mobile, we use the WEB callback URL instead of the custom scheme.
- * This is because Chrome Custom Tabs on Android don't properly redirect to custom 
- * URL schemes directly. Instead, we let the web callback page detect the mobile 
- * platform and redirect to the custom scheme from there.
+ * On mobile, we use the custom URL scheme directly. The key is that:
+ * 1. Supabase OAuth flow redirects to our custom scheme (pelerinaj://auth/callback)
+ * 2. Android intercepts this via the intent-filter in AndroidManifest.xml
+ * 3. The deep link listener receives the URL with tokens
+ * 4. We close the browser and set the session
+ * 
+ * This requires the custom scheme URL to be added to Supabase redirect URLs.
  */
 export const getOAuthRedirectUrl = (): string => {
-  // Always use web callback URL - it will handle mobile redirect
-  // The published URL is used because it's more reliable across environments
-  const baseUrl = 'https://pasi-comunitate-sfanta.lovable.app';
+  if (isNativePlatform()) {
+    // On mobile, redirect directly to custom URL scheme
+    // This triggers the Android intent-filter and iOS universal links
+    return APP_CALLBACK_URL;
+  }
+  // On web, use the web callback URL
+  const baseUrl = window.location.origin;
   return `${baseUrl}/auth/callback`;
 };
 
 /**
  * Open OAuth URL in in-app browser (for mobile)
- * This ensures the OAuth flow happens within the app context
+ * 
+ * CRITICAL: We use presentationStyle: 'popover' on Android because:
+ * 1. It opens Chrome Custom Tabs which can handle redirects better
+ * 2. The redirect to custom scheme (pelerinaj://) will trigger the intent-filter
+ * 3. Android will then route the URL to our app via the deep link listener
  */
 export const openOAuthInBrowser = async (url: string): Promise<void> => {
   if (isNativePlatform()) {
     console.log('[capacitor-auth] Opening OAuth URL in in-app browser');
-    
-    // Add listener for browser finished event
-    const browserFinishedListener = await Browser.addListener('browserFinished', () => {
-      console.log('[capacitor-auth] Browser finished event received');
-      browserFinishedListener.remove();
-    });
-    
-    // Add listener for page loaded (optional, for debugging)
-    const browserPageLoadedListener = await Browser.addListener('browserPageLoaded', () => {
-      console.log('[capacitor-auth] Browser page loaded');
-    });
+    console.log('[capacitor-auth] OAuth URL (truncated):', url.substring(0, 150) + '...');
     
     try {
-      // Open in-app browser - use 'fullscreen' for better Android support
+      // Open in-app browser
+      // On Android, this opens Chrome Custom Tabs
+      // The redirect to pelerinaj:// will be intercepted by the intent-filter
       await Browser.open({
         url,
-        presentationStyle: 'fullscreen',
+        presentationStyle: 'popover', // popover works better with custom schemes on Android
         toolbarColor: '#4B0082', // Match app theme
-        windowName: '_blank',
       });
+      
+      console.log('[capacitor-auth] Browser opened successfully');
     } catch (error) {
       console.error('[capacitor-auth] Failed to open browser:', error);
-      browserFinishedListener.remove();
-      browserPageLoadedListener.remove();
       throw error;
     }
   } else {
@@ -167,17 +169,28 @@ const handleDeepLinkCallback = async (url: string): Promise<DeepLinkCallbackResu
   }
 
   // CRITICAL: Close the in-app browser FIRST and IMMEDIATELY
-  // This is essential for proper UX - the browser should close before we process tokens
-  console.log('[capacitor-auth] Closing browser before processing tokens...');
+  // This is the key fix - the browser MUST close before the app shows the dashboard
+  console.log('[capacitor-auth] *** CLOSING BROWSER IMMEDIATELY ***');
+  
+  // Close browser using multiple methods to ensure it works
   try {
+    // Method 1: Direct close
     await Browser.close();
-    console.log('[capacitor-auth] Browser.close() called successfully');
+    console.log('[capacitor-auth] Browser.close() succeeded');
   } catch (e) {
-    console.log('[capacitor-auth] Browser.close() error (may already be closed):', e);
+    console.log('[capacitor-auth] Browser.close() error:', e);
   }
   
-  // Also remove listeners to prevent any lingering callbacks
-  await removeAllBrowserListeners();
+  // Method 2: Remove all listeners (this can also trigger close on some platforms)
+  try {
+    await Browser.removeAllListeners();
+    console.log('[capacitor-auth] Browser listeners removed');
+  } catch (e) {
+    console.log('[capacitor-auth] Failed to remove browser listeners:', e);
+  }
+  
+  // Add a small delay to ensure browser is fully closed
+  await new Promise(resolve => setTimeout(resolve, 100));
   
   const { accessToken, refreshToken, isRecovery } = parseOAuthTokensFromUrl(url);
   
