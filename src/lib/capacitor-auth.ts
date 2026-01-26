@@ -14,22 +14,31 @@ export const isNativePlatform = (): boolean => {
   return Capacitor.isNativePlatform();
 };
 
+// Web callback URL that will bridge to the app
+export const WEB_CALLBACK_URL = 'https://pasi-comunitate-sfanta.lovable.app/auth/callback';
+
 /**
  * Get the appropriate redirect URL based on platform
  * 
- * On mobile, we use the custom URL scheme directly. The key is that:
- * 1. Supabase OAuth flow redirects to our custom scheme (pelerinaj://auth/callback)
- * 2. Android intercepts this via the intent-filter in AndroidManifest.xml
- * 3. The deep link listener receives the URL with tokens
- * 4. We close the browser and set the session
+ * IMPORTANT: On mobile, we redirect to the WEB callback URL first, not the custom scheme.
+ * This is because Chrome Custom Tabs often block or fail to handle direct redirects
+ * to custom URL schemes (pelerinaj://).
  * 
- * This requires the custom scheme URL to be added to Supabase redirect URLs.
+ * The flow is:
+ * 1. Supabase OAuth redirects to WEB_CALLBACK_URL (https://pasi-comunitate-sfanta.lovable.app/auth/callback)
+ * 2. AuthCallback.tsx detects it's in a mobile browser context
+ * 3. AuthCallback.tsx redirects to pelerinaj://auth/callback with tokens
+ * 4. Android intercepts the custom scheme via intent-filter
+ * 5. App receives deep link, closes browser, sets session
+ * 
+ * This "web-to-app bridge" approach works reliably across all Android versions.
  */
 export const getOAuthRedirectUrl = (): string => {
   if (isNativePlatform()) {
-    // On mobile, redirect directly to custom URL scheme
-    // This triggers the Android intent-filter and iOS universal links
-    return APP_CALLBACK_URL;
+    // On mobile, use the web callback as a bridge
+    // The web page will redirect to the custom scheme
+    console.log('[capacitor-auth] Using web bridge for OAuth redirect:', WEB_CALLBACK_URL);
+    return WEB_CALLBACK_URL;
   }
   // On web, use the web callback URL
   const baseUrl = window.location.origin;
