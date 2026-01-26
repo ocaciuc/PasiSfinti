@@ -134,9 +134,12 @@
 - [x] Fixed Google OAuth Chrome Custom Tab deep link issue
   - Chrome Custom Tabs on Android don't properly redirect to custom URL schemes
   - Solution: OAuth now redirects to web callback URL first
-  - AuthCallback page detects mobile browser context
+  - AuthCallback page detects mobile in-app browser context (improved detection)
   - Web page exchanges code for session, then redirects to custom scheme
   - Custom scheme triggers app's deep link listener with tokens
+  - Browser.close() called FIRST before processing tokens
+  - Fallback "Open in app" button shown if auto-redirect fails
+  - Multiple redirect methods tried (location.href + hidden link click)
   - Works with: cold start, warm start, first click, subsequent clicks
   - **CRITICAL**: Published URL (https://pasi-comunitate-sfanta.lovable.app/auth/callback) 
     must be in Supabase redirect URLs
