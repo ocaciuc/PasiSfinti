@@ -2,19 +2,25 @@
 
 This document explains how to configure Android deep linking for Google OAuth to redirect back into the mobile app.
 
-## How Google OAuth Works on Mobile
+## How Google OAuth Works on Mobile (Web-to-App Bridge)
+
+Chrome Custom Tabs often block or fail to handle direct redirects to custom URL schemes.
+Therefore, we use a **"Web-to-App Bridge"** approach:
 
 1. User taps "Continuă cu Google" in the app
 2. App opens Google OAuth in **Chrome Custom Tab** (in-app browser)
 3. User authenticates with Google
 4. Google redirects to Supabase callback (`https://<PROJECT_ID>.supabase.co/auth/v1/callback`)
-5. Supabase processes the auth and redirects to our custom scheme: `pelerinaj://auth/callback#access_token=...`
-6. **Android intercepts this custom URL scheme** via the intent-filter
-7. The `appUrlOpen` event fires in the app with the URL
-8. App parses tokens, sets session, and closes the browser
-9. User is navigated to the Dashboard inside the native app
+5. Supabase processes the auth and redirects to **WEB callback**: `https://pasi-comunitate-sfanta.lovable.app/auth/callback`
+6. **AuthCallback.tsx** loads in the Chrome Custom Tab, detects mobile context
+7. AuthCallback exchanges code for session tokens
+8. AuthCallback redirects to custom scheme: `pelerinaj://auth/callback#access_token=...`
+9. **Android intercepts this custom URL scheme** via the intent-filter
+10. The `appUrlOpen` event fires in the app with the URL
+11. App parses tokens, sets session, and closes the browser
+12. User is navigated to the Dashboard inside the native app
 
-**The key is that the redirect URL must be `pelerinaj://auth/callback`** - this triggers Android's intent-filter.
+**This two-step redirect (web then custom scheme) works reliably across all Android versions.**
 
 ## 1. Configure Android Intent Filters
 
