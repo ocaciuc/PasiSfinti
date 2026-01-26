@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 import BadgesSection from "@/components/BadgesSection";
+import { clearAuthStorage } from "@/lib/capacitor-storage";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "Prenumele este obligatoriu"),
@@ -180,6 +181,9 @@ const Profile = () => {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
+    // Always clear persistent storage on logout
+    await clearAuthStorage();
+    
     if (error) {
       toast.error("Eroare la deconectare: " + error.message);
     } else {

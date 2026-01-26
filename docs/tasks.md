@@ -94,7 +94,11 @@
 - [x] Added proper error handling and validation
 - [x] Added auth state management with `onAuthStateChange`
 - [x] Implemented session persistence
-- [x] Added logout functionality
+- [x] Added persistent session storage for mobile using @capacitor/preferences
+  - Custom storage adapter bridges Supabase's synchronous API with Capacitor's async Preferences
+  - Uses SharedPreferences (Android) / UserDefaults (iOS) instead of transient localStorage
+  - Cache hydration on app start ensures session is available immediately
+  - Logout explicitly clears both localStorage and Preferences
 - [x] Added protected route logic
 - [x] Added session check on app start with splash screen
   - Shows splash screen while checking for existing session
