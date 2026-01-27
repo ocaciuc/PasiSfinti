@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 import BadgesSection from "@/components/BadgesSection";
 import { clearAuthStorage } from "@/lib/capacitor-storage";
+import { signOutFromGoogle } from "@/lib/native-google-signin";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "Prenumele este obligatoriu"),
@@ -183,6 +184,8 @@ const Profile = () => {
     const { error } = await supabase.auth.signOut();
     // Always clear persistent storage on logout
     await clearAuthStorage();
+    // Also sign out from native Google to allow switching accounts
+    await signOutFromGoogle();
     
     if (error) {
       toast.error("Eroare la deconectare: " + error.message);
