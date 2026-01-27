@@ -11,6 +11,7 @@ import { Flame, Mail, Loader2, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import Footer from "@/components/Footer";
 import { translateAuthError } from "@/lib/onboarding-error-handler";
+import { performNativeGoogleSignIn, isNativePlatform } from "@/lib/native-google-signin";
 import { performGoogleOAuth } from "@/lib/capacitor-auth";
 
 // Validation schemas
@@ -168,18 +169,45 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await performGoogleOAuth();
-
-      if (error) {
-        console.error('Google login error:', error);
-        toast({
-          title: "Eroare la autentificare",
-          description: translateAuthError(error),
-          variant: "destructive",
-        });
+      // Use native Google Sign-In on mobile (no browser)
+      // Fall back to OAuth redirect on web
+      if (isNativePlatform()) {
+        console.log('Using native Google Sign-In');
+        const { error } = await performNativeGoogleSignIn();
+        
+        if (error) {
+          console.error('Native Google login error:', error);
+          // Check if user cancelled
+          if (error.message?.includes('cancelled')) {
+            // User cancelled - just reset loading state
+            setGoogleLoading(false);
+            return;
+          }
+          toast({
+            title: "Eroare la autentificare",
+            description: translateAuthError(error),
+            variant: "destructive",
+          });
+          setGoogleLoading(false);
+        }
+        // If no error, auth state listener will handle navigation
         setGoogleLoading(false);
+      } else {
+        // Web: Use OAuth redirect flow
+        console.log('Using web OAuth redirect');
+        const { error } = await performGoogleOAuth();
+
+        if (error) {
+          console.error('Google OAuth error:', error);
+          toast({
+            title: "Eroare la autentificare",
+            description: translateAuthError(error),
+            variant: "destructive",
+          });
+          setGoogleLoading(false);
+        }
+        // Don't set loading to false here - we're redirecting to Google
       }
-      // Don't set loading to false here - we're redirecting to Google
     } catch (error) {
       console.error('Google login exception:', error);
       toast({

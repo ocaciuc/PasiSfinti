@@ -131,21 +131,15 @@
   - Recovery links route to `/reset-password` instead of `/dashboard`
   - Global deep link handler in AppInitializer catches cold-start recovery links
   - Separate callbacks for auth success vs. recovery success
-- [x] Fixed Google OAuth Chrome Custom Tab browser closing issue
-  - **Root cause**: Chrome Custom Tabs block direct redirects to custom URL schemes
-  - **Solution**: Web-to-App Bridge approach
-    - OAuth now redirects to WEB callback: `https://pasi-comunitate-sfanta.lovable.app/auth/callback`
-    - AuthCallback.tsx detects embedded mobile browser context (Chrome Custom Tab)
-    - AuthCallback exchanges code for session tokens
-    - AuthCallback redirects to custom scheme: `pelerinaj://auth/callback#access_token=...`
-    - Android intercepts custom scheme via intent-filter
-    - App parses tokens, sets session, navigates to dashboard
-  - Multiple redirect methods (location.href, link click, window.open) for browser compatibility
-  - Manual "Deschide în aplicație" button shown after 3 seconds as fallback
-  - Browser.close() called FIRST before any token processing in native flow
-  - **CRITICAL**: Supabase must have BOTH URLs in redirect list:
-    - `pelerinaj://auth/callback` (for deep link interception)
-    - `https://pasi-comunitate-sfanta.lovable.app/auth/callback` (for web bridge)
+- [x] **Native Android Google Sign-In (No Browser)**
+  - **Replaced OAuth browser redirect with native Google Identity Services SDK**
+  - Custom Capacitor plugin: `GoogleSignInPlugin.kt` using One Tap Sign-In
+  - JavaScript bridge: `src/lib/native-google-signin.ts`
+  - Uses `signInWithIdToken` instead of `signInWithOAuth`
+  - No browser or Chrome Custom Tab opened during sign-in
+  - Auth flow: Native UI → Google ID Token → Supabase session
+  - Web fallback: OAuth redirect still works on non-native platforms
+  - **Setup required**: See `docs/native-google-signin-setup.md` for configuration
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
