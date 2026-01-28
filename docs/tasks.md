@@ -140,6 +140,9 @@
   - Auth flow: Native UI → Google ID Token → Supabase session
   - Web fallback: OAuth redirect still works on non-native platforms
   - **Setup required**: See `docs/native-google-signin-setup.md` for configuration
+- [x] **Aligned Capacitor dependencies to v7.0.1**
+  - All packages aligned: @capacitor/core, @capacitor/android, @capacitor/app, @capacitor/browser, @capacitor/preferences
+  - Fixes potential lifecycle and plugin callback issues during Google auth (pause/resume)
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
