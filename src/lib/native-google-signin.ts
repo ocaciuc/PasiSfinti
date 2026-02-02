@@ -29,7 +29,7 @@ const GoogleSignIn = registerPlugin<GoogleSignInPlugin>('GoogleSignIn');
  * Get this from your Google Cloud Console > APIs & Services > Credentials
  * It's the same Client ID configured in Supabase Dashboard > Auth > Providers > Google
  */
-const GOOGLE_WEB_CLIENT_ID = '958719330888-g1h7q31e56h1sefntjq5f52apotqamhh.apps.googleusercontent.com';
+const GOOGLE_WEB_CLIENT_ID = '593549224756-tarajju6444hmn8t3ojdoslspiqgg04q.apps.googleusercontent.com';
 
 /**
  * Check if we're running on a native platform
