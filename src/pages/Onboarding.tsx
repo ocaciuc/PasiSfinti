@@ -9,6 +9,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Cross, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { handleOnboardingError, isDuplicateProfileError } from "@/lib/onboarding-error-handler";
+import { z } from "zod";
+
+// Age validation schema - must be integer between 1-120
+const ageSchema = z
+  .string()
+  .min(1, { message: "Vârsta este obligatorie" })
+  .refine((val) => /^\d+$/.test(val), { message: "Vârsta trebuie să fie un număr întreg (fără zecimale)" })
+  .refine((val) => {
+    const num = parseInt(val, 10);
+    return num >= 1 && num <= 120;
+  }, { message: "Vârsta trebuie să fie între 1 și 120 de ani" });
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -105,6 +116,20 @@ const Onboarding = () => {
   };
 
   const handleNext = async () => {
+    // Validate age before proceeding from step 1
+    if (step === 1) {
+      const ageValidationError = validateAge(formData.age);
+      if (ageValidationError) {
+        setAgeError(ageValidationError);
+        toast({
+          title: "Eroare validare",
+          description: ageValidationError,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     if (step < 4) {
       setStep(step + 1);
       return;
@@ -195,12 +220,28 @@ const Onboarding = () => {
     }
   };
 
+  const validateAge = (age: string): string | null => {
+    try {
+      ageSchema.parse(age);
+      return null;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return error.errors[0].message;
+      }
+      return "Vârstă invalidă";
+    }
+  };
+
+  const [ageError, setAgeError] = useState<string | null>(null);
+
   const canProceed = () => {
     if (isSubmitting) return false;
     
     switch (step) {
       case 1:
-        return formData.firstName && formData.lastName && formData.age;
+        // Validate age when checking if can proceed
+        const ageValidationResult = formData.age ? validateAge(formData.age) : "Vârsta este obligatorie";
+        return formData.firstName && formData.lastName && formData.age && !ageValidationResult;
       case 2:
         return formData.city && formData.parish;
       case 3:
@@ -252,12 +293,32 @@ const Onboarding = () => {
                 <Label htmlFor="age">Vârsta</Label>
                 <Input
                   id="age"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={formData.age}
-                  onChange={(e) => handleInputChange("age", e.target.value)}
+                  onChange={(e) => {
+                    // Only allow digits
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    handleInputChange("age", value);
+                    // Validate and show error
+                    if (value) {
+                      setAgeError(validateAge(value));
+                    } else {
+                      setAgeError(null);
+                    }
+                  }}
                   disabled={isSubmitting}
                   autoComplete="off"
+                  placeholder="ex: 35"
+                  maxLength={3}
                 />
+                {ageError && (
+                  <p className="text-xs text-destructive">{ageError}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Introdu un număr întreg între 1 și 120
+                </p>
               </div>
             </>
           )}
