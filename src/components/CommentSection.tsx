@@ -59,6 +59,8 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
   const [showTopLevelComment, setShowTopLevelComment] = useState(false);
+  const [expanded, setExpanded] = useState(false); // Start collapsed for performance
+  const [totalCommentCount, setTotalCommentCount] = useState(0);
 
   const fetchComments = useCallback(async (currentOffset: number, append = false) => {
     if (currentOffset === 0) {
@@ -178,10 +180,28 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
     }
   }, [postId]);
 
-  // Load initial comments on mount
+  // Only load comments when expanded (lazy load for performance)
   useEffect(() => {
-    fetchComments(0);
-  }, [fetchComments]);
+    if (expanded && initialLoad) {
+      fetchComments(0);
+    }
+  }, [expanded, fetchComments, initialLoad]);
+
+  // Fetch just the comment count initially (fast query for collapsed state)
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const { count } = await supabase
+          .from("comments")
+          .select("id", { count: "exact", head: true })
+          .eq("post_id", postId);
+        setTotalCommentCount(count || 0);
+      } catch (error) {
+        console.error("Error fetching comment count:", error);
+      }
+    };
+    fetchCommentCount();
+  }, [postId]);
 
   const handleLoadMore = () => {
     fetchComments(offset, true);
@@ -245,6 +265,9 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
 
       // Notify parent
       onCommentAdded(newComment, parentCommentId);
+      
+      // Update comment count
+      setTotalCommentCount((prev) => prev + 1);
 
       setCommentText("");
       setReplyingTo(null);
@@ -333,6 +356,22 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
       )}
     </div>
   );
+
+  // Collapsed state - show expand button with comment count
+  if (!expanded) {
+    return (
+      <div className="mt-3">
+        <button
+          onClick={() => setExpanded(true)}
+          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+        >
+          {totalCommentCount > 0 
+            ? `Vezi ${totalCommentCount} ${totalCommentCount === 1 ? 'comentariu' : 'comentarii'}...`
+            : 'Adaugă un comentariu...'}
+        </button>
+      </div>
+    );
+  }
 
   if (initialLoad && loading) {
     return (

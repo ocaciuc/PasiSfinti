@@ -143,6 +143,13 @@
 - [x] **Aligned Capacitor dependencies to v7.0.1**
   - All packages aligned: @capacitor/core, @capacitor/android, @capacitor/app, @capacitor/browser, @capacitor/preferences
   - Fixes potential lifecycle and plugin callback issues during Google auth (pause/resume)
+- [x] **Fixed authentication validation**
+  - Password strength validation now only applies on signup, not login
+  - Users can log in with any password (validation happens server-side)
+- [x] **Fixed onboarding age validation**
+  - Age field now accepts only integers (no decimals)
+  - Validates range 1-120 years
+  - Shows clear Romanian error messages
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
@@ -258,10 +265,14 @@
 - [ ] Mobile responsiveness audit
 
 ### 7.2 Performance Optimizations
-- [ ] Add proper loading skeletons
-- [ ] Implement optimistic UI updates
-- [ ] Add image lazy loading
-- [ ] Optimize database queries
+- [x] Add proper loading skeletons
+- [x] Implement optimistic UI updates
+- [x] Add image lazy loading
+- [x] Optimize database queries
+- [x] **Lazy load comments in Pilgrimage details**
+  - Comments now start collapsed showing just count
+  - Only load comments when user clicks to expand
+  - Dramatically improves page load time with many comments
 
 ### 7.3 Error Handling & Edge Cases
 - [x] Robust onboarding error handling implemented
