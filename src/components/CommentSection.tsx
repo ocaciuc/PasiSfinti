@@ -70,73 +70,83 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
     }
 
     try {
-      // Fetch comments with pagination - no date filter, all comments visible
-      const { data: commentsData, error } = await supabase
-        .from("comments")
-        .select("id, post_id, user_id, content, created_at, parent_comment_id")
-        .eq("post_id", postId)
-        .is("parent_comment_id", null) // Only top-level comments for pagination
-        .order("created_at", { ascending: false })
-        .range(currentOffset, currentOffset + COMMENTS_LIMIT - 1);
-
-      if (error) throw error;
-
-      // Check if there are more comments beyond what we fetched
-      const { count: totalCount } = await supabase
-        .from("comments")
-        .select("id", { count: "exact", head: true })
-        .eq("post_id", postId)
-        .is("parent_comment_id", null);
-
-      // Collect all user IDs for profiles
-      const topLevelCommentIds = (commentsData || []).map((c) => c.id);
-      const userIds = [...new Set((commentsData || []).map((c) => c.user_id))];
-
-      // Fetch replies for all top-level comments
-      const { data: repliesData } = await supabase
-        .from("comments")
-        .select("id, post_id, user_id, content, created_at, parent_comment_id")
-        .eq("post_id", postId)
-        .in("parent_comment_id", topLevelCommentIds.length > 0 ? topLevelCommentIds : ['no-match'])
-        .order("created_at", { ascending: true });
-
-      // Add reply user IDs
-      (repliesData || []).forEach((r) => {
-        if (!userIds.includes(r.user_id)) {
-          userIds.push(r.user_id);
-        }
-      });
-
-      // Get current user ID for fetching co-pilgrim profiles
+      // Get current user ID first (needed for profile fetching)
       const { data: { user } } = await supabase.auth.getUser();
       const currentUserId = user?.id;
 
-      // Fetch co-pilgrim profiles using secure function (only returns first_name and avatar)
+      // OPTIMIZATION: Run all independent queries in parallel
+      const [commentsResult, countResult, ownProfileResult, coProfilesResult] = await Promise.all([
+        // 1. Fetch top-level comments with pagination
+        supabase
+          .from("comments")
+          .select("id, post_id, user_id, content, created_at, parent_comment_id")
+          .eq("post_id", postId)
+          .is("parent_comment_id", null)
+          .order("created_at", { ascending: false })
+          .range(currentOffset, currentOffset + COMMENTS_LIMIT - 1),
+        
+        // 2. Get total count (only on first load, reuse cached count for load more)
+        currentOffset === 0
+          ? supabase
+              .from("comments")
+              .select("id", { count: "exact", head: true })
+              .eq("post_id", postId)
+              .is("parent_comment_id", null)
+          : Promise.resolve({ count: null }),
+        
+        // 3. Fetch own profile (allowed by RLS)
+        currentUserId
+          ? supabase
+              .from("profiles")
+              .select("first_name, avatar_url, user_id")
+              .eq("user_id", currentUserId)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+        
+        // 4. Fetch co-pilgrim profiles using secure RPC
+        currentUserId
+          ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
+          : Promise.resolve({ data: [] }),
+      ]);
+
+      if (commentsResult.error) throw commentsResult.error;
+      const commentsData = commentsResult.data || [];
+      const totalCount = countResult.count;
+      
+      // Build profile map from parallel results
       const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
       
-      if (currentUserId) {
-        const { data: coProfilesData } = await supabase.rpc("get_co_pilgrim_profiles", { 
-          requesting_user_id: currentUserId 
+      // Add own profile
+      if (ownProfileResult.data) {
+        profileMap.set(ownProfileResult.data.user_id, {
+          first_name: ownProfileResult.data.first_name,
+          avatar_url: ownProfileResult.data.avatar_url,
         });
-        (coProfilesData || []).forEach((p: any) => {
-          profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
-        });
+      }
+      
+      // Add co-pilgrim profiles
+      (coProfilesResult.data || []).forEach((p: any) => {
+        profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
+      });
 
-        // Also fetch own profile (allowed by RLS)
-        const { data: ownProfile } = await supabase
-          .from("profiles")
-          .select("first_name, avatar_url")
-          .eq("user_id", currentUserId)
-          .maybeSingle();
-        if (ownProfile) {
-          profileMap.set(currentUserId, { first_name: ownProfile.first_name, avatar_url: ownProfile.avatar_url });
-        }
+      // Now fetch replies (depends on commentsData)
+      const topLevelCommentIds = commentsData.map((c) => c.id);
+      
+      let repliesData: any[] = [];
+      if (topLevelCommentIds.length > 0) {
+        const { data } = await supabase
+          .from("comments")
+          .select("id, post_id, user_id, content, created_at, parent_comment_id")
+          .eq("post_id", postId)
+          .in("parent_comment_id", topLevelCommentIds)
+          .order("created_at", { ascending: true });
+        repliesData = data || [];
       }
 
       // Build comments with author info
-      const commentsWithAuthors: Comment[] = (commentsData || []).map((comment) => {
+      const commentsWithAuthors: Comment[] = commentsData.map((comment) => {
         const author = profileMap.get(comment.user_id);
-        const commentReplies = (repliesData || [])
+        const commentReplies = repliesData
           .filter((r) => r.parent_comment_id === comment.id)
           .map((reply) => {
             const replyAuthor = profileMap.get(reply.user_id);
@@ -169,8 +179,11 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
         setComments(commentsWithAuthors);
       }
 
-      setOffset(currentOffset + (commentsData?.length || 0));
-      setHasMore(totalCount !== null && currentOffset + (commentsData?.length || 0) < totalCount);
+      setOffset(currentOffset + commentsData.length);
+      // Use cached count for "load more", only update on first load
+      if (totalCount !== null) {
+        setHasMore(currentOffset + commentsData.length < totalCount);
+      }
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
