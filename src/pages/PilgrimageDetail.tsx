@@ -110,18 +110,43 @@ const PilgrimageDetail = () => {
       const currentUserId = user?.id || null;
       setUserId(currentUserId);
 
-      // Fetch all data in parallel for better performance
+      // OPTIMIZATION: Fetch ALL data in a single parallel batch
       const [
         pilgrimageResult,
         userPilgrimagesResult,
         postsResult,
+        coProfilesResult,
+        ownProfileResult,
       ] = await Promise.all([
-        // Fetch pilgrimage details
-        supabase.from("pilgrimages").select("id, title, description, location, city, start_date, end_date, participant_count, map_url").eq("id", id).single(),
-        // Fetch all user_pilgrimages for this pilgrimage
-        supabase.from("user_pilgrimages").select("user_id").eq("pilgrimage_id", id),
-        // Fetch posts for this pilgrimage
-        supabase.from("posts").select("id, user_id, content, likes_count, created_at").eq("pilgrimage_id", id).order("created_at", { ascending: false }),
+        // 1. Fetch pilgrimage details
+        supabase
+          .from("pilgrimages")
+          .select("id, title, description, location, city, start_date, end_date, participant_count, map_url")
+          .eq("id", id)
+          .single(),
+        // 2. Fetch all user_pilgrimages for this pilgrimage
+        supabase
+          .from("user_pilgrimages")
+          .select("user_id")
+          .eq("pilgrimage_id", id),
+        // 3. Fetch posts for this pilgrimage
+        supabase
+          .from("posts")
+          .select("id, user_id, content, likes_count, created_at")
+          .eq("pilgrimage_id", id)
+          .order("created_at", { ascending: false }),
+        // 4. Fetch co-pilgrim profiles using secure RPC
+        currentUserId
+          ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
+          : Promise.resolve({ data: [], error: null }),
+        // 5. Fetch own profile (done in parallel, not sequentially)
+        currentUserId
+          ? supabase
+              .from("profiles")
+              .select("first_name, avatar_url")
+              .eq("user_id", currentUserId)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
       if (pilgrimageResult.error) throw pilgrimageResult.error;
@@ -131,48 +156,47 @@ const PilgrimageDetail = () => {
       const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
       setIsRegistered(currentUserId ? participantUserIds.includes(currentUserId) : false);
 
-      // Collect all user IDs we need profiles for (post authors)
-      const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
-      const allUserIdsForProfiles = [...new Set(postUserIds)];
-
-      // Fetch co-pilgrim profiles using secure function (only returns first_name and avatar)
-      // and user likes in parallel
-      const [coProfilesResult, userLikesResult] = await Promise.all([
-        // Use the secure function that only exposes minimal profile data
-        currentUserId
-          ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
-          : Promise.resolve({ data: [], error: null }),
-        // Fetch user's likes for all posts in one query
-        currentUserId && postsResult.data && postsResult.data.length > 0
-          ? supabase.from("post_likes").select("post_id").eq("user_id", currentUserId).in("post_id", postsResult.data.map((p: any) => p.id))
-          : Promise.resolve({ data: [], error: null }),
-      ]);
-
-      // Create a profile lookup map for O(1) access (includes co-pilgrims with minimal data)
+      // Build profile map from parallel results
       const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
       (coProfilesResult.data || []).forEach((p: any) => {
         profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
       });
-
-      // Also fetch current user's own profile for their posts
-      if (currentUserId) {
-        const { data: ownProfile } = await supabase
-          .from("profiles")
-          .select("first_name, avatar_url")
-          .eq("user_id", currentUserId)
-          .maybeSingle();
-        if (ownProfile) {
-          profileMap.set(currentUserId, { first_name: ownProfile.first_name, avatar_url: ownProfile.avatar_url });
-        }
+      if (currentUserId && ownProfileResult.data) {
+        profileMap.set(currentUserId, { 
+          first_name: ownProfileResult.data.first_name, 
+          avatar_url: ownProfileResult.data.avatar_url 
+        });
       }
+
+      // Get post IDs for likes query
+      const postIds = (postsResult.data || []).map((p: any) => p.id);
+      const allUserIdsForBadges = [...new Set((postsResult.data || []).map((p: any) => p.user_id))];
+
+      // OPTIMIZATION: Fetch likes and badges in parallel
+      const [userLikesResult, allUserBadgesResult] = await Promise.all([
+        // Fetch user's likes for all posts in one query
+        currentUserId && postIds.length > 0
+          ? supabase
+              .from("post_likes")
+              .select("post_id")
+              .eq("user_id", currentUserId)
+              .in("post_id", postIds)
+          : Promise.resolve({ data: [], error: null }),
+        // Batch fetch all user badges in one query
+        allUserIdsForBadges.length > 0
+          ? supabase
+              .from("user_badges")
+              .select(`user_id, badges (id, name, name_ro, description, icon_name, priority)`)
+              .in("user_id", allUserIdsForBadges)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
       // Create liked posts set for O(1) lookup
       const likedPostIds = new Set((userLikesResult.data || []).map((l: any) => l.post_id));
 
-      // Build posts with all details - comments are now loaded separately per post
+      // Build posts with all details
       const postsWithDetails: Post[] = (postsResult.data || []).map((post: any) => {
         const authorProfile = profileMap.get(post.user_id);
-
         return {
           id: post.id,
           user_id: post.user_id,
@@ -187,49 +211,35 @@ const PilgrimageDetail = () => {
 
       setPosts(postsWithDetails);
 
-      // Fetch badges for post authors
-      const allUserIdsForBadges = new Set<string>();
-      postsWithDetails.forEach(post => {
-        allUserIdsForBadges.add(post.user_id);
+      // Process badges
+      const badgesMap: Record<string, Badge | null> = {};
+      const userBadgesGroup = new Map<string, any[]>();
+      
+      (allUserBadgesResult.data || []).forEach((ub: any) => {
+        if (!userBadgesGroup.has(ub.user_id)) {
+          userBadgesGroup.set(ub.user_id, []);
+        }
+        if (ub.badges) {
+          userBadgesGroup.get(ub.user_id)!.push(ub.badges);
+        }
       });
 
-      // Batch fetch all user badges in one query
-      if (allUserIdsForBadges.size > 0) {
-        const { data: allUserBadgesData } = await supabase
-          .from("user_badges")
-          .select(`user_id, badges (id, name, name_ro, description, icon_name, priority)`)
-          .in("user_id", Array.from(allUserIdsForBadges));
+      // For each user, get the highest priority badge
+      userBadgesGroup.forEach((badges, uid) => {
+        if (badges.length > 0) {
+          badges.sort((a, b) => a.priority - b.priority);
+          badgesMap[uid] = badges[0];
+        }
+      });
 
-        // Group badges by user and find the highest priority one
-        const badgesMap: Record<string, Badge | null> = {};
-        const userBadgesGroup = new Map<string, any[]>();
-        
-        (allUserBadgesData || []).forEach((ub: any) => {
-          if (!userBadgesGroup.has(ub.user_id)) {
-            userBadgesGroup.set(ub.user_id, []);
-          }
-          if (ub.badges) {
-            userBadgesGroup.get(ub.user_id)!.push(ub.badges);
-          }
-        });
+      // Initialize all users with null if they don't have badges
+      allUserIdsForBadges.forEach(uid => {
+        if (!badgesMap[uid]) {
+          badgesMap[uid] = null;
+        }
+      });
 
-        // For each user, get the highest priority badge
-        userBadgesGroup.forEach((badges, uid) => {
-          if (badges.length > 0) {
-            badges.sort((a, b) => a.priority - b.priority);
-            badgesMap[uid] = badges[0];
-          }
-        });
-
-        // Initialize all users with null if they don't have badges
-        allUserIdsForBadges.forEach(uid => {
-          if (!badgesMap[uid]) {
-            badgesMap[uid] = null;
-          }
-        });
-
-        setUserBadges(badgesMap);
-      }
+      setUserBadges(badgesMap);
     } catch (error: any) {
       console.error("Error fetching pilgrimage data:", error);
       toast({
