@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format, startOfDay } from "date-fns";
 import { ro } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
 
 type TimeFilter = "upcoming" | "previous";
 
@@ -63,6 +64,24 @@ const Pilgrimages = () => {
   const [tempEndDate, setTempEndDate] = useState<Date | undefined>();
   const [tempType, setTempType] = useState<string>("all");
   const [citySearch, setCitySearch] = useState("");
+
+  // Fetch user's enrolled pilgrimages
+  const { data: enrolledPilgrimageIds = [] } = useQuery({
+    queryKey: ["user-enrolled-pilgrimages"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      
+      const { data, error } = await supabase
+        .from("user_pilgrimages")
+        .select("pilgrimage_id")
+        .eq("user_id", user.id)
+        .is("deleted_at", null);
+      
+      if (error) throw error;
+      return data?.map(up => up.pilgrimage_id) || [];
+    },
+  });
 
   useEffect(() => {
     const fetchPilgrimages = async () => {
@@ -409,7 +428,7 @@ const Pilgrimages = () => {
                     {pilgrimage.description}
                   </p>
                   <Button className="w-full mt-4">
-                    Vezi detalii și înscrie-te
+                    {enrolledPilgrimageIds.includes(pilgrimage.id) ? "Vezi detalii" : "Vezi detalii și înscrie-te"}
                   </Button>
                 </CardContent>
               </Card>
