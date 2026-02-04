@@ -241,9 +241,11 @@ const Onboarding = () => {
       case 1:
         // Validate age when checking if can proceed
         const ageValidationResult = formData.age ? validateAge(formData.age) : "Vârsta este obligatorie";
-        return formData.firstName && formData.lastName && formData.age && !ageValidationResult;
+        // Trim whitespace from required fields
+        return formData.firstName.trim() && formData.lastName.trim() && formData.age && !ageValidationResult;
       case 2:
-        return formData.city && formData.parish;
+        // Trim whitespace from required fields (religion has default value)
+        return formData.religion.trim() && formData.city.trim() && formData.parish.trim();
       case 3:
         return true; // Photo is optional
       case 4:
