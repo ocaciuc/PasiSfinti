@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Pași de Pelerin</string>
+    <string name="title_activity_main">Pași de Pelerin</string>
+    <string name="package_name">app.lovable.ee3834849f11481bad7f08d619b104bd</string>
+    <string name="custom_url_scheme">app.lovable.ee3834849f11481bad7f08d619b104bd</string>
+</resources>
