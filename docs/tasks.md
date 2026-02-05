@@ -273,6 +273,12 @@
   - Comments now start collapsed showing just count
   - Only load comments when user clicks to expand
   - Dramatically improves page load time with many comments
+- [x] **Comment section performance refactoring**
+  - Split CommentSection into smaller memoized components (CommentItem, CommentList, ReplyItem)
+  - Replies load on-demand when user expands a comment (not on page load)
+  - Pagination for both comments (10) and replies (5)
+  - Eliminated N+1 queries by batching profile lookups
+  - React.memo prevents full list re-renders when expanding replies
 
 ### 7.3 Error Handling & Edge Cases
 - [x] Robust onboarding error handling implemented
