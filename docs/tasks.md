@@ -280,6 +280,13 @@
   - Eliminated N+1 queries by batching profile lookups
   - React.memo prevents full list re-renders when expanding replies
 
+ - [x] **Client-side caching with React Query**
+   - Pilgrimage details cached with 10-min stale/15-min GC
+   - Community data cached with 2-min stale/5-min GC
+   - Custom hooks: usePilgrimageDetails, usePilgrimageCommunity
+   - Stale-while-revalidate for instant page revisits
+   - Optimistic updates for registration, likes, posts
+ 
 ### 7.3 Error Handling & Edge Cases
 - [x] Robust onboarding error handling implemented
   - UPSERT logic to prevent duplicate profile errors
