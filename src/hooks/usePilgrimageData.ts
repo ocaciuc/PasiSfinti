@@ -41,9 +41,7 @@
    userBadges: Record<string, Badge | null>;
  }
  
- // Stale times for different data types (stale-while-revalidate strategy)
- const PILGRIMAGE_STALE_TIME = 10 * 60 * 1000; // 10 minutes
- const PILGRIMAGE_GC_TIME = 15 * 60 * 1000; // 15 minutes
+// No caching — always fetch fresh data for pilgrimage detail pages
  
  async function fetchPilgrimageDetails(pilgrimageId: string): Promise<Pilgrimage | null> {
    const { data, error } = await supabase
@@ -156,29 +154,29 @@
    return { posts, isRegistered, userBadges: badgesMap };
  }
  
- export function usePilgrimageDetails(pilgrimageId: string | undefined) {
-   return useQuery({
-     queryKey: ["pilgrimage", pilgrimageId],
-     queryFn: () => fetchPilgrimageDetails(pilgrimageId!),
-     enabled: !!pilgrimageId,
-     staleTime: PILGRIMAGE_STALE_TIME,
-     gcTime: PILGRIMAGE_GC_TIME,
-   });
- }
- 
- export function usePilgrimageCommunity(
-   pilgrimageId: string | undefined,
-   userId: string | null,
-   enabled: boolean = true
- ) {
-   return useQuery({
-     queryKey: ["pilgrimage-community", pilgrimageId, userId],
-     queryFn: () => fetchPilgrimageCommunityData(pilgrimageId!, userId),
-     enabled: !!pilgrimageId && enabled,
-     staleTime: 2 * 60 * 1000, // 2 minutes for community data
-     gcTime: 5 * 60 * 1000, // 5 minutes
-   });
- }
+  export function usePilgrimageDetails(pilgrimageId: string | undefined) {
+    return useQuery({
+      queryKey: ["pilgrimage", pilgrimageId],
+      queryFn: () => fetchPilgrimageDetails(pilgrimageId!),
+      enabled: !!pilgrimageId,
+      staleTime: 0,
+      gcTime: 0,
+    });
+  }
+  
+  export function usePilgrimageCommunity(
+    pilgrimageId: string | undefined,
+    userId: string | null,
+    enabled: boolean = true
+  ) {
+    return useQuery({
+      queryKey: ["pilgrimage-community", pilgrimageId, userId],
+      queryFn: () => fetchPilgrimageCommunityData(pilgrimageId!, userId),
+      enabled: !!pilgrimageId && enabled,
+      staleTime: 0,
+      gcTime: 0,
+    });
+  }
  
  export function useInvalidatePilgrimageData() {
    const queryClient = useQueryClient();
