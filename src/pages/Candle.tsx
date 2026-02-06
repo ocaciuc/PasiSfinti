@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Flame, Clock } from "lucide-react";
+import { CandleHistory } from "@/components/CandleHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
+
 
 interface Candle {
   id: string;
@@ -253,37 +255,7 @@ const Candle = () => {
 
         {/* Candle History */}
         {candleHistory.length > 0 && (
-          <Card className="glow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg text-primary">Istoricul Lumânărilor</CardTitle>
-              <CardDescription>Rugăciunile tale anterioare</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {candleHistory.map((candle) => (
-                <div
-                  key={candle.id}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50"
-                >
-                  <Flame className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {candle.purpose || "Pentru pace și binecuvântare"}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      <span>
-                        {new Date(candle.lit_at).toLocaleDateString("ro-RO", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <CandleHistory candles={candleHistory} />
         )}
       </div>
 
