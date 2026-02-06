@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Cross, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { handleOnboardingError, isDuplicateProfileError } from "@/lib/onboarding-error-handler";
+import { uploadAvatar } from "@/lib/avatar-upload";
 import { z } from "zod";
 
 // Age validation schema - must be integer between 1-120
@@ -34,6 +35,7 @@ const Onboarding = () => {
     city: "",
     parish: "",
     profilePhoto: "",
+    profilePhotoFile: null as File | null,
     bio: "",
   });
 
@@ -92,6 +94,12 @@ const Onboarding = () => {
    * Safe for retry, refresh, and duplicate submissions.
    */
   const upsertProfile = async (userId: string) => {
+    // Upload avatar to Storage if a file was selected
+    let avatarUrl: string | null = null;
+    if (formData.profilePhotoFile) {
+      avatarUrl = await uploadAvatar(userId, formData.profilePhotoFile);
+    }
+
     const profileData = {
       user_id: userId,
       first_name: formData.firstName,
@@ -100,7 +108,7 @@ const Onboarding = () => {
       religion: formData.religion,
       city: formData.city,
       parish: formData.parish,
-      avatar_url: formData.profilePhoto || null,
+      avatar_url: avatarUrl,
       bio: formData.bio || null,
     };
 
@@ -371,11 +379,12 @@ const Onboarding = () => {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      handleInputChange("profilePhoto", reader.result as string);
-                    };
-                    reader.readAsDataURL(file);
+                    // Store file for upload, and create preview URL
+                    setFormData(prev => ({
+                      ...prev,
+                      profilePhotoFile: file,
+                      profilePhoto: URL.createObjectURL(file),
+                    }));
                   }
                 }}
               />

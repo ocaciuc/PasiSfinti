@@ -81,9 +81,12 @@
 - [x] Populated Orthodox calendar data (January, February)
 
 ### 1.6 Storage Setup
-- [ ] Create storage bucket `profile-photos` for user profile pictures
-- [ ] Set bucket to public access
-- [ ] Create RLS policies for profile-photos bucket
+- [x] Create storage bucket `avatars` for user avatar images (public)
+- [x] RLS policies: users can upload/update/delete own avatars, public read
+- [x] Client-side image resizing: generates `avatar_small.webp` (64×64) and `avatar_medium.webp` (256×256)
+- [x] Upload utility: `src/lib/avatar-upload.ts` + `src/lib/image-resize.ts`
+- [x] Onboarding and Profile edit both use resized upload instead of base64
+- [x] CommentAvatar uses `avatar_small.webp` for minimal payload
 - [ ] Create storage bucket `pilgrimage-images` for pilgrimage photos
 
 ### 1.7 Authentication Implementation

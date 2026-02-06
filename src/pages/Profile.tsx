@@ -19,6 +19,7 @@ import { ro } from "date-fns/locale";
 import BadgesSection from "@/components/BadgesSection";
 import { clearAuthStorage } from "@/lib/capacitor-storage";
 import { signOutFromGoogle } from "@/lib/native-google-signin";
+import { uploadAvatar } from "@/lib/avatar-upload";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "Prenumele este obligatoriu"),
@@ -205,19 +206,7 @@ const Profile = () => {
       // Handle photo upload if file is provided
       if (values.profilePhoto && values.profilePhoto[0]) {
         const file = values.profilePhoto[0];
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${userId}-${Date.now()}.${fileExt}`;
-
-        // Convert file to base64 for storage (MVP approach)
-        const reader = new FileReader();
-        await new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-            avatarUrl = reader.result as string;
-            resolve(avatarUrl);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+        avatarUrl = await uploadAvatar(userId, file);
       }
 
       // Update profile in database
