@@ -1,0 +1,2585 @@
+{
+  "2026": {
+    "1": [
+      {
+        "dayNumber": "1",
+        "description": "(†) Tăierea-împrejur cea după trup a Domnului; †) Sf. Ier. Vasile cel Mare, arhiep. Cezareei Capadociei și mama sa Sf. Emilia        ",
+        "comment": "Tăierea împrejur a Domnului\n- Hristos primește tăierea împrejur ca semn al ascultării de Legea Veche.\n- Prin acest act, El arată smerenie și intră în istoria mântuirii ca împlinitor al Legii.\nSfântul Vasile cel Mare\n- Mare ierarh și teolog, apărător al credinței ortodoxe.\n- A întemeiat așezăminte pentru săraci și bolnavi și a lăsat Liturghia ce îi poartă numele.",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "2",
+        "description": "Înainte-prăznuirea Botezului Domnului; Sf. Ier. Silvestru, ep. Romei; Sf. Cuv. Serafim de Sarov;        ",
+        "comment": "Sfântul Serafim de Sarov\n- Cunoscut pentru blândețea și bucuria cu care întâmpina pe fiecare om.\n- A trăit în rugăciune neîncetată și a primit darul vindecării și al înainte-vederii.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Prooroc Maleahi; Sf. Mc. Gordie        ",
+        "comment": "Sfântul Mucenic Gordie\n- Soldat roman care a mărturisit credința în Hristos fără teamă.\n- A refuzat să jertfească idolilor și a primit moarte martirică.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "4",
+        "description": "Soborul Sf. 70 de Apostoli; Sf. Cuv. Teoctist din Siciliei; Sf. Cuv. Apolinaria; Sf. Cuv. Nichifor cel Lepros        ",
+        "comment": "Cei 70 de Apostoli\n- Trimiși de Hristos să vestească Evanghelia în lume.\n- Au întemeiat comunități creștine și au suferit multe încercări pentru credință.",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Mc. Teopempt și Teonas; Sf. Cuv. Sinclitichia        ",
+        "comment": "Sfântul Teopempt și Sfântul Teona\n- Teopempt, episcop, a mărturisit credința în fața împăratului păgân.\n- Teona, magician convertit, a recunoscut puterea lui Hristos și a primit mucenicia.",
+        "color": "black",
+        "post": "Post aspru (Ajun de Bobotează) – tradițional post negru până la sfințirea apei;\ndupă aceea, mâncare de post simplă, fără ulei și fără pește."
+      },
+      {
+        "dayNumber": "6",
+        "description": "(†) Botezul Domnului (Boboteaza - Dumnezeiasca Arătare)",
+        "comment": "Sărbătoare mare: Botezul Domnului\n- Hristos este botezat în Iordan de către Sf. Ioan Botezătorul.\n- Se arată Sfânta Treime: Tatăl mărturisește, Fiul Se botează, Duhul Sfânt Se arată în chip de porumbel.\n- Este una dintre cele mai vechi și importante sărbători creștine.",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "7",
+        "description": "† Soborul Sf. Prooroc Ioan Botezătorul și Înaintemergătorul Domnului        ",
+        "comment": "Sfântul Ioan Botezătorul\n- Este Înaintemergătorul Domnului și cel mai mare dintre proroci.\n- A trăit în pustie în asceză și a chemat oamenii la pocăință.\n- L-a botezat pe Hristos în Iordan.",
+        "color": "red",
+        "post": "Dezlegare la pește."
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. Cuv. Gheorghe Hozevitul; Sf. Cuv. Domnica        ",
+        "comment": "Sfântul Gheorghe Hozevitul\n- A fost monah în Țara Sfântă, trăind în rugăciune și nevoință.\n- Era cunoscut pentru smerenia și blândețea sa.\nSfânta Cuvioasă Domnica\n- A venit din Cartagina la Constantinopol pentru viață duhovnicească.\n- A primit darul rugăciunii curate și al vindecării.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. Mc. Polieuct; Sf. Ier. Petru, ep. Sevastiei        ",
+        "comment": "Sfântul Polieuct\n- Ofițer roman convertit la creștinism prin prietenul său Nearh.\n- A sfărâmat idolii în public și a primit moarte martirică.\nSfântul Nearh\n- Prieten apropiat al lui Polieuct și mărturisitor al credinței.\n- A rămas statornic în Hristos în ciuda persecuțiilor.",
+        "color": "black",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Ier. Grigorie, ep. Nyssei; †) Sf. Cuv. Antipa de la Calapodești; Sf. Ier. Dometian, ep. Melitenei;         ",
+        "comment": "Sfântul Grigorie de Nyssa\n- Frate al Sf. Vasile cel Mare și mare teolog al Bisericii.\n- A scris lucrări profunde despre viața duhovnicească și cunoașterea lui Dumnezeu.\nSfântul Dometian, episcopul Melitenei\n- A fost un ierarh milostiv și apărător al credinței.\n- A ajutat pe săraci și a întărit Biserica în vremuri grele.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "11",
+        "description": "† Sf. Cuv. Teodosie, începătorul vieții călugărești de obște din Palestina; Sf. Cuv. Vitalie        ",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "comment": "Sfântul Teodosie cel Mare\n- A organizat primele mari mănăstiri de obște din Palestina.\n- Era cunoscut pentru milostenia și grija față de bolnavi și săraci.\n- A primit darul facerii de minuni.\n\uD83C\uDF7D Tip de post\nPost – se consumă doar alimente de post, fără pește.\n"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Mc. Tatiana diaconița și Eutasia        ",
+        "comment": "Sfânta Tatiana\n- Diaconiță în Roma, a mărturisit credința în Hristos cu mult curaj.\n- A îndurat chinuri grele fără să se lepede de credință.\nSfinții Petru, Sevirian și Leontie\n- Mucenici care au suferit pentru Hristos în vremea persecuțiilor.\n- Au rămas statornici până la moarte.\n\uD83C\uDF7D Tip de post\nPost – fără pește.\n",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "† Sf. Mc. Ermil și Stratonic; Sf. Ier. Iacob, ep. din Nisibe;        ",
+        "color": "black",
+        "comment": "Sfinții Ermil și Stratonic au fost prieteni apropiați care au mărturisit credința în Hristos și au primit moarte martirică, fiind aruncați în Dunăre. Curajul lor a întărit pe mulți creștini în vremea persecuțiilor.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "14",
+        "description": "Odovania praznicului Botezului Domnului; Sf. Cuv. Mc. din Sinai și Rait; Sf. Nina, luminătoarea Georgiei;        ",
+        "color": "black",
+        "comment": "Sfântul Sava cel Sfințit a fost mare ascet și organizator al vieții monahale, iar în această zi se cinstește mutarea moaștelor sale. Sfânta Nina a luminat Georgia prin viață sfântă și propovăduire, fiind cinstită ca întocmai cu apostolii.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Cuv. Pavel Tebeul și Ioan Colibașul        ",
+        "color": "black",
+        "comment": "Sfântul Pavel Tebeul este considerat primul pustnic al creștinătății, trăind în rugăciune în pustie. Sfântul Ioan Colibașul a dus o viață ascunsă în smerenie aproape de casa părintească.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "16",
+        "description": "Cinstirea lanțului Sf. Ap. Petru; Sf. Mc. Danact citețul",
+        "color": "black",
+        "comment": "Se cinstește lanțul cu care Sfântul Apostol Petru a fost legat în temniță, amintind de eliberarea sa minunată. Această zi subliniază puterea credinței și a rugăciunii.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+      },
+      {
+        "dayNumber": "17",
+        "description": "†) Sf. Cuv. Antonie cel Mare; Sf. Cuv. Antonie cel nou de la Veria",
+        "comment": "Sfântul Antonie cel Mare este părintele monahismului, trăind în pustie în asceză și rugăciune. A fost povățuitor al multor oameni care îl căutau pentru sfat.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "† Sf. Ier. Atanasie și Chiril, arhiep. Alexandriei        ",
+        "comment": "Sfântul Atanasie cel Mare a apărat credința împotriva ereziei ariene, suferind multe exiluri. Sfântul Chiril al Alexandriei a fost mare teolog și apărător al învățăturii despre Maica Domnului.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Cuv. Macarie cel Mare și Macarie Alexandrinul;Sf. Ier. Marcu, mitr. Efesului; Sf. Mc. Eufrasia        ",
+        "comment": "Sfântul Macarie Egipteanul a fost mare ascet, numit 'înger în trup', având darul vindecării. Sfântul Macarie Alexandrinul a trăit în pustie cu multă blândețe și răbdare.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "†) Sf. Cuv. Eftimie cel Mare; Sf. Mc. Eusebiu; † Sf. Mc. In, Pin și Rim; ",
+        "comment": "Sfântul Eftimie cel Mare a fost întemeietor de mănăstiri și povățuitor al pustnicilor, cunoscut pentru înțelepciune și minuni.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Cuv. Maxim Mărt.; Sf. Mc. Neofit; Sf. Mc. Agnia din Roma        ",
+        "comment": "Sfântul Maxim Mărturisitorul a apărat dreapta credință împotriva ereziei monotelite, suferind tăierea limbii și a mâinii pentru mărturisirea adevărului.",
+        "post": "Post – fără pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Ap. Timotei; Sf. Cuv. Mc. Anastasie Persul        ",
+        "comment": "Sfântul Apostol Timotei, ucenic al Sfântului Pavel, a fost episcop în Efes și a propovăduit Evanghelia cu multă râvnă.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Sfințit Mc. Clement, ep. Ancirei; Sf. Mc. Agatanghel; Sf. Părinți de la Sinodul al VI-lea Ecumenic        ",
+        "comment": "Sfântul Clement, episcop în Ancira, a suferit multe chinuri pentru Hristos. Sfântul Agatanghel, ucenicul său, a primit mucenicia împreună cu el.",
+        "post": "Post – fără pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. Cuv. Xenia din Roma; Sf. Xenia din Sankt Petersburg        ",
+        "comment": "Sfânta Xenia din Roma a părăsit casa părintească pentru a trăi în curăție și rugăciune, fiind cunoscută pentru milostenie și ajutorarea celor în nevoie.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "†) Sf. Ier. Grigorie Teologul, arhiep. Constantinopolului; †) Sf. Ier. Bretanion, ep. Tomisului ",
+        "comment": "Sfântul Grigorie Teologul, numit și Cuvântătorul de Dumnezeu, a fost mare ierarh și teolog, lăsând scrieri de mare profunzime.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "26",
+        "description": "†) Sf. Ier. Iosif cel Milostiv, mitr. Moldovei; Sf. Cuv. Xenofont, Maria, Arcadie și Ioan        ",
+        "comment": "Sfinții Xenofont și Maria au trăit în credință și milostenie, povățuindu-și fiii spre viață duhovnicească. Arcadie și Ioan, fiii lor, au devenit monahi și făcători de minuni.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "† Aducerea moaștelor Sf. Ier. Ioan Gură de Aur; Sf. Marciana, împ.        ",
+        "comment": "Sfântul Efrem Sirul, diacon și imnograf, este numit 'Harpa Duhului Sfânt' pentru imnele și scrierile sale duhovnicești.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Cuv. Efrem Sirul, Isaac Sirul, Paladie și Iacob Sihastrul        ",
+        "comment": "Sfântul Efrem Sirul, diacon și imnograf, este numit 'Harpa Duhului Sfânt' pentru imnele și scrierile sale duhovnicești.",
+        "post": "Post – fără pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Aducerea moaștelor Sf. Sfințit Mc. Ignatie Teoforul; Sf. Mc. Filotei        ",
+        "comment": "Sfântul Lavrentie a fost episcop și mărturisitor al credinței în vreme de persecuții. Sfântul Ignatie Teoforul, ucenic al apostolilor, este cinstit pentru mutarea moaștelor sale.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "†) Sf. Trei Ierarhi: Vasile cel Mare, Grigorie Teologul și Ioan Gură de Aur; Sf. Sfințit Mc. Ipolit, ep. Romei        ",
+        "comment": "Sfinții Trei Ierarhi — Vasile cel Mare, Grigorie Teologul și Ioan Gură de Aur — sunt mari învățători ai lumii și apărători ai credinței, prăznuiți împreună ca modele de unitate.",
+        "color": "red",
+        "post": "Dezlegare la ulei și vin."
+      },
+      {
+        "dayNumber": "31",
+        "description": "Sf. Doctori fără de arginți Chir și Ioan        ",
+        "comment": "Sfânta Marciana a trăit în asceză și rugăciune, primind cununa muceniciei. Sfântul Iuliu a mărturisit credința cu statornicie și a suferit moarte martirică.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      }
+    ],
+    "2": [
+      {
+        "dayNumber": "1",
+        "description": "Înainte-prăznuirea Întâmpinării Domnului; Sf. Mc. Trifon; Sf. Mc. Perpetua și Felicitas        ",
+        "comment": "Sfântul Mucenic Trifon a fost tânăr credincios cunoscut pentru rugăciunea sa puternică și pentru vindecările pe care le făcea în numele lui Hristos. A suferit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "2",
+        "description": "(†) Întâmpinarea Domnului (Stratenia); Evrei VII, 7-17        ",
+        "comment": "Întâmpinarea Domnului amintește aducerea Pruncului Iisus la templu, unde a fost întâmpinat de dreptul Simeon și prorocița Ana. Este o sărbătoare a luminii și a împlinirii profețiilor.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. și Dreptul Simeon, primitorul de Dumnezeu; Sf. Proorociță Ana        ",
+        "comment": "Sfântul și Dreptul Simeon a primit pe Pruncul Iisus în brațe, recunoscând în El pe Mesia. Prorocița Ana a mărturisit și ea venirea Mântuitorului.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. Cuv. Isidor Pelusiotul; Sf. Sfințit Mc. Avramie        ",
+        "comment": "Sfântul Isidor Pelusiotul a fost mare ascet și învățător al Bisericii, cunoscut pentru scrisorile sale pline de înțelepciune. A apărat credința și a povățuit pe mulți.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Mc. Agata și Teodula        ",
+        "comment": "Sfânta Agata a fost fecioară creștină din Sicilia, care a suferit chinuri grele pentru Hristos. Este cinstită ca ocrotitoare a celor aflați în primejdii.",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Sf. Ier. Vucol, ep. Smirnei și Fotie, patr. Constantinopolului; Sf. Cuv. Varsanufie cel Mare  și Ioan din Gaza        ",
+        "comment": "Sfântul Fotie cel Mare, patriarh al Constantinopolului, a fost mare teolog și apărător al Ortodoxiei. A scris lucrări importante și a condus Biserica cu înțelepciune.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "7",
+        "description": "Sf. Ier. Partenie, ep. Lampsacului; Sf. Cuv. Luca din Elada        ",
+        "comment": "Sfântul Partenie, episcop al Lampsacului, a primit darul vindecării și al izgonirii duhurilor rele. Era cunoscut pentru milostenia și blândețea sa.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. M. Mc. Teodor Stratilat; Sf. Proroc Zaharia        ",
+        "comment": "Sfântul Teodor Stratilat a fost general roman care a mărturisit credința în Hristos. A suferit moarte martirică pentru refuzul de a jertfi idolilor.",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "9",
+        "description": "Odovania Praznicului Întâmpinării Domnului; Sf. Mc. Nichifor        ",
+        "comment": "Sfânta Muceniță Nichifora a rămas statornică în credință în ciuda persecuțiilor. Viața ei este un exemplu de curaj și iubire pentru Hristos.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "10",
+        "description": "†) Sf. Sfințit Mc. Haralambie; Sf. Mc. Valentina        ",
+        "comment": "Sfântul Haralambie, preot în Tesalia, a suferit chinuri grele la vârstă înaintată pentru credință. Este cunoscut ca făcător de minuni și ocrotitor împotriva bolilor.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "11",
+        "comment": "Sfântul Vlasie, episcop al Sevastiei, a fost cunoscut pentru vindecările sale și pentru ajutorul dat celor aflați în suferință. A primit moarte martirică.",
+        "post": "Post – fără pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Ier. Meletie, arhiep. Antiohiei celei Mari; Sf. Mc. Hristea        ",
+        "comment": "Sfântul Meletie al Antiohiei a fost ierarh înțelept și apărător al credinței ortodoxe. A suferit exiluri pentru mărturisirea adevărului.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+
+      },
+      {
+        "dayNumber": "13",
+        "description": "Sf. Cuv. Martinian; Sf. Ap. și Mc. Acvila și soția sa, Priscila; Sf. Ier. Evloghie, patr. Alexandriei        ",
+        "comment": "Sfântul Martinian a trăit în asceză și rugăciune, fugind de ispite și căutând viață curată. A fost cunoscut pentru răbdarea și nevoințele sale.",
+        "color": "black",
+        "post": "Post – fără pește."
+      },
+      {
+        "dayNumber": "14",
+        "description": "Sf. Cuv. Auxenție, Maron și Avraam        ",
+        "comment": "Sfântul Auxențiu a fost pustnic și făcător de minuni, trăind în rugăciune pe muntele Oxia. A povățuit pe mulți către viață duhovnicească. Pomenirea morților - Moșii de iarnă.",
+        "color": "black",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Ap. Onisim; Sf. Mc. Maior        ",
+        "comment": "Sfântul Onisim, ucenic al Sfântului Apostol Pavel, a fost episcop și mărturisitor al credinței. A slujit Biserica cu multă râvnă.",
+        "color": "red",
+        "post": "Harti – nu există restricții alimentare, se poate mânca de toate."
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Mc. Pamfil preotul și Valent diaconul; Sf. Ier. Flavian, arhiep. Constantinopolului        ",
+        "comment": "Sfântul Pamfil și cei împreună cu el au suferit moarte martirică pentru Hristos în vremea persecuțiilor. Au rămas statornici în credință până la sfârșit.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. M. Mc. Teodor Tiron; Sf. Mariamna; Sf. Împ. Marcian și Pulheria        ",
+        "comment": "Sfântul Teodor Tiron a fost soldat creștin care a mărturisit credința în Hristos și a primit moarte martirică. Este cinstit ca ocrotitor al credincioșilor.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Ier. Leon cel Mare, ep. Romei        ",
+        "comment": "Sfânta Agnia a fost fecioară martiră care a suferit pentru Hristos la vârstă tânără. Curajul ei a întărit pe mulți creștini.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Ap. Arhip, Filimon și soția sa, Apfia        ",
+        "comment": "Sfântul Filotei a fost episcop și mărturisitor al credinței, cunoscut pentru înțelepciunea și blândețea sa. A apărat Biserica în vremuri grele.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. Ier. Leon, ep. Cataniei; Sf. Cuv. Visarion        ",
+        "comment": "Sfântul Leon, episcop al Romei, numit și Leon cel Mare, a fost mare teolog și apărător al credinței. A condus Biserica cu multă înțelepciune.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Cuv. Timotei; Sf. Ier. Eustatie, arhiep. Antiohiei        ",
+        "comment": "Sfântul Eustatie, arhiepiscop al Antiohiei, a fost apărător al Ortodoxiei împotriva ereziilor. A suferit exil pentru mărturisirea adevărului.",
+        "color": "black",
+        "post": "Dezlegare la brânză, lapte și ouă."
+      },
+      {
+        "dayNumber": "22",
+        "description": "Aflarea moaștelor Sf. Mc. din Constantinopol        ",
+        "comment": "Sfântul Atanasie al III-lea a fost patriarh al Constantinopolului, cunoscut pentru viața sa smerită și pentru grija față de cei săraci.",
+        "color": "red",
+        "post": "Lăsatul secului pentru Postul Sfintelor Paști. Lăsatului sec de brânză."
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Sfințit Mc. Policarp, ep. Smirnei; Sf. Cuv. Gorgonia        ",
+        "comment": "Sfântul Policarp al Smirnei, ucenic al apostolilor, a fost episcop și martir. A mărturisit credința cu statornicie până la moarte.",
+        "color": "black",
+        "post": "Începutul Postului Sfintelor Paști. Numai seara, pâine și apă."
+      },
+      {
+        "dayNumber": "24",
+        "description": "† Întâia și a doua aflare a Capului Sf. Ioan, Înaintemergătorul și Botezătorul Domnului; †) Sf. Cuv. Petroniu de la Prodromu ",
+        "comment": "Întâia și a doua aflare a capului Sfântului Ioan Botezătorul amintește descoperirea minunată a cinstitului său cap, păstrat ca mare binecuvântare pentru credincioși.",
+        "color": "black",
+        "post": "Numai seara, pâine și apă."
+      },
+      {
+        "dayNumber": "25",
+        "description": "Sf. Ier. Tarasie, patr. Constantinopolului        ",
+        "comment": "Sfântul Tarasie, patriarh al Constantinopolului, a apărat cinstirea sfintelor icoane și a condus Sinodul VII Ecumenic. A fost ierarh milostiv și înțelept.",
+        "color": "black",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Ier. Porfirie, ep. Gazei; Sf. Mc. Fotini Samarineanca        ",
+        "comment": "Sfântul Porfirie, episcop al Gazei, a fost mare făcător de minuni și apărător al credinței. A distrus templele păgâne și a întărit creștinismul în Gaza.",
+        "color": "black",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Cuv. Mărt. Procopie și Talaleu        ",
+        "comment": "Sfântul Procopie Decapolitul a apărat cinstirea icoanelor în vremea iconoclasmului. A suferit închisori și bătăi pentru credință.",
+        "color": "black",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește."
+      },
+      {
+        "dayNumber": "28",
+        "description": "†) Sf. Cuv. Ioan Casian Romanul și Gherman din Dobrogea; Sf. Cuv. Vasile Mărt.        ",
+        "comment": "Sfântul Vasile Mărturisitorul a fost monah și apărător al icoanelor, suferind prigoniri pentru mărturisirea adevărului. A rămas statornic până la sfârșit. Sfântul Ioan Casian, originar din Dobrogea, a fost mare teolog și întemeietor de mănăstiri în Apus. Scrierile sale au influențat profund monahismul.",
+        "color": "black",
+        "post": "Post – Dezlegare la ulei și vin."
+      }
+    ],
+    "3": [
+      {
+        "dayNumber": "1",
+        "description": "Sf. Cuv. Mc. Evdochia; Sf. Cuv. Domnina        ",
+        "comment": "Sfânta Cuvioasă Muceniță Evdochia a fost o păgână convertită la creștinism, trăind în pocăință și milostenie până la mucenicie. Sfânta Domnina a dus viață curată și plină de nevoințe.",
+        "post": "Dezlegare la ulei și vin – Duminica Ortodoxiei.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Sf. Sfințit Mc. Teodot, ep. Chiriniei; Sf. Mc. Isihie        ",
+        "comment": "Sfântul Sfințit Mucenic Teodot a fost episcop care a mărturisit credința în Hristos până la moarte. Sfântul Isihie a suferit pentru credință în vremea persecuțiilor.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Mc. Eutropie, Cleonic și Vasilisc        ",
+        "comment": "Sfinții Mucenici Eutropiu, Cleonic și Vasilisc au fost soldați creștini care au mărturisit credința cu statornicie și au primit moarte martirică.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. Cuv. Gherasim de la Iordan; Sf. Mc. Pavel și sora sa, Iuliana        ",
+        "comment": "Sfântul Gherasim de la Iordan a fost mare ascet și povățuitor al monahilor. Sfântul Pavel și sora sa Iuliana au suferit pentru credință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Mc. Conon din Isauria și Conon Grădinarul; Sf. Cuv. Marcu Pustnicul        ",
+        "comment": "Sfântul Conon din Isauria a fost făcător de minuni și mărturisitor al credinței. Conon Grădinarul a primit mucenicia pentru Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Sf. 42 de Mc. din Amoreea; Aflarea Sfintei Cruci        ",
+        "comment": "Cei 42 de Mucenici din Amoreea au suferit moarte martirică pentru refuzul de a se lepăda de Hristos. Se pomenește și Aflarea Sfintei Cruci.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Sf. Sfințiți Mc. Vasilevs, Evghenie, Capiton, Eterie, Agatodor și Elpidie, ep. din Herson; † Sf. Sfințit Mc. Efrem, ep. Tomisului ",
+        "comment": "Sfinții Mucenici Episcopi din Cherson au propovăduit Evanghelia în Crimeea și au primit moarte martirică. Sfântul Efrem, episcopul Tomisului, este cinstit ca apărător al credinței.",
+        "post": "Dezlegare la ulei și vin – Pomenirea morților",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "†) Sf. Pr. Mc. Liviu-Galaction de la Cluj; Sf. Ier. Mărt. Teofilact, ep. Nicomidiei        ",
+        "comment": "Sfântul Preot Mucenic Liviu-Galaction a mărturisit credința în Transilvania. Sfântul Teofilact Mărturisitorul a apărat Ortodoxia în vremea iconoclasmului.",
+        "post": "Dezlegare la ulei și vin – Duminica Sfântului Grigorie Palama.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "9",
+        "description": "† Sf. 40 de Mc. din Sevastia        ",
+        "comment": "Sfinții 40 de Mucenici din Sevastia au îndurat frigul și chinurile pentru Hristos, rămânând uniți în credință până la sfârșit.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Codrat, Ciprian, Dionisie și cei împreună cu ei        ",
+        "comment": "Sfinții Mucenici Codrat, Ciprian și Dionisie au suferit pentru credință în vremea persecuțiilor. Sunt modele de statornicie.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. Ier. Sofronie, patr. Ierusalimului        ",
+        "comment": "Sfântul Sofronie, patriarh al Ierusalimului, a fost mare teolog și apărător al credinței. A scris imne și rugăciuni cunoscute.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Cuv. Teofan Mărt. Sf. Ier. Grigorie Dialogul, ep. Romei; Sf. Cuv. Simeon Noul Teolog        ",
+        "comment": "Sfântul Teofan Mărturisitorul a apărat cinstirea icoanelor și a suferit închisori pentru credință.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "Aducerea moaștelor Sf. Ier. Nichifor, patr. Constantinopolului        ",
+        "comment": "Sfântul Nicefor Mărturisitorul, patriarh al Constantinopolului, a apărat Ortodoxia în vremea iconoclasmului.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "Sf. Cuv. Benedict de Nursia; Sf. Sfințit Mc. Alexandru, pr. din Pidna        ",
+        "comment": "Sfânta Muceniță Eufrasia a trăit în curăție și a primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Mc. Agapie și Plisie, Timolau        ",
+        "comment": "Sfântul Agapie și cei împreună cu el au suferit moarte martirică pentru credință. Sunt pomeniți ca mărturisitori ai Evangheliei.",
+        "post": "Dezlegare la ulei și vin – Duminica Sfintei Cruci.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Mc. Sabin Egipteanul; Sf. Cuv. Hristodul din Patmos        ",
+        "comment": "Sfântul Sabin Egipteanul a fost martir al primelor veacuri, cunoscut pentru milostenia sa.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Cuv. Alexie, omul lui Dumnezeu        ",
+        "comment": "Sfânta Alexia a trăit în rugăciune și smerenie, fiind cunoscută pentru viața ei curată.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Ier. Chiril, arhiep. Ierusalimului        ",
+        "comment": "Sfântul Chiril al Ierusalimului a fost mare catehet și apărător al credinței, autor al Catehezelor baptismale.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Mc. Hrisant și Daria, Claudiu și Ilaria; Sf. Mc. Marian diac.        ",
+        "comment": "Sfântul Iosif Imnograful a fost mare poet bisericesc și compozitor de imne liturgice.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. Cuv. Mc. uciși în M. Sf. Sava cel Sfințit        ",
+        "comment": "Sfântul Cuvios Martinian a trăit în asceză și a fugit de ispite, căutând viață curată.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Ier. Iacob Mărt.; Sf. Cuv. Serapion;         ",
+        "comment": "Sfântul Iacob Mărturisitorul a suferit pentru apărarea icoanelor. Este cinstit ca apărător al Ortodoxiei.",
+        "post": "Dezlegare la ulei și vin – Pomenirea morților.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Sfințit Mc. Vasile, pr. din Ancira; Sf. Mc. Drosida, fiica împ. Traian        ",
+        "comment": "Sfântul Vasile de la Poiana Mărului a fost mare stareț și povățuitor al rugăciunii inimii.",
+        "post": "Dezlegare la ulei și vin – Duminica Sfântului Ioan Scărarul.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Cuv. Mc. Nicon și cei 199 ucenici ai lui        ",
+        "comment": "Sfântul Nicon și cei 199 de ucenici ai săi au primit moarte martirică pentru Hristos.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Înainte-prăznuirea Bunei Vestiri; Sf. Ier. Artemon, ep. Seleuciei        ",
+        "comment": "Sfânta Artemona a trăit în curăție și a primit mucenicia pentru credință.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "(†) Buna Vestire (Blagoveștenia)        ",
+        "comment": "Buna Vestire amintește momentul în care Arhanghelul Gavriil îi vestește Fecioarei Maria nașterea Mântuitorului. Este una dintre cele mai mari sărbători ale Bisericii.",
+        "post": "Dezlegare la pește – singura din luna martie.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Odovania Praznicului Bunei Vestiri; Soborul Sf. Arh. Gavriil; Sf. Mc. Montanus, pr. și soția sa, Maxima; Sf. 26 de Mc. din Goția/Dacia ",
+        "comment": "Soborul Arhanghelului Gavriil cinstește pe vestitorul întrupării Domnului.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Mc. Matrona din Tesalonic; Sf. Mc. Filit și Lidia, soția sa, cu cei 4 fii ai lor        ",
+        "comment": "Sfântul Mucenic Matrona a suferit pentru credință în Tesalonic.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Cuv. Ilarion cel Nou, eg. Pelechitului; Sf. Cuv. Ștefan, făcătorul de minuni        ",
+        "comment": "Sfântul Ilarion cel Nou a fost stareț și făcător de minuni.",
+        "post": "Dezlegare la ulei și vin – Pomenirea morților.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. Sfințiți Mc. Marcu, ep. Aretuselor și Chiril diac.; Sf. Mc. Iona și Varahisie; Sf. Ier. Diadoh, ep. Foticeei;        ",
+        "comment": "Sfântul Marcu, episcopul Aretuselor, a suferit pentru apărarea credinței în vremea arienilor.",
+        "post": "Dezlegare la ulei și vin – Duminica Sfintei Maria Egipteanca.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Cuv. Ioan Scărarul; Sf. Cuv. Euvula, mama Sf. Pantelimon        ",
+        "comment": "Sfântul Ioan Scărarul, autorul Scării Raiului, este mare învățător al vieții duhovnicești.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Sf. Sfințit Mc. Ipatie, ep. Gangrei; Sf. Mc. Veniamin, diac.        ",
+        "comment": "Sfântul Ipatie, episcop al Gangrei, a fost făcător de minuni și apărător al credinței.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      }
+    ],
+    "4": [
+      {
+        "dayNumber": "1",
+        "description": "Sf. Cuv. Maria Egipteanca; Sf. Cuv. Macarie Mărt.; Sf. Mc. Gherontie; Sf. Varsanufie de la Optina        ",
+        "comment": "Sfântul Maria Egipteanca este model de pocăință și nevoință, trăind zeci de ani în pustie în rugăciune. Viața ei arată puterea schimbării prin harul lui Dumnezeu.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Sf. Cuv. Tit, făcătorul de minuni; Sf. Mc. Amfian și Edesie        ",
+        "comment": "Sfântul Tit, făcătorul de minuni, a fost monah cu viață sfântă și mare rugător. A primit darul vindecării și al izgonirii duhurilor rele.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Cuv. Nichita Mărt. și Ilirie        ",
+        "comment": "Sfântul Nichita Mărturisitorul a apărat cinstirea icoanelor și a suferit închisori pentru credință. Este cinstit ca apărător al Ortodoxiei.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. Cuv. Iosif Imnograful, Gheorghe din Maleon și Zosima        ",
+        "comment": "Sfânta Maria din Persia a trăit în curăție și rugăciune, primind mucenicia pentru Hristos. Este pomenită ca model de statornicie.",
+        "post": "Dezlegare la ulei și vin. Sâmbăta lui Lazăr - Pomenirea morților",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. și Marea Luni; † Sf. Sfințit Mc. Irineu, ep. de Sirmium; Sf. Ier. Eutihie, patr. Constantinopolului; Sf. Cuv. Grigorie Sinaitul și Platonida        ",
+        "comment": "Intrarea Domnului în Ierusalim (Floriile) amintește primirea lui Hristos ca Împărat al păcii. Este sărbătoare de bucurie înaintea Săptămânii Mari.",
+        "post": "Dezlegare la pește. Denia Sf. și Marii Luni.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Sf. și Marea Luni; † Sf. Sfințit Mc. Irineu, ep. de Sirmium; Sf. Ier. Eutihie, patr. Constantinopolului; Sf. Cuv. Grigorie Sinaitul și Platonida        ",
+        "comment": "Începutul Săptămânii Mari amintește uscarea smochinului neroditor și chemarea la pocăință. Este zi de pregătire pentru Patimile Domnului.",
+        "post": "Post aspru – numai seara, pâine și apă. Denia Sf. și Marii Marți",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Sf. și Marea Marți; Sf. Mc. Caliopie; Sf. Ier. Gheorghe Mărt., ep. Mitilenei        ",
+        "comment": "Sfântul Gheorghe Mărturisitorul a apărat credința în vremea iconoclasmului. Este pomenit în Săptămâna Mare ca model de statornicie.",
+        "post": "Post aspru – numai seara, pâine și apă. Denia Sf. și Marii Miercuri.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. și Marea Miercuri; Sf. Ap. Irodion, Agav, Ruf, Flegon, Asincrit și Ermis; Sf. Ier. Celestin, ep. Romei        ",
+        "comment": "Sfântul Apostol Irodion, ucenic al Sfântului Pavel, a fost episcop și martir. A propovăduit Evanghelia cu mult curaj.",
+        "post": "Post aspru – numai seara, pâine și apă. Denia Sf. și Marii Joi.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. și Marea Joi; Sf. Mc. Eupsihie din Cezareea Capadociei; Sf. Cuv. Vadim        ",
+        "comment": "Sfântul Eupsihie a fost martir al primelor veacuri, cunoscut pentru credința sa neclintită. A primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la ulei și vin. Pomenirea morților - Denia celor 12 Evanghelii, a Sf. și Marii Vineri",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. și Marea Vineri - Scoaterea Sf. Aer; Sf. Mc. Terentie, Pompei, African, Maxim și Dima        ",
+        "comment": "Sfântul Terentie și cei împreună cu el au suferit moarte martirică pentru credință. Sunt pomeniți ca mărturisitori ai Evangheliei.",
+        "post": "Post negru. Denia Prohodului Domnului, a Sf. și Marii Sâmbete",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. și Marea Sâmbătă; †) Sf. Ier. Calinic de la Cernica, ep. Râmnicului; Sf. Sfințit Mc. Antipa, ep. Pergamului Asiei        ",
+        "comment": "Sfântul Calinic a fost episcop și făcător de minuni. În Sâmbăta Mare se face pomenirea îngropării Domnului și a pogorârii la iad.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "(†) A doua zi de Paști (Mărturia lui Ioan Botezătorul); †) Cinstirea Sf. Ic. a M. D. „Axion Estin” de la M. Protaton - Athos; Sf. Sfințit Mc. Artemon; Sf. Mc. Elefterie Persul. In aceasta zi se savarsesc si Slujbele Sfintilor romani din 11 si 12 aprilie: †) Sf. Ier. Calinic de la Cernica, ep. Râmnicului si mama sa Sf. Cuv. Filoteia de la Pasarea, si Sf. Mc. Sava de la Buzău ",
+        "comment": "Învierea Domnului este cea mai mare sărbătoare a creștinătății, biruința asupra morții și începutul vieții veșnice. Este zi de bucurie și lumină.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "13",
+        "description": "(†) A doua zi de Paști (Mărturia lui Ioan Botezătorul); †) Cinstirea Sf. Ic. a M. D. „Axion Estin” de la M. Protaton - Athos; Sf. Sfințit Mc. Artemon; Sf. Mc. Elefterie Persul. In aceasta zi se savarsesc si Slujbele Sfintilor romani din 11 si 12 aprilie: †) Sf. Ier. Calinic de la Cernica, ep. Râmnicului si mama sa Sf. Cuv. Filoteia de la Pasarea, si Sf. Mc. Sava de la Buzău ",
+        "comment": "Sfântul Artemon a fost preot și făcător de minuni. În Săptămâna Luminată se prăznuiește bucuria Învierii.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "14",
+        "description": "(†) A treia zi de Paști (Drumul spre Emaus); †) Sf. Ier. Pahomie de la Gledin, ep. Romanului; Sf. Ier. Martin Mărt., ep. Romei; Sf. Mc. Tomaida        ",
+        "comment": "Sfântul Martin Mărturisitorul, papă al Romei, a apărat credința împotriva ereziei monotelite. A suferit exil pentru adevăr.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Ap. Aristarh, Pud și Trofim; Sf. Mc. Crescent        ",
+        "comment": "Sfântul Leon, episcop al Romei, a fost mare teolog și apărător al credinței. A condus Biserica cu înțelepciune.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Mc. fecioare Agapia, Irina și Hionia        ",
+        "comment": "Sfânta Irene a trăit în curăție și rugăciune, primind cununa muceniciei. Este cinstită ca model de credință.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "†) Izvorul Tămăduirii; †) Cinstirea Sf. Ic. a M. D. „Siriaca” de la M. Ghighiu; Sf. Sfințit Mc. Simeon, ep. Persiei        ",
+        "comment": "Sfântul Simeon, episcop al Persiei, a suferit moarte martirică împreună cu mulți creștini. Este pomenit ca apărător al credinței.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Cuv. Ioan, ucenicul Sf. Grigorie Decapolitul        ",
+        "comment": "Sfântul Ioan Postitorul, patriarh al Constantinopolului, a fost mare ascet și povățuitor al credincioșilor.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Cuv. Ioan de la Lavra Veche; Sf. Sfințit Mc. Pafnutie        ",
+        "comment": "Duminica Tomii amintește arătarea Domnului către Apostolul Toma. Este zi de întărire în credință.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "20",
+        "description": "† Sf. Ier. Teotim, ep. Tomisului; Sf. Cuv. Teodor Trihina        ",
+        "comment": "Sfântul Teodor Trifon a fost martir al primelor veacuri. În perioada pascală se prăznuiește bucuria Învierii.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Sfințit Mc. Ianuarie, ep. de Benevent; Sf. Mc. Teodor din Perga; Sf. Mc. Alexandra, împ.        ",
+        "comment": "Sfântul Ierarh Nifon a fost episcop și făcător de minuni. A apărat credința în vremuri grele.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Ier. Teodor Sicheotul, ep. Anastasiopolei        ",
+        "comment": "Sfântul Teodor Sicheotul a fost mare ascet și făcător de minuni, cunoscut pentru vindecările sale.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "†) Sf. M. Mc. Gheorghe, Purtătorul de biruință; Sf. Mc. Valerie        ",
+        "comment": "Sfântul Mare Mucenic Gheorghe este unul dintre cei mai iubiți sfinți, cunoscut ca purtător de biruință și apărător al credinței.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "24",
+        "description": "†) Sf. Ier. Mărt. Ilie Iorest, Sava Brancovici și Simion Ștefan, mitr. Transilvaniei; Sf. Ier. Iosif Mărt. din Maramureș; Sf. Mc. Pasicrat și Valentin; Sf. Cuv. Elisabeta        ",
+        "comment": "Sfânta Elisabeta a trăit în curăție și rugăciune, fiind cunoscută pentru milostenia ei.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Sf. Ap. și Ev. Marcu; †) Sf. Cuv. Vasile de la Poiana Mărului ",
+        "comment": "Sfântul Apostol și Evanghelist Marcu a fost ucenic al Sfântului Petru și autor al celei de-a doua Evanghelii.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Sfințit Mc. Vasilevs, ep. Amasiei; Sf. Cuv. Glafira; † Soborul Sfintelor Femei Românce; † Sf. Mc. Chiril, Chindeu și Tasie din Axiopolis (Cernavodă) ",
+        "comment": "Sfânta Muceniță Glafira a suferit pentru credință în vremea persecuțiilor. Este cinstită ca model de statornicie.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Sfințit Mc. Simeon, ruda Domnului, ep. Ierusalimului        ",
+        "comment": "Sfânta Matrona din Moscova a fost cunoscută pentru darul înainte-vederii și al vindecării. A ajutat pe mulți în suferințe.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Ap. Iason și Sosipatru; † Sf. Mc. Maxim, Cvintilian și Dadas din Ozovia ",
+        "comment": "Sfântul Ierarh Vasile al Ostrogului este mare făcător de minuni și ocrotitor al celor aflați în necazuri.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. 9 Mc. din Cizic; Sf. Cuv. Memnon, făcătorul de minuni        ",
+        "comment": "Sfânta Tomaida a primit mucenicia pentru apărarea curăției. Este cinstită ca model de viață sfântă.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Ap. Iacob al lui Zevedeu, fratele Sf. Ap. și Ev. Ioan; Sf. Ier. Donat, ep. Evriei        ",
+        "comment": "Sfântul Iacob Persul a fost mare ascet și povățuitor al monahilor. A trăit în rugăciune și smerenie.",
+        "post": "Harti – se mănâncă de toate.",
+        "color": "black"
+      }
+    ],
+    "5": [
+      {
+        "dayNumber": "1",
+        "description": "Sf. Prooroc Ieremia; Sf. Cuv. Mc. Eftimie, Ignatie și Acachie; Sf. Cuv. Isidora        ",
+        "comment": "Sfântul Prooroc Ieremia a fost unul dintre marii profeți ai Vechiului Testament, chemând poporul la pocăință și vestind voia lui Dumnezeu.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Aducerea moaștelor Sf. Ier. Atanasie cel Mare în Constantinopol; †) Sf. Ier. Atanasie al III-lea (Patelarie), patr. Constantinopolului; Sf. Matrona din Moscova        ",
+        "comment": "Sfântul Atanasie cel Mare, patriarh al Alexandriei, a apărat credința împotriva ereziei ariene și a scris lucrări teologice fundamentale.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "†) Sf. Cuv. Irodion de la Lainici; Sf. Mc. Timotei și soția sa, Mavra        ",
+        "comment": "Sfântul Timotei și Sfântul Mavra au fost soți care au primit moarte martirică pentru Hristos, rămânând uniți în credință până la sfârșit.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "4",
+        "description": "† Sf. Cuv. Mavra de pe Ceahlău; Sf. Mc. Pelaghia; Sf. Cuv. Monica, mama Fer. Augustin        ",
+        "comment": "Sfânta Monica, mama Fericitului Augustin, este cunoscută pentru rugăciunea și răbdarea ei, prin care și-a adus fiul la credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "† Sf. Cuv. Matrona de la Hurezi; Sf. M. Mc. Irina; Sf. Cuv. Mc. Efrem cel Nou        ",
+        "comment": "Sfântul Mucenic Efrem cel Nou a fost monah în Grecia și a primit moarte martirică, fiind cunoscut pentru multele minuni săvârșite după moarte.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Înjumătățirea praznicului Cincizecimii; Sf. și Dreptul Iov, mult răbdătorul; Sf. Mc. Varvar        ",
+        "comment": "Sfântul și Dreptul Iov, mult răbdătorul, este model de credință în suferință, rămânând statornic în încercări grele.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Arătarea pe cer a semnului Sf. Cruci în Ierusalim; Sf. Mc. Acachie și Codrat        ",
+        "comment": "Sfânta Emilia, mama Sfântului Vasile cel Mare, a crescut o familie de sfinți și a trăit în rugăciune și milostenie.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "†) Sf. Ap. și Ev. Ioan Teologul; Sf. Cuv. Arsenie cel Mare        ",
+        "comment": "Sfântul Apostol și Evanghelist Ioan este ucenicul iubit al Domnului, autor al Evangheliei, al Epistolelor și al Apocalipsei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. Prooroc Isaia; Sf. Mc. Hristofor; Aducerea moaștelor Sf. Ier. Nicolae la Bari        ",
+        "comment": "Sfântul Proroc Isaia a vestit venirea lui Mesia și a scris una dintre cele mai profunde cărți profetice ale Scripturii.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Ap. Simon Zilotul; †) Sf. Cuv. Calistrat de la Timișeni și Vasiova ",
+        "comment": "Sfântul Proroc Isaia a vestit venirea lui Mesia și a scris una dintre cele mai profunde cărți profetice ale Scripturii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "11",
+        "description": "†) Sf. Cuv. Dionisie Vatopedinul de la Colciu; Sf. Sfințit Mc. Mochie pr.;Sf. Ier. Metodie și Sf. Cuv. Chiril, luminătorii slavilor        ",
+        "comment": "Sfântul Mochie a fost preot în Roma și a primit moarte martirică pentru credință. Este cinstit ca apărător al creștinilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "†) Sf. Mc. Ioan Valahul; Sf. Ier. Epifanie, arhiep. Ciprului și Gherman, patriarhul Constantinopolului        ",
+        "comment": "Sfântul Epifanie al Ciprului a fost mare ierarh și apărător al Ortodoxiei, cunoscut pentru înțelepciunea și scrierile sale.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "Odovania Înjumătățirii praznicului Cincizecimii; Sf. Mc. Glicheria; Sf. Cuv. Serghie Mărt.        ",
+        "comment": "Sfântul Teodosie al Kievului a fost întemeietor al monahismului rus și povățuitor al multor monahi.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "Sf. Mc. Isidor din Hios; Sf. Sfințit Mc. Terapont, ep. Ciprului;         ",
+        "comment": "Sfântul Isidor, episcop al Seviliei, a fost mare învățat și autor de lucrări teologice și istorice.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Cuv. Pahomie cel Mare; †) Sf. Ier. Iacob Putneanul, mitr. Moldovei ",
+        "comment": "Sfântul Pahomie cel Mare a organizat viața monahală de obște în Egipt, fiind considerat părintele monahismului cenobitic.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Cuv. Teodor cel Sfințit; †) Sf. Cuv. Sila, Paisie și Natan de la Sihăstria Putnei ",
+        "comment": "Sfântul Teodor cel Sfințit a fost ucenic al Sfântului Pahomie și mare povățuitor al monahilor.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Ap. Andronic și soția sa, Iunia; Sf. Cuv. Nectarie și Teofan        ",
+        "comment": "Sfântul Apostol Andronic și soția sa Iunia au fost ucenici ai Sfântului Pavel și propovăduitori ai Evangheliei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Mc. Petru, Dionisie și Paulin        ",
+        "comment": "Sfântul Petru al Argosului a fost episcop milostiv și făcător de minuni, ajutând pe cei săraci și bolnavi.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Mc. Patrichie, ep. Prusei        ",
+        "comment": "Sfântul Patricie, episcop al Prusiei, a primit moarte martirică împreună cu alți episcopi pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Odovania praznicului Învierii Domnului; Sf. Mc. Talaleu; Sf. Cuv. Talasie; Sf. Lidia din Filipi        ",
+        "comment": "Sfântul Talaleu a fost tânăr martir cunoscut pentru curajul său în fața chinurilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "(†) Înălțarea Domnului (Ispasul); Ziua Eroilor; †) Sf. Împ., întocmai cu ap., Constantin și mama sa, Elena        ",
+        "comment": "Sfinții Împărați Constantin și Elena sunt întocmai cu apostolii, cunoscuți pentru sprijinirea creștinismului și aflarea Sfintei Cruci.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Mc. Vasilisc și Marcel; Sf. Părinți de la Sinodul al II-lea Ecumenic        ",
+        "comment": "Sfântul Mucenic Vasilisc a suferit moarte martirică pentru Hristos, fiind cunoscut pentru statornicia sa.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Ier. Mihail Mărt., ep. Sinadei; Sf. Mironosiță Maria lui Cleopa        ",
+        "comment": "Sfântul Mihail Sinadul a fost episcop și apărător al credinței în vremea iconoclasmului.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "† Sf. Mărt. Blandina de la Iași; Sf. Cuv. Simeon cel din Muntele Minunat        ",
+        "comment": "Sfinții Chiril și Metodie, luminătorii slavilor, au creat alfabetul slavon și au tradus Scriptura pentru popoarele slave.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "25",
+        "description": "† A treia aflare a capului Sf. Ioan, Înaintemergătorul și Botezătorul Domnului        ",
+        "comment": "Sfântul Grigorie, episcop al Nyssei, a fost mare teolog și frate al Sfântului Vasile cel Mare.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Ap. Carp și Alfeu; Sf. Mc. Averchie și Elena        ",
+        "comment": "Sfântul Apostol Carp a fost unul dintre cei 70 de apostoli și propovăduitor al Evangheliei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Mc. Iuliu Veteranul; Sf. Sfințiți Mc. Eladie și Terapont, ep. Sardei; Sf. Mărt. Ioan Rusul        ",
+        "comment": "Sfântul Ioan Rusul a fost rob în Asia Mică, trăind în sfințenie și făcând minuni chiar și după moarte.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Ier. Eutihiei, ep. Melitinei și Nichita, ep. Calcedonului        ",
+        "comment": "Sfântul Nichita, episcop al Calcedonului, a fost apărător al credinței și făcător de minuni.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Odovania praznicului Înălțării Domnului; Sf. Mc. Teodosia, fecioara; Sf. Sfințit Mc. Olivian        ",
+        "comment": "Sf. Muceniţă Teodosia din Cezareea a indurat mucenicie la 17 ani.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Cuv. Isaachie Mărt. și Varlaam",
+        "comment": "Sfânta Macrina cea Bătrână, bunica Sfântului Vasile cel Mare, a fost femeie de mare credință și model de viață creștină.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Sf. Mc. Ermie, Eusebiu și Haralambie",
+        "comment": "Sfântul Ermie a fost soldat creștin care a primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      }
+    ],
+    "6": [
+      {
+        "dayNumber": "1",
+        "description": "(✝) Sfânta Treime. Sfântul Iustin Martirul și Filosoful",
+        "comment": "Sfântul Iustin Martirul și Filosoful a fost unul dintre primii mari apologeți ai creștinismului, apărând credința în fața păgânilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "2",
+        "description": "†) Sf. M. Mc. Ioan cel Nou de la Suceava; Sf. Ier. Nichifor, patr. Constantinopolului        ",
+        "comment": "Sfântul Nichifor Mărturisitorul, patriarh al Constantinopolului, a apărat cinstirea icoanelor și a suferit exil pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Mc. Luchilian, Ipatie și Paula fecioara        ",
+        "comment": "Sfântul Luchilian și cei împreună cu el au primit moarte martirică pentru Hristos, rămânând statornici în credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "†) Sf. Mc. Zotic, Atal, Camasie și Filip de la Niculițel; Sf. Ier. Mitrofan, patr. Constantinopolului; Sf. Mironosițe Maria și Marta, surorile Dreptului Lazăr        ",
+        "comment": "Sfântul Metodie, patriarh al Constantinopolului, a fost apărător al Ortodoxiei și a restabilit cinstirea icoanelor.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "† Sf. Cuv. Elisabeta de la Pasărea; Sf. Sfințit Mc. Dorotei, ep. Tirului; Sf. Mc.  Apolon și Leonid        ",
+        "comment": "Sfântul Dorotei al Tirului a fost episcop și martir, cunoscut pentru înțelepciunea și scrierile sale.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Odovania praznicului Pogorârii Sf. Duh; Sf. Cuv. Ilarion cel Nou, eg. M. Dalmaților; Sf. Cuv. Visarion        ",
+        "comment": "Sfântul Ilarion cel Nou a fost stareț și făcător de minuni, apărând credința în vremea iconoclasmului.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Sf. Sfințit Mc. Teodot, ep. Ancirei; Sf. Mc. Zenaida        ",
+        "comment": "Pogorârea Sfântului Duh (Rusaliile) amintește coborârea Duhului Sfânt peste apostoli și întemeierea Bisericii.",
+        "post": "Harti – nu există restricții alimentare. Pomenirea morților - Moșii de vară",
+        "color": "red"
+      },
+      {
+        "dayNumber": "8",
+        "description": "† Sf. Mc. Nicandru și Marcian; Aducerea moaștelor Sf. M. Mc. Teodor Stratilat        ",
+        "comment": "Lunea Sfântului Duh cinstește lucrarea Duhului Sfânt în lume și în Biserică.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. Ier. Chiril, arhiep. Alexandriei        ",
+        "comment": "Sfântul Chiril al Alexandriei a fost mare teolog și apărător al învățăturii despre Maica Domnului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Alexandru și Antonina; Sf. Sfințit Mc. Timotei, ep. Prusiei        ",
+        "comment": "Sfântul Mucenic Timotei a suferit moarte martirică pentru Hristos, rămânând statornic în credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. Ap. Bartolomeu și Barnaba; Sf. Ier. Luca, arhiep. Crimeei        ",
+        "comment": "Sfântul Apostol Bartolomeu și Sfântul Apostol Barnaba au propovăduit Evanghelia până la marginile lumii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Cuv. Onufrie cel Mare și Petru Atonitul        ",
+        "comment": "Sfântul Onufrie cel Mare a trăit în pustie în rugăciune și nevoință, fiind mare ascet al Bisericii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "Sf. Mc. Achilina; Sf. Ier. Trifilie, ep. Lefcosiei din Cipru        ",
+        "comment": "Sfântul Trifilie, episcop al Levkosiei, a fost ucenic al Sfântului Spiridon și mare învățător al credinței.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": " Sf. Prooroc Elisei; Sf. Ier. Metodie Mărturisitorul, patriarhul Constantinopolului        ",
+        "comment": "Sfântul Proroc Elisei a fost ucenicul Sfântului Ilie și făcător de minuni. Sfântul Metodie a apărat credința în vremea iconoclasmului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Prooroc Amos; † Sf. Mc. Isihie; Fer. Augustin și Ieronim        ",
+        "comment": "Sfântul Proroc Amos a vestit dreptatea lui Dumnezeu și chemarea la pocăință. Începe Postul Sfinților Apostoli.",
+        "post": "Lăsatul secului pentru Postul Sf. Ap. Petru și Pavel",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "†) Sf. Ier. Martir Neofit Cretanul, mitropolitul Țării Româneti; Sf. Ier. Tihon, ep. Amatundei        ",
+        "comment": "Sfântul Tihon al Amatundei a fost episcop milostiv și făcător de minuni, ajutând pe cei săraci.",
+        "post": "Post - Dezlegare la pește. Începutul Postului Sf. Ap. Petru și Pavel",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Mc. Manuil, Savel, Ismail, Inochentie și Felix        ",
+        "comment": "Sfântul Mucenic Isihie a suferit pentru credință în vremea persecuțiilor. Este cinstit ca mărturisitor.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Mc. Leontie, Ipatie și Teodul; Sf. Cuv. Erasm        ",
+        "comment": "Sfântul Leontie, împreună cu Ipatie și Teodul, au primit moarte martirică pentru Hristos.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Ap. Iuda, ruda Domnului; Sf. Cuv. Paisie cel Mare        ",
+        "comment": "Sfântul Apostol Iuda, ruda Domnului, a propovăduit Evanghelia în multe țări și a suferit pentru credință.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. Sfințit Mc. Metodie, ep. Patarelor; Sf. Ier. Calist, patr. Constantinopolului; Sf. Nicolae Cabasila        ",
+        "comment": "Sfântul Metodie al Constantinopolului a fost apărător al icoanelor și mare ierarh al Bisericii.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Mc. Iulian din Tars și Afrodisie        ",
+        "comment": "Sfântul Iulian din Tars a primit moarte martirică pentru Hristos, fiind cunoscut pentru statornicia sa.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "22",
+        "description": "†) Sf. Ier. Grigorie Dascălul, mitr. Țării Românești; Sf. Sfințit Mc. Eusebiu, ep. Samosatei        ",
+        "comment": "Sfântul Grigorie, episcop al Panfiliei, a fost mare învățător și apărător al credinței.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Mc. Agripina; Sf. Sfințit Mc. Aristocleu, pr.        ",
+        "comment": "Sfânta Agripina a primit mucenicia pentru Hristos, fiind cinstită pentru curăția și credința ei.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "(†) Nașterea Sf. Proroc Ioan Botezătorul (Sânzienele); † Aducerea moaștelor Sf. M. Mc. Ioan cel Nou de la Suceava; † Sf. Ier. Niceta de Remesiana; ",
+        "comment": "Nașterea Sfântului Ioan Botezătorul este mare sărbătoare care amintește venirea Înaintemergătorului Domnului.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Sf. M. Mc. Fevronia; Sf. Mc. Orentie și frații săi; Sf. Mc. Livia        ",
+        "comment": "Sfântul Fevronia a fost fecioară martiră, cunoscută pentru curajul și credința ei neclintită.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Cuv. David din Tesalonic; Sf. Ier. Ioan, ep. Goției        ",
+        "comment": "Sfântul Ioan cel Nou de la Suceava este mare mucenic și ocrotitor al Moldovei, făcător de minuni.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Cuv. Samson, primitorul de străini; Sf. Mironosiță Ioana        ",
+        "comment": "Sfântul Samson, doctor fără de arginți, a vindecat pe mulți bolnavi prin rugăciune și milostenie.",
+        "post": "Post – fără ulei.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Aducerea moaștelor Sf. Mc. Doctori fără de arginți Chir și Ioan; Sf. Mc. Papias        ",
+        "comment": "Sfântul Ierarh Iachint, primul mitropolit al Țării Românești, a fost păstor înțelept și apărător al credinței.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "29",
+        "description": "(†) Sf. Ap. Petru și Pavel        ",
+        "comment": "Sfinții Apostoli Petru și Pavel sunt cei mai mari propovăduitori ai Evangheliei, prăznuiți împreună ca stâlpi ai Bisericii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "30",
+        "description": "† Soborul Sf. 12 Ap.; †) Sf. Ier. Ghelasie de la Râmeț ",
+        "comment": "Soborul celor 12 Apostoli îi cinstește pe toți ucenicii aleși ai Domnului, trimiși să vestească Evanghelia în lume.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      }
+    ],
+    "7": [
+      {
+        "dayNumber": "1",
+        "description": "†) Sf. Ier. Leontie de la Rădăuți; Sf. Mc. Doctori fără de arginți, Cosma și Damian, cei din Roma        ",
+        "comment": "Sfântul Cosma și Sfântul Damian, doctori fără de arginți, au vindecat bolnavi fără plată și au propovăduit credința prin fapte de milostenie.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Așezarea veșmântului Născătoarei de Dumnezeu în biserica Vlaherne; †) Sf. Voievod Ștefan cel Mare; Sf. Ier. Iuvenalie, patr. Ierusalimului; Sf. Ier. Ioan Maximovici        ",
+        "comment": "Aducerea moaștelor Sfântului Voievod Ștefan cel Mare amintește de domnitorul credincios și apărător al creștinătății.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Mc. Iachint; Sf. Ier. Anatolie, patr. Constantinopolului        ",
+        "comment": "Sfântul Mucenic Iachint a suferit moarte martirică pentru Hristos în vremea împăratului Traian.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "† Sf. Olimpia de la Farcașa. ; Sf. Ier. Andrei, arhiep. Cretei; Sf. Cuv. Marta        ",
+        "comment": "Sfânta Marta, mama Sfântului Simeon Stâlpnicul, a trăit în rugăciune și smerenie, fiind cinstită pentru viața ei curată.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "† Sf. Cuv. Atanasie Atonitul; Sf. Cuv. Lampadie        ",
+        "comment": "Sfântul Atanasie Athonitul este întemeietorul vieții de obște pe Muntele Athos și mare povățuitor al monahilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "6",
+        "description": "†) Sf. Cuv. Dometie cel Milostiv de la Râmeț și mama sa, Sf. Cuv. Filotimia; Sf. Cuv. Sisoe cel Mare; Sf. Mc. Lucia din Roma; Sf. Mc. Marius, soția sa, Marta, și fiii lor, Audifaciu și Avacum        ",
+        "comment": "Sfânta Muceniță Lucia a primit moarte martirică pentru credință, rămânând statornică în mărturisirea lui Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "†) Sf. M. Mc. Chiriachi; Sf. Cuv. Toma din Maleon; Sf. Mc. Evanghel        ",
+        "comment": "Sfânta Muceniță Chiriachi a suferit chinuri grele pentru credință, fiind cinstită ca model de curaj și statornicie.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. M. Mc. Procopie și mama sa, Teodosia; †) Sf. Mc. Epictet preotul și Astion monahul ",
+        "comment": "Sfântul Mare Mucenic Procopie a fost soldat roman convertit la creștinism, primind moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "†) Cinstirea Ic. Maicii Domnului „Îndrumătoarea” de la M. Neamț; Sf. Sfințiți Mc. Pangratie, ep. Tavromeniei        ",
+        "comment": "Sfântul Pangratie, episcop al Tavromeniei, a fost ucenic al apostolilor și făcător de minuni.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. 45 de Mc. din Nicopolea Armeniei        ",
+        "comment": "Sfinții 45 de Mucenici din Nicopole au suferit moarte martirică pentru credință în vremea împăratului Liciniu.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. M. Mc. Eufimia; Sf. Olga, cea întocmai cu Ap. și luminătoarea Rusiei        ",
+        "comment": "Sfânta Olga, luminătoarea Rusiei, a fost prima conducătoare rusă care a primit credința creștină.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "†) Cinstirea Ic. Maicii Domnului „Prodromița” de la Muntele Athos; Sf. Mc. Proclu și Ilarie; Cuv. Mihai Maleinul; Sf. Veronica; Sf. Cuv. Paisie Aghioritul        ",
+        "comment": "Sfântul Paisie Aghioritul este unul dintre cei mai iubiți sfinți contemporani, cunoscut pentru sfaturile sale pline de discernământ.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "13",
+        "description": "† Aducerea moaștelor Sfântului Cuvios Dimitrie cel Nou la București; Soborul Sf. Arh. Gavriil; Sf. Cuv. Ștefan Savaitul; Sf. Mc. Maria din Persia; Sf. Cuv. Sara        ",
+        "comment": "Soborul Arhanghelului Gavriil cinstește pe vestitorul întrupării Domnului și pe îngerul bucuriei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "Sf. Ap. Achila; Sf. Mc. Iust și Iraclie; Sf. Cuv. Nicodim Aghioritul        ",
+        "comment": "Sfântul Apostol Achila, ucenic al Sfântului Pavel, a propovăduit Evanghelia în multe cetăți.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Mc. Chiric și Iulita; Sf. Vladimir, luminătorul Rusiei        ",
+        "comment": "Sfântul Vladimir, luminătorul Rusiei, a botezat poporul său și a întemeiat creștinismul în ținuturile slave.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Sfințit Mc. Atinoghen cu cei 10 ucenici ai săi; Sf. Mc. Iulia        ",
+        "comment": "Sfânta Muceniță Iulia a suferit moarte martirică pentru Hristos, fiind cinstită pentru credința ei neclintită.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. M. Mc. Marina; Sf. Ier. Eufrasie, ep. Ionopolei        ",
+        "comment": "Sfânta Marina a fost fecioară martiră, cunoscută pentru curajul și statornicia ei în fața prigonitorilor.",
+        "post":  "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "†) Sf. Mc. Emilian de la Durostorum (Ostrov); Sf. Cuv. Pamvo        ",
+        "comment": "Sfântul Emilianos, episcop al Cizicului, a fost apărător al credinței și făcător de minuni.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Cuv. Macrina, sora Sf. Vasile cel Mare; Sf. Cuv. Die; Aflarea moaștelor Sf. Cuv. Serafim de Sarov        ",
+        "comment": "Sfântul Macrina, sora Sfântului Vasile cel Mare, a trăit în rugăciune și înțelepciune, povățuind multe suflete.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "20",
+        "description": "†) Sf. Slăvitul Prooroc Ilie Tesviteanul        ",
+        "comment": "Sfântul Prooroc Ilie Tesviteanul este mare făcător de minuni și apărător al credinței în Dumnezeul cel viu.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Cuv. Simeon și Ioan Pustnicul; Sf. Prooroc Iezechiel; †) Sf. Cuv. Rafail și Partenie, de la Agapia Veche ",
+        "comment": "Sfântul Simeon, episcop al Seleuciei, a fost mare învățător și apărător al credinței.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "†) Sf. Pr. Mărt. Ilie Lăcătușu; Sf. Mironosiță, întocmai cu Ap., Maria Magdalena; Sf. Cuv. Mc. Marcela        ",
+        "comment": "Sfânta Maria Magdalena, mironosiță și întocmai cu apostolii, a fost prima care L-a văzut pe Hristos înviat.",
+        "post":  "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Aducerea Moaștelor Sf. Sfințit Mc. Foca; Sf. Mc. Apolinarie, Vitalie și Valeria        ",
+        "comment": "Sfânta Pelaghia a trăit în pocăință și rugăciune, fiind cinstită pentru viața ei curată.",
+        "post":  "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. M. Mc. Hristina; Sf. Mc. Ermoghen        ",
+        "comment": "Sfânta Hristina a primit moarte martirică pentru Hristos, fiind cunoscută pentru credința ei neclintită.",
+        "post":  "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Adormirea Sf. Ana, mama Preasfintei Născătoare de Dumnezeu; Sf. Părinți de la Sinodul al V-lea Ecumenic; Sf. Cuv. Eupraxia și Olimpiada        ",
+        "comment": "Adormirea Sfintei Ana, mama Maicii Domnului, este cinstită ca zi de bucurie și binecuvântare.",
+        "post":  "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Sfințit Mc. Ermolae; Sf. Mc. Cuv. Paraschevi din Roma; †) Sf. Cuv. Ioanichie cel Nou de la Muscel (Argeș) ",
+        "comment": "Sfântul Ermolae și cei împreună cu el au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "27",
+        "description": "† Sf. M. Mc. și Tămăduitor Pantelimon        ",
+        "comment": "Sfântul Mare Mucenic Pantelimon, doctor fără de arginți, a vindecat bolnavi și a primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Ap. și Diac. Prohor, Nicanor, Timon și Parmena; Sf. Cuv. Pavel de la Xiropotamu        ",
+        "comment": "Sfântul Prooroc Irineu a fost mare învățător al credinței și apărător al adevărului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. Mc. Calinic, Veniamin și Mamant; Sf. Mc. Teodota cu fiii săi        ",
+        "comment": "Sfânta Muceniță Calinica a suferit pentru credință, rămânând statornică în mărturisirea lui Hristos.",
+        "post":  "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Ap. Sila, Silvan, Crescent, Epenet și Andronic; Sf. Mc. Valentin, ep. Umbriei        ",
+        "comment": "Sfântul Apostol Silas, ucenic al Sfântului Pavel, a propovăduit Evanghelia în multe cetăți.",
+        "post":  "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Înainte-prăznuirea scoaterii Sf. Cruci; Sf. și Dreptul Evdochim; Sf. și Dreptul Iosif din Arimateea        ",
+        "comment": "Sfântul Evdochim a trăit în curăție și milostenie, fiind cunoscut pentru viața sa sfântă.",
+        "post":  "Lăsatul secului pentru Postul Adormirii Maicii Domnului",
+        "color": "black"
+      }
+    ],
+    "8": [
+      {
+        "dayNumber": "1",
+        "description": "Scoaterea Sf. Cruci; Sf. 7 frați Mc. Macabei        ",
+        "comment": "Scoaterea Sfintei Cruci amintește de purtarea crucii în procesiune pentru binecuvântarea orașelor. Se pomenesc și Sfinții șapte frați Macabei.",
+        "post": "Dezlegare la ulei și vin - Începutul Postului Adormirii Maicii Domnului",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Aducerea moaștelor Sf. Întâi Mc. și Arhid. Ștefan; Dreptul Gamaliel; Binecredinciosul Împ. Iustinian cel Mare        ",
+        "comment": "Sfântul Prooroc Ilie Tesviteanul este cinstit pentru râvna și minunile sale. Este unul dintre cei mai mari profeți ai Vechiului Testament.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "3",
+        "description": "†) Sf. Cuv. Mărt. Iraclie din Basarabia; Sf. Cuv. Isaachie, Dalmat și Faust; Sf. Mironosiță Salomeea; Sf. Cuv. Teodora din Tesalonic        ",
+        "comment": "Sfântul Isaac Sirul a fost mare ascet și autor de scrieri duhovnicești pline de înțelepciune.",
+        "post": "Post – dezlegare la ulei și vin (luni).",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. 7 tineri din Efes; Sf. Mc. Tatuil        ",
+        "comment": "Sfânta Maria Magdalena, mironosiță și întocmai cu apostolii, a fost prima care L-a văzut pe Hristos înviat.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Înainte-prăznuirea Schimbării la Față a Domnului; †) Sf. Cuv. Ioan Iacob de la Neamț; Sf. Mc. Evsignie; Sf. Nona, mama Sf. Ier. Grigorie Teologul; Sf. Ier. Fabian, ep. Romei        ",
+        "comment": "Sfântul Mucenic Eusignie a slujit în armata romană și a mărturisit credința în Hristos până la moarte.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "(†) Schimbarea la Față a Domnului (Pobrejenia)        ",
+        "comment": "Schimbarea la Față a Domnului arată slava dumnezeiască a lui Hristos pe Muntele Tabor. Este una dintre marile sărbători ale Bisericii.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "7",
+        "description": "†) Sf. Cuv. Teodora de la Sihla; †) Sf. Cuv. Pafnutie - Pârvu Zugravul; Sf. Cuv. Mc. Dometie Persul; Sf. Sfințit Mc. Narcis, arhep. Ierusalimului; Sf. Cuv. Nicanor        ",
+        "comment": "Sfânta Teodora din Alexandria a trăit în pocăință și smerenie, ascunzându-și identitatea pentru a duce viață monahală.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "†) Sf. Pr. Mc. Alexandru din Basarabia; Sf. Ier. Emilian Mărt., ep. Cizicului și Miron, ep. Cretei        ",
+        "comment": "Sfântul Emilian Mărturisitorul a apărat credința în vremea iconoclasmului și a suferit pentru adevăr.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. Ap. Matia; Sf. 10 Mc. Mărt. pentru icoana lui Hristos        ",
+        "comment": "Sfântul Apostol Matia a fost ales în ceata celor doisprezece după Înălțarea Domnului și a propovăduit Evanghelia până la moarte martirică.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Laurențiu, arhid.; Sf. Sfințit Mc. Xist, ep. Romei; Sf. Mc. Ipolit        ",
+        "comment": "Sfântul Laurențiu Arhidiaconul Romei a primit moarte martirică, fiind cunoscut pentru milostenia și curajul său.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "†) Sf. Ier. Nifon, patr. Constantinopolului; Sf. M. Mc. Evplu, arhid.        ",
+        "comment": "Sfânta Muceniță Susana a suferit pentru credință în Roma, rămânând statornică în mărturisirea lui Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Mc. Fotie și Anichit        ",
+        "comment": "Sfântul Fotie cel Mare, patriarh al Constantinopolului, a fost mare teolog și apărător al Ortodoxiei.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "Odovania praznicului Schimbării la Față a Domnului; Mutarea moaștelor Sf. Cuv. Maxim Mărt.; Sf. Cuv. Dorotei și Dositei        ",
+        "comment": "Aducerea moaștelor Sfântului Maxim Mărturisitorul amintește de marele teolog care a apărat dreapta credință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "Înainte-prăznuirea Adormirii Maicii Domnului; Sf. Prooroc Miheia        ",
+        "comment": "În ajunul Adormirii Maicii Domnului, credincioșii se pregătesc prin post și rugăciune pentru marea sărbătoare.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "(†) Adormirea Maicii Domnului        ",
+        "comment": "Adormirea Maicii Domnului este una dintre cele mai mari sărbători, amintind mutarea la cer a Născătoarei de Dumnezeu.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Aducerea Sf. Mahrame a Domnului din Edesa la Constantinopol; †) Sf. Martiri Brâncoveni: Constantin Voievod cu cei patru fii ai săi: Constantin, Ștefan, Radu și Matei, și sfetnicul Ianache; †) Sf. Cuv. Iosif de la Văratec; Sf. Mc. Diomid        ",
+        "comment": "Sfinții Martiri Brâncoveni – Constantin Vodă, fiii săi și sfetnicul Ianache – au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "17",
+        "description": "†) Sf. Gheorghe Pelerinul; † Sf. Cuv. Nazaria, Olimpiada, Elisabeta (Safta) Brâncoveanu, de la Văratec ; Sf. Mc. Miron pr., Straton și Ciprian        ",
+        "comment": "Sfântul Miron, episcop al Cretei, a fost făcător de minuni și păstor înțelept al credincioșilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Mc. Flor și Lavru        ",
+        "comment": "Sfânta Florentina a trăit în curăție și rugăciune, fiind cinstită pentru viața ei sfântă.",
+        "post": "Post – dezlegare la ulei și vin (miercuri).",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Mc. Andrei Stratilat, Timotei, Agapie și Tecla        ",
+        "comment": "Sfântul Andrei Stratilat a fost ofițer roman convertit la creștinism, primind moarte martirică împreună cu ostașii săi.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. Prooroc Samuel; Sf. Mc. Sever, Eliodor și Teoharie        ",
+        "comment": "Sfântul Proroc Samuel a fost ultimul dintre judecătorii lui Israel și mare proroc al Vechiului Testament.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": " Sf. Ap. Tadeu; Sf. Mc. Vasa, cu fiii ei; † Sf. Mc. Donat diac., Romul pr., Silvan diac. și Venust ",
+        "comment": "Sfântul Emilian din Cizic a fost episcop și apărător al credinței în vremea iconoclasmului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Mc. Agatonic și cei îmtruna cu ei        ",
+        "comment": "Sfântul Agatonic și cei împreună cu el au primit moarte martirică pentru Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Odovania praznicului Adormirii Maicii Domnului; † Sf. Mc. Lup; Sf. Sfințit Mc. Irineu, ep. de Lugdunum (Lyon)        ",
+        "comment": "Sfântul Lup, slujitor al Sfântului Dimitrie, a primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. Sfințit Mc. Eutihie; Sf. Mc. Tation        ",
+        "comment": "Sfântul Cosma Etolianul a fost mare misionar și luminător al poporului grec.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Aducerea moaștelor Sf. Ap. Bartolomeu; Sf. Ap. Tit        ",
+        "comment": "Sfântul Apostol Tit, ucenic al Sfântului Pavel, a fost episcop în Creta și mare propovăduitor al Evangheliei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Mc. Adrian și Natalia, soția sa        ",
+        "comment": "Sfântul Adrian și soția sa Natalia au suferit pentru credință, fiind modele de statornicie și iubire creștină.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. Cuv. Pimen cel Mare; Sf. Mc. Fanurie; Sf. Ier. Osie, ep. Cordobei        ",
+        "comment": "Sfântul Fanurie este cunoscut ca făcător de minuni și ajutător al celor aflați în necazuri.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. Cuv. Moise Etiopianul; Dreptul Iezechia        ",
+        "comment": "Sfântul Moise Etiopianul a fost tâlhar convertit, devenind mare ascet și pildă de pocăință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "(†) Tăierea Capului Sf. Prooroc Ioan Botezătorul; Fapte XIII, 25-33        ",
+        "comment": "Tăierea Capului Sfântului Ioan Botezătorul amintește de martiriul Înaintemergătorului Domnului. Este zi de post și sobrietate.",
+        "post": "Post - Dezlegare la ulei și vin.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "30",
+        "description": "†) Sf. Ier. Varlaam, mitr. Moldovei și Ioan de la Râșca și Secu, ep. Romanului; Sf. Ier. Ioan, Pavel cel Nou și Alexandru, patr. Constantinopolului        ",
+        "comment": "Sfântul Alexandru, patriarh al Constantinopolului, a fost apărător al credinței în vremea arianismului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Așezarea în raclă a cinstitului brâu al Maicii Domnului; †) Sf. Cuv. Macarie Protopsaltul ",
+        "comment": "Punerea în raclă a brâului Maicii Domnului este cinstită ca mare binecuvântare pentru credincioși.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      }
+    ],
+    "9": [
+      {
+        "dayNumber": "1",
+        "description": "† Începutul anului bisericesc; † Sf. Cuv. Dionisie Exiguul (cel Smerit);  Sf. Cuv. Simeon Stâlpnicul; Sf. 40 de Mucenițe din Adrianopol; Dreptul Iosua        ",
+        "comment": "Începutul Indictului, anul nou bisericesc, este zi de rugăciune pentru binecuvântarea anului ce începe.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Sf. Mc. Mamant; Sf. Ier. Ioan Postitorul, patr. Constantinopolului        ",
+        "comment": "Sfântul Mucenic Mamant a fost păstor și făcător de minuni, primind moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Sfințit Mc. Antim, ep. Nicomidiei; Sf. Cuv. Teoctist din Palestina; †) Sf. Cuv. Neofit și Meletie de la M-rea. Stânișoara ",
+        "comment": "Sfântul Antim, episcop al Nicomidiei, a fost mare apărător al credinței și făcător de minuni.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. Sfințit Mc. Vavila, ep. Antiohiei; Sf. Prooroc Moise; Sf. Mc. Petroniu        ",
+        "comment": "Sfânta Ermiona, fiica Sfântului Apostol Filip, a fost vindecătoare și mărturisitoare a credinței.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Prooroc Zaharia și Dreapta Elisabeta, părinții Sf. Ioan Botezătorul        ",
+        "comment": "Sfântul Prooroc Zaharia, tatăl Sfântului Ioan Botezătorul, a fost ucis pentru mărturisirea adevărului.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Pomenirea minunii Sf. Arh. Mihail în Colose; Sf. Mc. Eudoxie;         ",
+        "comment": "Sfântul Mucenic Vavila și cei împreună cu el au suferit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Înainte-prăznuirea Nașterii Maicii Domnului; Sf. Mc. Sozont; Sf. Cuv. Casiana Imnografa;  †) Sf. Cuv. Simeon și Amfilohie de la Pângărați  ",
+        "comment": "Sfântul Sozont a fost păstor și martir, cunoscut pentru viața sa curată și credința neclintită.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "(†) Nașterea Maicii Domnului        ",
+        "comment": "Nașterea Maicii Domnului este prima mare sărbătoare a anului bisericesc, aducând bucurie și binecuvântare.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. și Drepții dumnezeiești Părinți Ioachim și Ana; †) Sf. Cuv. Chiriac de la Tazlău; †) Sf. Cuv. Onufrie de la Vorona; Sf. Părinți de la Sinodul al III-lea Ecumenic; Sf. Mc. Severian        ",
+        "comment": "Sfinții Ioachim și Ana, părinții Maicii Domnului, sunt cinstiți pentru credința și răbdarea lor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Minodora, Mitrodora și Nimfodora; Sf. Împ. Pulheria        ",
+        "comment": "Sfântul Mucenic Menodora, Metrodora și Ninfodora au fost trei surori care au primit moarte martirică pentru Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. Cuv. Teodora din Alexandria; Sf. Cuv. Eufrosin Bucătarul        ",
+        "comment": "Sfântul Teodora din Alexandria a trăit în pocăință și smerenie, ascunzându-și identitatea pentru a duce viață monahală.",
+        "post": "Post – dezlegare la ulei și vin (vineri).",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Odovania Praznicului Nașterii Maicii Domnului; Sf. Mc. Avtonom, Macedonie și Teodul        ",
+        "comment": "Sfântul Mucenic Autonom a fost episcop și misionar, primind moarte martirică pentru credință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "Înainte-prăznuirea Înălțării Sf. Cruci; † Târnosirea Bisericii Învierii din Ierusalim; Sf. Sfințiți Mc. Corneliu Sutașul și Ciprian, ep. Cartaginei; †) Sf. Cuv. Ioan de la Prislop; † Sf. Mc. din Dobrogea: Macrobie, Gordian, Ilie, Zotic, Lucian și Valerian ",
+        "comment": "Sfântul Ioan de la Prislop a fost pustnic român, cunoscut pentru viața sa sfântă și minunile sale.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "14",
+        "description": "(†) Înălțarea Sfintei Cruci; Sf. Nou Mc. Macarie, ucenicul patr. Nifon        ",
+        "comment": "Înălțarea Sfintei Cruci amintește aflarea și înălțarea lemnului Sfintei Cruci. Este zi de post aspru și rugăciune.",
+        "post": "Post aspru – Dezlegare la ulei și vin.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "15",
+        "description": "†) Sf. Ier. Iosif cel Nou de la Partoș, mitr. Banatului; † Sf. M. Mc. Nichita; † Sf. Ier. Visarion, arhiep. Larisei        ",
+        "comment": "Sfânta Muceniță Lucia din Roma a suferit pentru credință, rămânând statornică în mărturisirea lui Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "†) Sf. Cuv. Mărt. Sofian de la Antim; Sf. M. Mc. Eufimia; Sf. Mc. Meletina și Ludmila        ",
+        "comment": "Sfinții Mucenici Eufemia, Dorotei și Castor au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "†) Sf. Ier. Dionisie, ep. Cetății Albe - Ismail; Sf. Mc. Sofia și fiicele sale: Pistis, Elpis și Agapi        ",
+        "comment": "Sfânta Sofia și fiicele ei, Pistis, Elpis și Agapis, au suferit pentru credință, fiind modele de curaj creștin.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "†) Sf. Pr. Mc. Ilarion Felea; Sf. Ier. Eumenie, ep. Gortinei; Sf. Mc. Ariadna        ",
+        "comment": "Sfântul Eumenie, episcop al Gortinei, a fost făcător de minuni și apărător al credinței.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Mc. Trofim, Savatie și Dorimedont        ",
+        "comment": "Sfântul Tihon de la Zadonsk a fost mare ierarh rus, cunoscut pentru scrierile sale duhovnicești.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. M. Mc. Eustatie și soția sa, Teopista, cu cei doi fii ai lor: Agapie și Teopist        ",
+        "comment": "Sfântul Mare Mucenic Eustatie și familia sa au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Odovania Praznicului Înălțării Sfintei Cruci; Sf. Ap. Codrat; Sf. Prooroc Iona        ",
+        "comment": "Sfântul Apostol Codrat a fost unul dintre cei 70 de apostoli și mare propovăduitor al Evangheliei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "†) Sf. Ier. Mc. Teodosie de la M. Brazi, mitr. Moldovei; Sf. Sfințit Mc. Foca, ep. de Sinope        ",
+        "comment": "Sfântul Mucenic Foca a fost episcop și făcător de minuni, ajutând pe cei aflați în primejdii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Zămislirea Sf. Prooroc Ioan Botezătorul; Sf. Cuv. Xantipa și Polixenia        ",
+        "comment": "Zămislirea Sfântului Ioan Botezătorul amintește minunea nașterii Înaintemergătorului Domnului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. întâia Mc., întocmai cu ap., Tecla; Sf. Cuv. Siluan Athonitul        ",
+        "comment": "Sfânta Tecla, ucenica Sfântului Pavel, este cinstită ca întocmai cu apostolii pentru viața și mărturisirea ei.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Sf. Cuv. Eufrosina; Sf. Cuv. Pafnutie Egipteanul; Sf. Cuv. Serghie de la Radonej        ",
+        "comment": "Sfântul Cuvios Eufrosin Bucătarul este cunoscut pentru smerenia și ascultarea sa în viața monahală.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "†) Mutarea Sf. Ap. și Ev. Ioan; †) Sf. Voievod Neagoe Basarab; Sf. Cuv. Platonide de la Argeș (fosta Despina Milița, soția voievodului); Dreptul Ghedeon        ",
+        "comment": "Aducerea moaștelor Sfântului Ioan Gură de Aur amintește de cinstea adusă marelui ierarh și predicator.",
+        "post": "Post – dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "†) Sf. Ier. Martir Antim Ivireanul, mitr. Țării Românești; Sf. Mc. Calistrat și Epiharia        ",
+        "comment": "Sfântul Mucenic Calistrat și cei împreună cu el au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "28",
+        "description": "† Sf. Cuv. Hariton Mărt.; Sf. Prooroc Baruh; Sf. Neofit Zăvorâtul din Cipru        ",
+        "comment": "Sfântul Hariton Mărturisitorul a fost mare ascet și întemeietor de mănăstiri în Palestina.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. Cuv. Chiriac Sihastrul; Sf. Mc. Petronia        ",
+        "comment": "Sfânta Cuvioasă Chiriachi a trăit în curăție și rugăciune, fiind cinstită pentru viața ei sfântă.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Ier. Grigorie Luminătorul, arhiep. Armeniei; Sf. Mc. Ripsimia și Gaiani        ",
+        "comment": "Sfântul Grigorie Luminătorul a creștinat Armenia și este cinstit ca întocmai cu apostolii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      }
+    ],
+    "10": [
+      {
+        "dayNumber": "1",
+        "description": "(†) Acoperământul Maicii Domnului; Sf. Ap. Anania; Sf. Cuv. Roman Melodul; †) Sf. Cuv. Chiriac și Iosif de la Bisericani ",
+        "comment": "Acoperământul Maicii Domnului amintește arătarea ei minunată în biserica din Vlaherne, ocrotind poporul prin rugăciune.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Sf. Sfințit Mc. Ciprian; Sf. Mc. Iustina fecioara        ",
+        "comment": "Sfântul Ciprian și Sfânta Iustina au suferit pentru credință, fiind cunoscuți pentru convertirea lor minunată.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Sfințit Mc. Dionisie Areopagitul; Sf. Mc. Teoctist        ",
+        "comment": "Sfântul Dionisie Areopagitul, ucenic al Sfântului Pavel, a fost primul episcop al Atenei și mare teolog.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "†) Sf. Pr. Mărt. Dumitru Stăniloae; Sf. Sfințit Mc. Ierotei, ep. Atenei        ",
+        "comment": "Sfânta Muceniță Hrisi a suferit moarte martirică pentru Hristos, rămânând statornică în credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Mc. Haritina; †) Sf. Cuv. Misail și Daniil de la Mănăstirea Turnu ",
+        "comment": "Sfânta Muceniță Haritina a fost tânără creștină care a mărturisit credința cu mult curaj.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Sf. Ap. Toma; Sf. Mc. Erotiida        ",
+        "comment": "Sfântul Apostol Toma, unul dintre cei doisprezece, a propovăduit Evanghelia până în India.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "† Sf. M. Mc. Serghie și Vah; Sf. Mc. Iulian pr., Chesarie diac. și Polihronie        ",
+        "comment": "Sfânta Pelaghia a trăit în pocăință și rugăciune, fiind cinstită pentru viața ei curată.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. Cuv. Pelaghia și Taisia        ",
+        "comment": "Sfânta Pelaghia din Antiohia a primit moarte martirică pentru Hristos, fiind model de statornicie.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Sf. Ap. Iacov al lui Alfeu; Sf. Cuv. Atanasia, Andronic și Anastasia        ",
+        "comment": "Sfântul Apostol Iacob al lui Alfeu a fost unul dintre cei doisprezece apostoli și propovăduitor al Evangheliei.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Evlampie și sora sa, Evlampia; Sf. Cuv. Vasian și Teofil Mărt.        ",
+        "comment": "Sfântul Ambrozie de la Optina a fost mare stareț rus, cunoscut pentru sfaturile sale duhovnicești.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. Ap. Filip, unul din cei 7 diac.; Sf. Ier. Teofan Mărt., ep. Niceei        ",
+        "comment": "Sfântul Filip, unul dintre cei șapte diaconi, a propovăduit Evanghelia în Samaria și a botezat pe famenul etiopian.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Mc. Prov, Tarah și Andronic; Sf. Ier. Cosma, ep. Maiumei        ",
+        "comment": "Sfântul Mucenic Probus a suferit moarte martirică pentru Hristos, fiind cinstit pentru curajul său.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "† Aducerea moaștelor Sf. Ap. Andrei la Iași; Sf. Mc. Carp, Papil, Agatodor, Agatonica și Florentie        ",
+        "comment": "Sfânta Cuvioasă Parascheva de la Iași este ocrotitoarea Moldovei, cunoscută pentru viața ei sfântă și minunile sale.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "†) Sf. Cuv. Parascheva de la Iași; Sf. Mc. Nazarie, Ghervasie, Protasie și Chelsie        ",
+        "comment": "Sfânta Cuvioasă Parascheva de la Iași este ocrotitoarea Moldovei, cunoscută pentru viața ei sfântă și minunile sale.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "15",
+        "description": "† Sf. Magdalena de la Mălainița; Sf. Mc. Luchian, pr. din Antiohia        ",
+        "comment": "Sfânta Muceniță Lucia din Sicilia a suferit pentru credință, fiind cinstită pentru statornicia ei.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Mc. Longhin Sutașul        ",
+        "comment": "Sfântul Mucenic Longhin Sutașul a fost soldatul care a mărturisit credința după ce a văzut minunile de la răstignirea Domnului.",
+        "post": "Post – dezlegare la ulei și vin (vineri).",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Prooroc Oseea; Sf. Cuv. Mc. Andrei Criteanul        ",
+        "comment": "Sfânta Osea Proorocița a vestit pocăința și întoarcerea la Dumnezeu în Vechiul Testament.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Ap. și Ev. Luca; Sf. Mc. Marin cel Bătrân        ",
+        "comment": "Sfântul Apostol și Evanghelist Luca a fost autorul Evangheliei și al Faptelor Apostolilor, medic și pictor al icoanelor Maicii Domnului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Prooroc Ioil; Sf. Mc. Uar; Sf. Cleopatra; Sf. Cuv. Ioan de la Rila;         ",
+        "comment": "Sfântul Prooroc Ioil a vestit venirea Duhului Sfânt și chemarea la pocăință.",
+        "post": "Post – dezlegare la ulei și vin (luni).",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Sf. M. Mc. Artemie; Sf. Gherasim din Chefalonia        ",
+        "comment": "Sfântul Mare Mucenic Artemie a fost general roman convertit la creștinism, primind moarte martirică.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "†) Sf. Cuv. Mărt. Visarion și Sofronie; Sf. Mc. Oprea; Sf. Pr. Mărt. Ioan din Galeș și Moise Măcinic din Sibiel; Sf. Cuv. Ilarion cel Mare        ",
+        "comment": "Sfânta Ilaria și cei împreună cu ea au primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Ier. Averchie, ep. Ierapolei; Sf. 7 tineri din Efes;        ",
+        "comment": "Sfântul Averchie, episcop al Ierapolei, a fost mare misionar și făcător de minuni.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "Sf. Ap. Iacob, ruda Domnului, întâiul ep. al Ierusalimului; †) Sf. Pr. Mc. Constantin Sârbu; Sf. Cuv. Macarie Romanul        ",
+        "comment": "Sfântul Iacob, ruda Domnului, a fost primul episcop al Ierusalimului și autor al Epistolei sobornicești.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. M. Mc. Areta; Sf. Mc. Marcu, Sotirih și Valentin        ",
+        "comment": "Sfântul Mare Mucenic Areta și cei împreună cu el au suferit moarte martirică în Arabia pentru credință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Sf. Mc. Marcian și Martirie; Sf. Tavita        ",
+        "comment": "Sfântul Mucenic Marcian și cei împreună cu el au primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "26",
+        "description": "†) Sf. M. Mc. Dimitrie, Izvorâtorul de mir        ",
+        "comment": "Sfântul Mare Mucenic Dimitrie, Izvorâtorul de Mir, este apărător al credinței și făcător de minuni.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "27",
+        "description": "†) Sf. Cuv. Dimitrie cel Nou, Ocrotitorul Bucureștilor, ale cărui moaște se află în Catedrala Patriarhală; Sf. Mc. Nestor        ",
+        "comment": "Sfântul Cuvios Dimitrie cel Nou, ocrotitorul Bucureștilor, a trăit în smerenie și rugăciune, fiind făcător de minuni.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "28",
+        "description": "† Sf. Ier. Iachint, mitr. Țării Românești; †) Sf. Cuv. Teofana Basarab; Sf. Mc. Terentie, soția sa Neonila și cei 7 fii ai lor: Nita, Sarvil, Ierax, Teodul, Fota, Vilie si Evnichi; Sf. Ier. Firmilian, ep. Cezareei Capadociei;        ",
+        "comment": "Sfântul Iachint, episcop al Târgoviștei, a fost apărător al credinței și păstor înțelept.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. M. Mc. Anastasia Romana; Sf. Cuv. Avramie și Maria, nepoata sa        ",
+        "comment": "Sfântul Anastasie al Antiohiei a fost patriarh și apărător al credinței în vremuri tulburi.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Sfințit Mc. Zenovie, ep. Ciliciei și sora sa, Zenovia; Sf. Ap. Cleopa        ",
+        "comment": "Sfântul Zenovie și sora sa Zenovia au primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Sf. Ap. Apelie, Stahie, Amplie, Urban, Aristobul și Narcis; Sf. Mc. Epimah        ",
+        "comment": "Sfântul Stachie, unul dintre cei 70 de apostoli, a fost ucenic al Sfântului Pavel și episcop al Bizanțului.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      }
+    ],
+    "11": [
+      {
+        "dayNumber": "1",
+        "description": "Sf. doctori fără de arginți Cosma și Damian, cei din Asia        ",
+        "comment": "Sfinții Cosma și Damian, doctori fără de arginți, au vindecat bolnavi prin rugăciune și milostenie.",
+        "post": "Pomenirea morților - Moşii de toamnă.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "2",
+        "description": "Sf. Mc. Achindin, Pigasie, Aftonie, Elpifidor și Anempodist        ",
+        "comment": "Sfântul Acindin și cei împreună cu el au primit moarte martirică pentru credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "Sf. Mc. Achepsima ep., Iosif pr. și Aitala diac.; Așezarea moaștelor Sf. M. Mc. Gheorghe în Lida        ",
+        "comment": "Sfântul Mucenic Achindin a suferit pentru Hristos în Persia, rămânând statornic în credință.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "Sf. Cuv. Ioanichie cel Mare; Sf. Mc. Nicandru și Ermeu; Sf. Cuv.Gheorghe Mărt. din Drama        ",
+        "comment": "Sfântul Ioanichie cel Mare a fost mare ascet și făcător de minuni, cunoscut pentru rugăciunea neîncetată.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "Sf. Mc. Galaction și Epistimia        ",
+        "comment": "Sfântul Galaction și Epistimia au primit moarte martirică pentru credință, fiind modele de curaj creștin.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "Sf. Pavel Mărt., patr. Constantinopolului; Sf. Cuv. Luca din Sicilia        ",
+        "comment": "Sfântul Pavel Mărturisitorul, patriarh al Constantinopolului, a apărat credința în vremea arianismului.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "7",
+        "description": "Sf. 33 de Mc. din Melitina; Sf. Cuv. Lazăr din Muntele Galisiei        ",
+        "comment": "Sfinții 33 de Mucenici din Melitina au suferit moarte martirică pentru Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "†) Soborul Sf. Arh. Mihail și Gavriil și al tuturor cereștilor puteri        ",
+        "comment": "Soborul Sfinților Arhangheli Mihail și Gavriil și al tuturor puterilor cerești neîntrupate.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "9",
+        "description": "†) Sf. Ier. Nectarie Taumaturgul de la Eghina; Sf. Mc. Claudiu, Castor, Sempronian și Nicostrat; Sf. Mc. Onisifor și Porfirie; Sf. Cuv. Matrona        ",
+        "comment": "Sfântul Nectarie din Eghina este mare făcător de minuni și vindecător al bolnavilor.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Ap. Olimp, Rodion, Sosipatru, Erast, Terțiu și Cvart; †) Sf. Cuv. Mc. Visarion de la Lainici; Sf. Mc. Orest        ",
+        "comment": "Sfântul Arsenie Capadocianul a fost mare duhovnic și făcător de minuni, cunoscut pentru viața sa sfântă.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "† Sf. M. Mc. Mina; Sf. Mc. Victor, Vichentie și Ștefanida; Sf. Cuv. Teodor Studitul        ",
+        "comment": "Sfântul Mina, mare făcător de minuni, este cunoscut ca ajutător al celor nedreptățiți.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "Sf. Ier. Ioan cel Milostiv, patr. Alexandriei; †) Sf. Martiri și Mărt. Năsăudeni: Atanasie Todoran din Bichigiu, Vasile din Mocod, Grigorie din Zagra și Vasile din Telciu; Sf. Cuv. Nil Pustnicul        ",
+        "comment": "Sfântul Ioan cel Milostiv, patriarh al Alexandriei, a fost cunoscut pentru milostenia și dragostea sa față de săraci.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "†) Sf. Ier. Ioan Gură de Aur, arhiep. Constantinopolului și mama sa, Sf. Antuza        ",
+        "comment": "Sfântul Ioan Gură de Aur, mare predicator și teolog, este cinstit pentru învățăturile sale pline de înțelepciune.",
+        "post": "Lăsatul secului pentru Postul Nașterii Domnului.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "14",
+        "description": "†) Sf. Ap. Filip unul dintre cei 12 Apostoli; Sf. Ier. Grigorie Palama, arhiep. Tesalonicului        ",
+        "comment": "Sfântul Apostol Filip, unul dintre cei doisprezece, a propovăduit Evanghelia până la moarte martirică.",
+        "post": "Începutul Postului Nașterii Domnului - Dezlegare la ulei și vin",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "†) Sf. Cuv. Paisie de la Neamț; Sf. Mc. și Mărt. Gurie, Samona și Aviv, diac.        ",
+        "comment": "Sfântul Paisie de la Neamț a fost mare stareț și povățuitor al monahilor.",
+        "post": "Dezlegare la ulei și vine.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Ap. și Ev. Matei        ",
+        "comment": "Sfântul Apostol și Evanghelist Matei a fost autorul primei Evanghelii și martor al vieții Domnului.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Ier. Grigorie Taumaturgul, ep. Neocezareei Pontului și Ghenadiei, patr. Constantinopolului; Sf. Cuv. Lazăr Zugravul        ",
+        "comment": "Sfânta Muceniță Filofteia de la Curtea de Argeș este cinstită pentru milostenia și curăția ei.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "Sf. Mc. Platon, Roman și Zaheu        ",
+        "comment": "Sfântul Platon Mucenicul a suferit moarte martirică pentru Hristos în vremea persecuțiilor.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "Sf. Prooroc Avdie; Sf. Mc. Varlaam        ",
+        "comment": "Sfântul Proroc Avdie a vestit dreptatea lui Dumnezeu și chemarea la pocăință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Înainte-prăznuirea Intrării în Biserică a Maicii Domnului; †) Sf. Cuv. Grigorie Decapolitul; † Sf. Mc. Dasie; Sf. Ier. Proclu, arhiep. Constantinopolului;         ",
+        "comment": "Sfântul Grigorie Decapolitul a fost mare ascet și apărător al icoanelor.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "21",
+        "description": "(†) Intrarea în Biserică a Maicii Domnului (Vovidenia)        ",
+        "comment": "Intrarea în Biserică a Maicii Domnului amintește aducerea Fecioarei Maria la templu. Este o mare sărbătoare de bucurie.",
+        "post": "Dezlegare la pește – indiferent de zi.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "22",
+        "description": "Sf. Ap. Filimon, Arhip, Onisim și Apfia; Sf. Mc. Cecilia        ",
+        "comment": "Sfânta Cecilia a fost fecioară martiră, cunoscută ca ocrotitoare a muzicienilor.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "23",
+        "description": "† Sf. Cuv. Antonie de la Iezerul Vâlcii; Sf. Ier. Amfilohie, ep. Iconiei și Grigorie, ep. Acragandelor        ",
+        "comment": "Sfântul Antonie de la Iezeru Vâlcea a fost mare pustnic român, trăind în rugăciune și nevoință.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. Sfințiți Mc. Clement, ep. Romei și Petru, ep. Alexandriei        ",
+        "comment": "Sfânta Muceniță Ecaterina a fost înțeleaptă și curajoasă, convertind mulți păgâni prin credința ei.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "Odovania Praznicului Intrării în Biserică a Maicii Domnului; † Sf. M. Mc. Ecaterina; Sf. M. Mc. Mercurie        ",
+        "comment": "Sfânta Muceniță Mercuria a primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "26",
+        "description": "Sf. Cuv. Alipie Stâlpnicul, Nicon și Stelian Paflagonul        ",
+        "comment": "Sfântul Stelian este cunoscut ca ocrotitor al copiilor și făcător de minuni.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "27",
+        "description": "Sf. M. Mc. Iacob Persul; Sf. Cuv. Natanail și Pinufrie        ",
+        "comment": "Sfântul Iacob Persul a fost mare ascet și mărturisitor al credinței.",
+        "post": "Post – Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "28",
+        "description": "†) Sf. Cuv. Mărt. Arsenie de la Prislop; Sf. Cuv. Mc. Ștefan cel Nou; Sf. Mc. Irinarh        ",
+        "comment": "Sfântul Ștefan cel Nou a apărat cinstirea icoanelor și a suferit pentru credință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. Mc. Paramon și Filumen; Sf. Cuv. Pitirun        ",
+        "comment": "Sfântul Mucenic Paramon și cei împreună cu el au primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "30",
+        "description": "†) Sf. Ap. Andrei, cel Întâi Chemat, Ocrotitorul României; †) Sf. Ier. Andrei Șaguna, mitr. Transilvaniei; Sf. Ier. Frumentie, ep. Etiopiei        ",
+        "comment": "Sfântul Apostol Andrei, Ocrotitorul României, a propovăduit Evanghelia în Sciția Mică.",
+        "post": "Dezlegare la pește – mare sărbătoare.",
+        "color": "red"
+      }
+    ],
+    "12": [
+      {
+        "dayNumber": "1",
+        "description": "† Sf. Anastasia, mama Sfântului Ier. Andrei Șaguna; Sf. Prooroc Naum; Sf. Cuv. Filaret cel Milostiv        ",
+        "comment": "Sfânta Filoteia din Atena a trăit în milostenie și rugăciune, ajutând pe cei săraci și suferinzi.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "2",
+        "description": "†) Sf. Cuv. Paisie și Cleopa de la Sihăstria; Sf. Prooroc Avacum; Sf. Mc. Miropi; Sf. Porfirie Cavsocalivitul; Sf. Ier. Solomon, arhiep. Efesului        ",
+        "comment": "Sfânta Varvara a primit moarte martirică pentru Hristos, fiind cinstită ca ocrotitoare a celor aflați în primejdii.",
+        "post": "Dezlegare la ulei și vin. Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "3",
+        "description": "†) Sf. Cuv. Gheorghe de la Cernica și Căldărușani; Sf. Prooroc Sofonie        ",
+        "comment": "Sfântul Prooroc Sofonie a vestit dreptatea lui Dumnezeu și chemarea la pocăință.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "4",
+        "description": "† Sf. M. Mc. Varvara; Sf. Cuv. Ioan Damaschin        ",
+        "comment": "Sfânta Mare Muceniță Varvara și Sfântul Ioan Damaschin sunt pomeniți pentru credința și înțelepciunea lor.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "5",
+        "description": "†) Sf. Cuv. Sava cel Sfințit; Sf. Mc. Anastasie        ",
+        "comment": "Sfântul Sava cel Sfințit a fost mare ascet și organizator al vieții monahale în Palestina.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "6",
+        "description": "†) Sf. Ier. Nicolae, arhiep. Mirelor Lichiei, făcătorul de minuni        ",
+        "comment": "Sfântul Ierarh Nicolae, făcătorul de minuni, este cunoscut pentru milostenia și ajutorul său față de cei aflați în nevoie.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "7",
+        "description": "†) Sf. Mc. Filofteia de la Curtea de Argeș; Sf. Ier. Ambrozie, ep. Mediolanului (Milano)        ",
+        "comment": "Sfânta Muceniță Filofteia de la Argeș este cinstită pentru milostenia și curăția ei.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "8",
+        "description": "Sf. Cuv. Patapie; Sf. Ap. Cezar, Tihic și Onisifor        ",
+        "comment": "Sfântul Patapie a fost mare ascet și făcător de minuni, cunoscut pentru vindecările sale.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "9",
+        "description": "Zămislirea Sfintei Fecioare Maria de către Sf. Ana; Sf. Proorociță Ana, mama Proorocului Samuel        ",
+        "comment": "Zămislirea Sfintei Ana amintește minunea nașterii Maicii Domnului.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "10",
+        "description": "Sf. Mc. Mina, Ermoghen și Evgraf        ",
+        "comment": "Sfântul Mucenic Mina a fost soldat creștin care a primit moarte martirică pentru Hristos.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "11",
+        "description": "Sf. Cuv. Daniil Stâlpnicul și Luca cel Nou        ",
+        "comment": "Sfântul Daniel Stâlpnicul a trăit în nevoință pe un stâlp, fiind mare făcător de minuni.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "12",
+        "description": "†) Sf. Ier. Spiridon, ep. Trimitundei, făcătorul de minuni        ",
+        "comment": "Sfântul Spiridon al Trimitundei este mare făcător de minuni și apărător al credinței la Sinodul I Ecumenic.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "13",
+        "description": "†) Sf. Ier. Dosoftei, mitr. Moldovei; † Sf. M. Mc. Eustratie, Auxentie, Evghenie, Mardarie și Orest; Sf. Mc. Lucia, fecioara din Siracuza        ",
+        "comment": "Sfânta Muceniță Lucia a suferit pentru credință, fiind cinstită pentru statornicia ei.",
+        "post": "Dezlegare la pește.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "14",
+        "description": "Sf. Mc. Tirs, Calinic, Filimon și Apolonie        ",
+        "comment": "Sfântul Mucenic Tirs și cei împreună cu el au primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "15",
+        "description": "Sf. Sfințit Mc. Elefterie, ep. Iliriei; Sf. Mc. Antia și Suzana; Sf. Cuv. Pavel din Latro        ",
+        "comment": "Sfântul Elefterie a fost episcop tânăr și martir, cunoscut pentru curajul său.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "16",
+        "description": "Sf. Prooroc Agheu; Sf. Teofana, împ.        ",
+        "comment": "Sfântul Prooroc Agheu a vestit reconstruirea templului și întoarcerea la Dumnezeu.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "17",
+        "description": "Sf. Prooroc Daniel și Sf. trei tineri: Anania, Azaria și Misail        ",
+        "comment": "Sfânta Muceniță Varvara și Sfântul Daniil Stâlpnicul sunt pomeniți pentru viața lor sfântă.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "18",
+        "description": "†) Sf. Cuv. Daniil Sihastrul; Sf. Mc. Sebastian și Zoe; Sf. Ier. Modest, arhiep. Ierusalimului        ",
+        "comment": "Sfântul Mucenic Sebastian și cei împreună cu el au suferit pentru credință în Roma.",
+        "post": "Dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "19",
+        "description": "† Sf. Cuv. Muceniță Evloghia de la Samurcășești; Sf. Mc. Bonifatie; Sf. Cuv. Aglaia, Sf. Ier. Grichentie, ep. Etiopiei;         ",
+        "comment": "Sfântul Nicolae al Mirelor Lichiei este cinstit ca mare făcător de minuni și ocrotitor al celor aflați în primejdii.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "20",
+        "description": "Înainte-prăznuirea Nașterii Domnului; Sf. Sfințit Mc. Ignatie Teoforul, ep. Antiohiei; †) Sf. Cuv. Serafim cel Răbdător de la Sâmbăta de Sus ",
+        "comment": "Sfântul Ignatie Teoforul, ucenic al apostolilor, a primit moarte martirică la Roma.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "21",
+        "description": "Sf. Mc. Iuliana din Nicomidia; Sf. Mc. Temistocle        ",
+        "comment": "Sfântul Iulian și cei împreună cu el au primit moarte martirică pentru Hristos.",
+        "post": "Dezlegare la ulei și vin.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "22",
+        "description": "†) Sf. Ier. Petru Movilă, mitr. Kievului; Sf. M. Mc. Anastasia        ",
+        "comment": "Sfânta Anastasia Farmacolitria este cunoscută ca vindecătoare și ajutătoare a celor aflați în suferință.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "23",
+        "description": "† Sf. Cuv. Antonina de la Tismana ; Sf. 10 Mc. din Creta; Sf. Ier. Pavel, arhiep. Neocezareei        ",
+        "comment": "Sfântul Naum al Ohridei a fost ucenic al Sfinților Chiril și Metodie și mare misionar.",
+        "post": "Post – zi obișnuită de post, fără dezlegare la pește.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "24",
+        "description": "Sf. Mc. Eugenia        ",
+        "comment": "Ajunul Crăciunului este zi de post și pregătire pentru Nașterea Domnului.",
+        "post": "Post aspru – Numai seara, grâu fiert îndulcit cu miere, poame, covrigi sau turte de făină.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "25",
+        "description": "(†) Nașterea Domnului (Crăciunul)        ",
+        "comment": "Nașterea Domnului este una dintre cele mai mari sărbători creștine, amintind întruparea Fiului lui Dumnezeu.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "26",
+        "description": "A doua zi de Crăciun; †) Soborul Maicii Domnului; †) Sf. Cuv. Nicodim cel Sfințit de la Tismana; †) Sf. Cuv. Mc. Gherasim de la Tismana; Sf. Sfințit Mc. Eftimie, ep. Sardelor        ",
+        "comment": "Soborul Maicii Domnului cinstește rolul Născătoarei de Dumnezeu în planul mântuirii.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "27",
+        "description": "A treia zi de Crăciun; † Sf. Ap., întâiul Mc. și arhid. Ștefan; Sf. Cuv. Teodor Mărt.        ",
+        "comment": "Sfântul Arhidiacon Ștefan, primul martir al Bisericii, a mărturisit credința cu mult curaj.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "red"
+      },
+      {
+        "dayNumber": "28",
+        "description": "Sf. 20.000 de Mc. arși în Nicomidia        ",
+        "comment": "Sfinții 20.000 de Mucenici din Nicomidia au primit moarte martirică pentru Hristos.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "29",
+        "description": "Sf. 14.000 de prunci uciși din porunca lui Irod; Sf. Cuv. Marcel și Tadeu        ",
+        "comment": "Sfânta Muceniță Domnina și fiicele ei au suferit pentru credință, fiind modele de statornicie.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "30",
+        "description": "Sf. Mc. Anisia fecioara; Sf. Cuv. Teodora din Cezareea; Sf. Cuv. Leon, arhim.        ",
+        "comment": "Sfântul Mucenic Anisia a primit moarte martirică pentru Hristos în Tesalonic.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      },
+      {
+        "dayNumber": "31",
+        "description": "Odovania Praznicului Nașterii Domnului; Sf. Cuv. Melania Romana; † Sf. Mc. Hermes ",
+        "comment": "Sfântul Melania Romana a trăit în milostenie și rugăciune, fiind cunoscută pentru viața ei sfântă.",
+        "post": "Harti – nu există restricții alimentare.",
+        "color": "black"
+      }
+    ]
+  }
+}
