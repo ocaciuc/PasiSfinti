@@ -1,13 +1,13 @@
- import { memo, useState, useCallback } from "react";
- import { Button } from "@/components/ui/button";
- import { Textarea } from "@/components/ui/textarea";
- import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
- import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
- import { supabase } from "@/integrations/supabase/client";
- import { format, isValid, parseISO } from "date-fns";
- import { ro } from "date-fns/locale";
- import UserBadge from "@/components/UserBadge";
- import { Comment, Badge, REPLIES_LIMIT, COMMENT_MAX_LENGTH } from "./types";
+import { memo, useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { format, isValid, parseISO } from "date-fns";
+import { ro } from "date-fns/locale";
+import UserBadge from "@/components/UserBadge";
+import CommentAvatar from "./CommentAvatar";
+import { Comment, Badge, REPLIES_LIMIT, COMMENT_MAX_LENGTH } from "./types";
  
  const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
    if (!dateString) return "Data necunoscută";
@@ -171,13 +171,8 @@
  
    return (
      <div className="space-y-2">
-       <div className="flex items-start gap-2">
-         <Avatar className="w-6 h-6">
-           <AvatarImage src={comment.author_avatar || undefined} loading="lazy" />
-           <AvatarFallback className="text-xs">
-             {comment.author_name.split(" ").map(n => n[0]).join("")}
-           </AvatarFallback>
-         </Avatar>
+      <div className="flex items-start gap-2">
+        <CommentAvatar src={comment.author_avatar} name={comment.author_name} size="md" />
          <div className="flex-1">
            <div className="flex items-center gap-1">
              <p className="text-xs font-medium">{comment.author_name}</p>
@@ -292,14 +287,9 @@
  CommentItem.displayName = "CommentItem";
  
  // Separate memoized component for replies to prevent re-renders
- const ReplyItem = memo(({ reply, userBadges }: { reply: Comment; userBadges: Record<string, Badge | null> }) => (
-   <div className="flex items-start gap-2">
-     <Avatar className="w-5 h-5">
-       <AvatarImage src={reply.author_avatar || undefined} loading="lazy" />
-       <AvatarFallback className="text-xs">
-         {reply.author_name.split(" ").map(n => n[0]).join("")}
-       </AvatarFallback>
-     </Avatar>
+const ReplyItem = memo(({ reply, userBadges }: { reply: Comment; userBadges: Record<string, Badge | null> }) => (
+  <div className="flex items-start gap-2">
+    <CommentAvatar src={reply.author_avatar} name={reply.author_name} size="sm" />
      <div className="flex-1">
        <div className="flex items-center gap-1">
          <p className="text-xs font-medium">{reply.author_name}</p>
