@@ -1,21 +1,38 @@
 /**
- * Avatar utility for Supabase Storage.
- * Returns original URLs directly (Supabase Image Transformations
- * require a Pro plan). Lazy loading + CSS sizing keep avatars
- * visually small while the browser handles caching.
+ * Avatar utility functions.
+ *
+ * Avatars are stored in Supabase Storage in two sizes:
+ *   avatar_small.webp  (64×64)  — used in comments
+ *   avatar_medium.webp (256×256) — used in profile cards
+ *
+ * The `avatar_url` column in `profiles` stores the medium URL.
  */
 
+import { getSmallAvatarUrl } from "./avatar-upload";
+
 /**
- * Return a usable avatar URL.
- * The `size` parameter is kept for API compatibility but is not
- * used for server-side resizing (requires Supabase Pro).
+ * Return the appropriate avatar URL for the given context.
+ * - "small" → derives the 64px URL from the stored medium URL
+ * - "medium" or unspecified → returns the stored URL as-is
+ */
+export function getAvatarUrl(
+  storedUrl: string | null | undefined,
+  variant: "small" | "medium" = "medium"
+): string | null {
+  if (!storedUrl) return null;
+  if (variant === "small") return getSmallAvatarUrl(storedUrl);
+  return storedUrl;
+}
+
+/**
+ * @deprecated Use getAvatarUrl(url, "small") instead
  */
 export function getAvatarThumbnailUrl(
   originalUrl: string | null | undefined,
   _size?: number
 ): string | null {
   if (!originalUrl) return null;
-  return originalUrl;
+  return getSmallAvatarUrl(originalUrl);
 }
 
 /**

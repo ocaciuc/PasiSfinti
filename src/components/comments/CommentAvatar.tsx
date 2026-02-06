@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getAvatarThumbnailUrl, getInitials } from "@/lib/avatar-utils";
+import { getAvatarUrl, getInitials } from "@/lib/avatar-utils";
 import { cn } from "@/lib/utils";
 
 interface CommentAvatarProps {
@@ -17,14 +17,14 @@ const sizeClasses = {
 
 /**
  * Optimized avatar for comment lists.
- * - Uses 64x64 WebP thumbnails instead of full-size images
+ * - Uses avatar_small.webp (64×64 WebP) instead of full-size images
  * - Lazy-loads images (native browser lazy loading)
  * - Shows initials placeholder while loading
  * - Fades in smoothly when loaded
  */
 const CommentAvatar = memo(({ src, name, size = "md" }: CommentAvatarProps) => {
   const [loaded, setLoaded] = useState(false);
-  const thumbnailUrl = getAvatarThumbnailUrl(src, 64);
+  const thumbnailUrl = getAvatarUrl(src, "small");
   const initials = getInitials(name);
 
   return (
