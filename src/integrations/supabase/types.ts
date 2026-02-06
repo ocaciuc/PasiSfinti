@@ -214,29 +214,35 @@ export type Database = {
       orthodox_calendar_days: {
         Row: {
           color: string
+          comments: string | null
           created_at: string
           day_number: number
           description: string
           id: string
           month: number
+          post: string | null
           year: number
         }
         Insert: {
           color: string
+          comments?: string | null
           created_at?: string
           day_number: number
           description: string
           id?: string
           month: number
+          post?: string | null
           year: number
         }
         Update: {
           color?: string
+          comments?: string | null
           created_at?: string
           day_number?: number
           description?: string
           id?: string
           month?: number
+          post?: string | null
           year?: number
         }
         Relationships: []
