@@ -237,6 +237,7 @@
 - [x] Quick action navigation buttons
 - [x] Orthodox Calendar widget (from Supabase)
 - [x] Calendar page with TodayCalendarCard component
+- [x] Expandable Calendar card on Dashboard (accordion-style, shows saint details & fasting info)
 - [ ] Populate remaining calendar months (March-December)
 
 ---
