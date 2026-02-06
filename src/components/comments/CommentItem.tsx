@@ -57,29 +57,16 @@ import { Comment, Badge, REPLIES_LIMIT, COMMENT_MAX_LENGTH } from "./types";
        // Fetch profiles for reply authors in parallel
        const replyUserIds = [...new Set((repliesData || []).map(r => r.user_id))];
        
-       const [ownProfileResult, coProfilesResult] = await Promise.all([
-         currentUserId && replyUserIds.includes(currentUserId)
-           ? supabase
-               .from("profiles")
-               .select("first_name, avatar_url, user_id")
-               .eq("user_id", currentUserId)
-               .maybeSingle()
-           : Promise.resolve({ data: null }),
-         currentUserId
-           ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
-           : Promise.resolve({ data: [] }),
-       ]);
- 
-       const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
-       if (ownProfileResult.data) {
-         profileMap.set(ownProfileResult.data.user_id, {
-           first_name: ownProfileResult.data.first_name,
-           avatar_url: ownProfileResult.data.avatar_url,
-         });
-       }
-       (coProfilesResult.data || []).forEach((p: any) => {
-         profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
-       });
+        const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
+        if (currentUserId && replyUserIds.length > 0) {
+          const { data: profilesData } = await supabase.rpc("get_profiles_by_ids", {
+            requesting_user_id: currentUserId,
+            target_user_ids: replyUserIds,
+          });
+          (profilesData || []).forEach((p: any) => {
+            profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
+          });
+        }
  
        const repliesWithAuthors: Comment[] = (repliesData || []).map(reply => {
          const author = profileMap.get(reply.user_id);
