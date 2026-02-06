@@ -279,7 +279,12 @@
   - Replies load on-demand when user expands a comment (not on page load)
   - Pagination for both comments (10) and replies (5)
   - Eliminated N+1 queries by batching profile lookups
-  - React.memo prevents full list re-renders when expanding replies
+   - React.memo prevents full list re-renders when expanding replies
+- [x] **Avatar thumbnail optimization for comments**
+  - Supabase image transform API generates 64×64 WebP thumbnails (~2-5KB vs ~3MB originals)
+  - Dedicated CommentAvatar component with lazy loading and fade-in transition
+  - Initials placeholder shown while image loads
+  - Utility `getAvatarThumbnailUrl()` in `src/lib/avatar-utils.ts`
 
  - [x] **Client-side caching with React Query**
    - Pilgrimage details cached with 10-min stale/15-min GC
