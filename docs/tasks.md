@@ -284,7 +284,12 @@
   - Supabase image transform API generates 64×64 WebP thumbnails (~2-5KB vs ~3MB originals)
   - Dedicated CommentAvatar component with lazy loading and fade-in transition
   - Initials placeholder shown while image loads
-  - Utility `getAvatarThumbnailUrl()` in `src/lib/avatar-utils.ts`
+   - Utility `getAvatarThumbnailUrl()` in `src/lib/avatar-utils.ts`
+ - [x] **Replaced get_co_pilgrim_profiles with targeted get_profiles_by_ids**
+   - New SECURITY DEFINER RPC `get_profiles_by_ids(requesting_user_id, target_user_ids)` fetches only specific profiles
+   - Eliminated ~6MB response per page load (now fetches only profiles for visible post/comment authors)
+   - Removed triple redundant calls to get_co_pilgrim_profiles (was called in usePilgrimageData, CommentSection, CommentItem)
+   - Each call now sends only the user_ids it actually needs
 
  - [x] **Client-side caching with React Query**
    - Pilgrimage details cached with 10-min stale/15-min GC

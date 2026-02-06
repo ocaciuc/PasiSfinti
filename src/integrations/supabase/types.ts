@@ -907,6 +907,14 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_profiles_by_ids: {
+        Args: { requesting_user_id: string; target_user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          first_name: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

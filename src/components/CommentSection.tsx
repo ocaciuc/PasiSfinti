@@ -75,24 +75,11 @@ const CommentSection = ({ postId, userId, userBadges, onCommentAdded }: CommentS
       const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
 
       if (userIds.length > 0 && currentUserId) {
-        const [ownProfileResult, coProfilesResult] = await Promise.all([
-          userIds.includes(currentUserId)
-            ? supabase
-                .from("profiles")
-                .select("first_name, avatar_url, user_id")
-                .eq("user_id", currentUserId)
-                .maybeSingle()
-            : Promise.resolve({ data: null }),
-          supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId }),
-        ]);
-
-        if (ownProfileResult.data) {
-          profileMap.set(ownProfileResult.data.user_id, {
-            first_name: ownProfileResult.data.first_name,
-            avatar_url: ownProfileResult.data.avatar_url,
-          });
-        }
-        (coProfilesResult.data || []).forEach((p: any) => {
+        const { data: profilesData } = await supabase.rpc("get_profiles_by_ids", {
+          requesting_user_id: currentUserId,
+          target_user_ids: userIds,
+        });
+        (profilesData || []).forEach((p: any) => {
           profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
         });
       }

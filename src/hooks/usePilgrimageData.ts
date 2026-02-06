@@ -64,41 +64,38 @@
    isRegistered: boolean;
    userBadges: Record<string, Badge | null>;
  }> {
-   // Fetch all community data in parallel
-   const [userPilgrimagesResult, postsResult, coProfilesResult, ownProfileResult] = await Promise.all([
-     supabase.from("user_pilgrimages").select("user_id").eq("pilgrimage_id", pilgrimageId),
-     supabase
-       .from("posts")
-       .select("id, user_id, content, likes_count, created_at")
-       .eq("pilgrimage_id", pilgrimageId)
-       .order("created_at", { ascending: false }),
-     currentUserId
-       ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
-       : Promise.resolve({ data: [], error: null }),
-     currentUserId
-       ? supabase.from("profiles").select("first_name, avatar_url").eq("user_id", currentUserId).maybeSingle()
-       : Promise.resolve({ data: null, error: null }),
-   ]);
- 
-   // Check if current user is enrolled
-   const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
-   const isRegistered = currentUserId ? participantUserIds.includes(currentUserId) : false;
- 
-   // Build profile map
-   const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
-   (coProfilesResult.data || []).forEach((p: any) => {
-     profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
-   });
-   if (currentUserId && ownProfileResult.data) {
-     profileMap.set(currentUserId, {
-       first_name: ownProfileResult.data.first_name,
-       avatar_url: ownProfileResult.data.avatar_url,
-     });
-   }
+    // Fetch enrollment and posts in parallel (profiles fetched after we know user_ids)
+    const [userPilgrimagesResult, postsResult] = await Promise.all([
+      supabase.from("user_pilgrimages").select("user_id").eq("pilgrimage_id", pilgrimageId),
+      supabase
+        .from("posts")
+        .select("id, user_id, content, likes_count, created_at")
+        .eq("pilgrimage_id", pilgrimageId)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    // Check if current user is enrolled
+    const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
+    const isRegistered = currentUserId ? participantUserIds.includes(currentUserId) : false;
+
+    // Collect only the user_ids we actually need profiles for (post authors)
+    const postAuthorIds = [...new Set((postsResult.data || []).map((p: any) => p.user_id))];
+
+    // Fetch profiles only for post authors using targeted RPC
+    const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
+    if (currentUserId && postAuthorIds.length > 0) {
+      const { data: profilesData } = await supabase.rpc("get_profiles_by_ids", {
+        requesting_user_id: currentUserId,
+        target_user_ids: postAuthorIds,
+      });
+      (profilesData || []).forEach((p: any) => {
+        profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
+      });
+    }
  
    // Get post IDs for likes query
    const postIds = (postsResult.data || []).map((p: any) => p.id);
-   const allUserIdsForBadges = [...new Set((postsResult.data || []).map((p: any) => p.user_id))];
+   const allUserIdsForBadges = postAuthorIds;
  
    // Fetch likes and badges in parallel
    const [userLikesResult, allUserBadgesResult] = await Promise.all([
