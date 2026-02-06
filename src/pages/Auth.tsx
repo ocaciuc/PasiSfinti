@@ -299,11 +299,12 @@ const Auth = () => {
       return;
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
+    // Note: We don't validate password strength on login - only on signup
+    // This allows users with weaker passwords (created before stricter rules) to still log in
+    if (!password) {
       toast({
         title: "Eroare validare",
-        description: passwordError,
+        description: "Parola este obligatorie",
         variant: "destructive",
       });
       return;

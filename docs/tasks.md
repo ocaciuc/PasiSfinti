@@ -143,6 +143,13 @@
 - [x] **Aligned Capacitor dependencies to v7.0.1**
   - All packages aligned: @capacitor/core, @capacitor/android, @capacitor/app, @capacitor/browser, @capacitor/preferences
   - Fixes potential lifecycle and plugin callback issues during Google auth (pause/resume)
+- [x] **Fixed authentication validation**
+  - Password strength validation now only applies on signup, not login
+  - Users can log in with any password (validation happens server-side)
+- [x] **Fixed onboarding age validation**
+  - Age field now accepts only integers (no decimals)
+  - Validates range 1-120 years
+  - Shows clear Romanian error messages
 
 ## PHASE 2: ONBOARDING FLOW INTEGRATION
 **Priority: HIGH | Status: COMPLETED**
@@ -258,11 +265,28 @@
 - [ ] Mobile responsiveness audit
 
 ### 7.2 Performance Optimizations
-- [ ] Add proper loading skeletons
-- [ ] Implement optimistic UI updates
-- [ ] Add image lazy loading
-- [ ] Optimize database queries
+- [x] Add proper loading skeletons
+- [x] Implement optimistic UI updates
+- [x] Add image lazy loading
+- [x] Optimize database queries
+- [x] **Lazy load comments in Pilgrimage details**
+  - Comments now start collapsed showing just count
+  - Only load comments when user clicks to expand
+  - Dramatically improves page load time with many comments
+- [x] **Comment section performance refactoring**
+  - Split CommentSection into smaller memoized components (CommentItem, CommentList, ReplyItem)
+  - Replies load on-demand when user expands a comment (not on page load)
+  - Pagination for both comments (10) and replies (5)
+  - Eliminated N+1 queries by batching profile lookups
+  - React.memo prevents full list re-renders when expanding replies
 
+ - [x] **Client-side caching with React Query**
+   - Pilgrimage details cached with 10-min stale/15-min GC
+   - Community data cached with 2-min stale/5-min GC
+   - Custom hooks: usePilgrimageDetails, usePilgrimageCommunity
+   - Stale-while-revalidate for instant page revisits
+   - Optimistic updates for registration, likes, posts
+ 
 ### 7.3 Error Handling & Edge Cases
 - [x] Robust onboarding error handling implemented
   - UPSERT logic to prevent duplicate profile errors

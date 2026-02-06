@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,13 @@ import { format, isValid, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import UserBadge from "@/components/UserBadge";
 import CommentSection from "@/components/CommentSection";
+ import {
+   usePilgrimageDetails,
+   usePilgrimageCommunity,
+   useInvalidatePilgrimageData,
+   type Badge,
+   type Post,
+ } from "@/hooks/usePilgrimageData";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,15 +31,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-interface Badge {
-  id: string;
-  name: string;
-  name_ro: string;
-  description: string;
-  icon_name: string;
-  priority: number;
-}
 
 // Helper function to safely format dates
 const safeFormatDate = (dateString: string | null | undefined, formatStr: string): string => {
@@ -45,42 +44,54 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
   }
 };
 
-interface Post {
-  id: string;
-  user_id: string;
-  content: string;
-  likes_count: number;
-  created_at: string;
-  author_name: string;
-  author_avatar: string | null;
-  user_has_liked: boolean;
-}
-
-interface Pilgrimage {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  city: string;
-  start_date: string;
-  end_date: string | null;
-  participant_count: number;
-  map_url: string | null;
-}
-
 const PilgrimageDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+   const { invalidateCommunity, updatePilgrimageParticipantCount } = useInvalidatePilgrimageData();
+ 
   const [newPost, setNewPost] = useState("");
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [pilgrimage, setPilgrimage] = useState<Pilgrimage | null>(null);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [userBadges, setUserBadges] = useState<Record<string, Badge | null>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+ 
+   // Fetch user ID on mount (not cached - auth data)
+   useEffect(() => {
+     supabase.auth.getUser().then(({ data: { user } }) => {
+       setUserId(user?.id || null);
+     });
+   }, []);
+ 
+   // CACHED: Pilgrimage details (10 min stale, 15 min gc)
+   const {
+     data: pilgrimage,
+     isLoading: pilgrimageLoading,
+   } = usePilgrimageDetails(id);
+ 
+   // CACHED: Community data (2 min stale, 5 min gc)
+   const {
+     data: communityData,
+     isLoading: communityLoading,
+   } = usePilgrimageCommunity(id, userId, userId !== null);
+ 
+   // Local state for optimistic updates
+   const [localPosts, setLocalPosts] = useState<Post[]>([]);
+   const [localIsRegistered, setLocalIsRegistered] = useState<boolean | null>(null);
+ 
+   // Sync local state when community data changes
+   useEffect(() => {
+     if (communityData) {
+       setLocalPosts(communityData.posts);
+       setLocalIsRegistered(communityData.isRegistered);
+     }
+   }, [communityData]);
+ 
+   // Use local state for UI
+   const displayPosts = localPosts;
+   const displayIsRegistered = localIsRegistered ?? communityData?.isRegistered ?? false;
+   const userBadges = communityData?.userBadges ?? {};
+ 
+   const loading = pilgrimageLoading || (userId !== null && communityLoading && !communityData);
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -91,162 +102,15 @@ const PilgrimageDetail = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
-  useEffect(() => {
-    fetchPilgrimageData();
-  }, [id]);
-
-  const fetchPilgrimageData = async () => {
-    if (!id) return;
-    
-    try {
-      setLoading(true);
-
-      // Get current user first
-      const { data: { user } } = await supabase.auth.getUser();
-      const currentUserId = user?.id || null;
-      setUserId(currentUserId);
-
-      // Fetch all data in parallel for better performance
-      const [
-        pilgrimageResult,
-        userPilgrimagesResult,
-        postsResult,
-      ] = await Promise.all([
-        // Fetch pilgrimage details
-        supabase.from("pilgrimages").select("id, title, description, location, city, start_date, end_date, participant_count, map_url").eq("id", id).single(),
-        // Fetch all user_pilgrimages for this pilgrimage
-        supabase.from("user_pilgrimages").select("user_id").eq("pilgrimage_id", id),
-        // Fetch posts for this pilgrimage
-        supabase.from("posts").select("id, user_id, content, likes_count, created_at").eq("pilgrimage_id", id).order("created_at", { ascending: false }),
-      ]);
-
-      if (pilgrimageResult.error) throw pilgrimageResult.error;
-      setPilgrimage(pilgrimageResult.data);
-
-      // Check if current user is enrolled
-      const participantUserIds = (userPilgrimagesResult.data || []).map((up: any) => up.user_id);
-      setIsRegistered(currentUserId ? participantUserIds.includes(currentUserId) : false);
-
-      // Collect all user IDs we need profiles for (post authors)
-      const postUserIds = (postsResult.data || []).map((p: any) => p.user_id);
-      const allUserIdsForProfiles = [...new Set(postUserIds)];
-
-      // Fetch co-pilgrim profiles using secure function (only returns first_name and avatar)
-      // and user likes in parallel
-      const [coProfilesResult, userLikesResult] = await Promise.all([
-        // Use the secure function that only exposes minimal profile data
-        currentUserId
-          ? supabase.rpc("get_co_pilgrim_profiles", { requesting_user_id: currentUserId })
-          : Promise.resolve({ data: [], error: null }),
-        // Fetch user's likes for all posts in one query
-        currentUserId && postsResult.data && postsResult.data.length > 0
-          ? supabase.from("post_likes").select("post_id").eq("user_id", currentUserId).in("post_id", postsResult.data.map((p: any) => p.id))
-          : Promise.resolve({ data: [], error: null }),
-      ]);
-
-      // Create a profile lookup map for O(1) access (includes co-pilgrims with minimal data)
-      const profileMap = new Map<string, { first_name: string; avatar_url: string | null }>();
-      (coProfilesResult.data || []).forEach((p: any) => {
-        profileMap.set(p.user_id, { first_name: p.first_name, avatar_url: p.avatar_url });
-      });
-
-      // Also fetch current user's own profile for their posts
-      if (currentUserId) {
-        const { data: ownProfile } = await supabase
-          .from("profiles")
-          .select("first_name, avatar_url")
-          .eq("user_id", currentUserId)
-          .maybeSingle();
-        if (ownProfile) {
-          profileMap.set(currentUserId, { first_name: ownProfile.first_name, avatar_url: ownProfile.avatar_url });
-        }
-      }
-
-      // Create liked posts set for O(1) lookup
-      const likedPostIds = new Set((userLikesResult.data || []).map((l: any) => l.post_id));
-
-      // Build posts with all details - comments are now loaded separately per post
-      const postsWithDetails: Post[] = (postsResult.data || []).map((post: any) => {
-        const authorProfile = profileMap.get(post.user_id);
-
-        return {
-          id: post.id,
-          user_id: post.user_id,
-          content: post.content,
-          likes_count: post.likes_count || 0,
-          created_at: post.created_at,
-          author_name: authorProfile?.first_name || "Utilizator",
-          author_avatar: authorProfile?.avatar_url || null,
-          user_has_liked: likedPostIds.has(post.id),
-        };
-      });
-
-      setPosts(postsWithDetails);
-
-      // Fetch badges for post authors
-      const allUserIdsForBadges = new Set<string>();
-      postsWithDetails.forEach(post => {
-        allUserIdsForBadges.add(post.user_id);
-      });
-
-      // Batch fetch all user badges in one query
-      if (allUserIdsForBadges.size > 0) {
-        const { data: allUserBadgesData } = await supabase
-          .from("user_badges")
-          .select(`user_id, badges (id, name, name_ro, description, icon_name, priority)`)
-          .in("user_id", Array.from(allUserIdsForBadges));
-
-        // Group badges by user and find the highest priority one
-        const badgesMap: Record<string, Badge | null> = {};
-        const userBadgesGroup = new Map<string, any[]>();
-        
-        (allUserBadgesData || []).forEach((ub: any) => {
-          if (!userBadgesGroup.has(ub.user_id)) {
-            userBadgesGroup.set(ub.user_id, []);
-          }
-          if (ub.badges) {
-            userBadgesGroup.get(ub.user_id)!.push(ub.badges);
-          }
-        });
-
-        // For each user, get the highest priority badge
-        userBadgesGroup.forEach((badges, uid) => {
-          if (badges.length > 0) {
-            badges.sort((a, b) => a.priority - b.priority);
-            badgesMap[uid] = badges[0];
-          }
-        });
-
-        // Initialize all users with null if they don't have badges
-        allUserIdsForBadges.forEach(uid => {
-          if (!badgesMap[uid]) {
-            badgesMap[uid] = null;
-          }
-        });
-
-        setUserBadges(badgesMap);
-      }
-    } catch (error: any) {
-      console.error("Error fetching pilgrimage data:", error);
-      toast({
-        title: "Eroare",
-        description: "Nu s-au putut încărca detaliile pelerinajului.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+   const scrollToTop = useCallback(() => {
+     window.scrollTo({ top: 0, behavior: "smooth" });
+   }, []);
 
   const [isRegistering, setIsRegistering] = useState(false);
 
   const handleRegister = async () => {
     // Prevent double-click registration
-    if (isRegistering || isRegistered) {
+    if (isRegistering || displayIsRegistered) {
       return;
     }
 
@@ -282,7 +146,7 @@ const PilgrimageDetail = () => {
 
       if (existingEnrollment) {
         // User is already enrolled, just update the state
-        setIsRegistered(true);
+         setLocalIsRegistered(true);
         toast({
           title: "Deja înscris",
           description: "Ești deja înscris la acest pelerinaj.",
@@ -298,16 +162,12 @@ const PilgrimageDetail = () => {
 
       if (error) throw error;
 
-      setIsRegistered(true);
-      
-      // Update participant count locally
-      if (pilgrimage) {
-        setPilgrimage({ ...pilgrimage, participant_count: pilgrimage.participant_count + 1 });
-      }
-
-      // Refetch posts so the user can see all comments now that they're enrolled
-      // This is needed because RLS policies restrict post visibility to enrolled users
-      await fetchPilgrimageData();
+       // Optimistic update
+       setLocalIsRegistered(true);
+       updatePilgrimageParticipantCount(id!, 1);
+       
+       // Invalidate community cache to refetch posts
+       invalidateCommunity(id!);
 
       toast({
         title: "Înregistrare reușită!",
@@ -317,7 +177,7 @@ const PilgrimageDetail = () => {
       console.error("Error registering for pilgrimage:", error);
       // Handle duplicate key error gracefully
       if (error.code === "23505") {
-        setIsRegistered(true);
+         setLocalIsRegistered(true);
         toast({
           title: "Deja înscris",
           description: "Ești deja înscris la acest pelerinaj.",
@@ -346,13 +206,10 @@ const PilgrimageDetail = () => {
 
       if (error) throw error;
 
-      setIsRegistered(false);
+       setLocalIsRegistered(false);
       setShowLeaveConfirmation(false);
-      
-      // Update participant count locally
-      if (pilgrimage) {
-        setPilgrimage({ ...pilgrimage, participant_count: Math.max(0, pilgrimage.participant_count - 1) });
-      }
+       updatePilgrimageParticipantCount(id!, -1);
+       setLocalPosts([]);
 
       toast({
         title: "Succes",
@@ -410,7 +267,7 @@ const PilgrimageDetail = () => {
         user_has_liked: false,
       };
 
-      setPosts([newPostObj, ...posts]);
+       setLocalPosts(prev => [newPostObj, ...prev]);
       setNewPost("");
       toast({
         title: "Postare publicată!",
@@ -429,7 +286,7 @@ const PilgrimageDetail = () => {
   const handleLike = async (postId: string) => {
     if (!userId) return;
 
-    const post = posts.find((p) => p.id === postId);
+     const post = displayPosts.find((p) => p.id === postId);
     if (!post) return;
 
     try {
@@ -440,8 +297,8 @@ const PilgrimageDetail = () => {
         if (error) throw error;
 
         // Update local state
-        setPosts(
-          posts.map((p) =>
+         setLocalPosts(prev =>
+           prev.map((p) =>
             p.id === postId
               ? {
                   ...p,
@@ -449,7 +306,7 @@ const PilgrimageDetail = () => {
                   user_has_liked: false,
                 }
               : p,
-          ),
+           )
         );
       } else {
         // Like: insert into post_likes
@@ -461,8 +318,8 @@ const PilgrimageDetail = () => {
         if (error) throw error;
 
         // Update local state
-        setPosts(
-          posts.map((p) =>
+         setLocalPosts(prev =>
+           prev.map((p) =>
             p.id === postId
               ? {
                   ...p,
@@ -470,7 +327,7 @@ const PilgrimageDetail = () => {
                   user_has_liked: true,
                 }
               : p,
-          ),
+           )
         );
       }
     } catch (error: any) {
@@ -605,19 +462,19 @@ const PilgrimageDetail = () => {
               </div>
             )}
 
-            {!isRegistered && !isPastPilgrimage && (
+             {!displayIsRegistered && !isPastPilgrimage && (
               <Button onClick={handleRegister} className="w-full mt-4" disabled={!userId || isRegistering}>
                 {isRegistering ? "Se înregistrează..." : userId ? "Înscrie-te la pelerinaj" : "Autentifică-te pentru a te înscrie"}
               </Button>
             )}
 
-            {isPastPilgrimage && !isRegistered && (
+             {isPastPilgrimage && !displayIsRegistered && (
               <p className="text-sm text-muted-foreground text-center pt-2 border-t">
                 Acest pelerinaj a avut loc deja.
               </p>
             )}
 
-            {isRegistered && (
+             {displayIsRegistered && (
               <div className="pt-2 border-t space-y-3">
                 <div className="text-center text-sm text-accent font-medium">
                   ✓ Ești înscris la acest pelerinaj
@@ -666,7 +523,7 @@ const PilgrimageDetail = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isRegistered ? (
+           {displayIsRegistered ? (
               <>
                 {/* New Post Form */}
                 <div className="space-y-2">
@@ -689,12 +546,12 @@ const PilgrimageDetail = () => {
 
                 {/* Posts */}
                 <div className="space-y-4 pt-4 border-t">
-                  {posts.length === 0 ? (
+                 {displayPosts.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       Fii primul care postează în această comunitate!
                     </p>
                   ) : (
-                    posts.map((post) => (
+                   displayPosts.map((post) => (
                       <div key={post.id} className="space-y-3 pb-4 border-b last:border-b-0">
                         {/* Post Author */}
                         <div className="flex items-start gap-3">

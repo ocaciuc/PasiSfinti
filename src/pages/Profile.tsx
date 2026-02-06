@@ -367,7 +367,12 @@ const Profile = () => {
                     key={pilgrimage.id}
                     className="border rounded-lg p-4 space-y-2"
                   >
-                    <h3 className="font-semibold text-lg">{pilgrimage.title}</h3>
+                    <h3 
+                      className="font-semibold text-lg text-primary hover:underline cursor-pointer"
+                      onClick={() => navigate(`/pilgrimage/${pilgrimage.id}`)}
+                    >
+                      {pilgrimage.title}
+                    </h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
                       {pilgrimage.location}
@@ -432,7 +437,12 @@ const Profile = () => {
                     key={pilgrimage.id}
                     className="border rounded-lg p-4 space-y-2"
                   >
-                    <h3 className="font-semibold text-lg">{pilgrimage.title}</h3>
+                    <h3 
+                      className="font-semibold text-lg text-primary hover:underline cursor-pointer"
+                      onClick={() => navigate(`/pilgrimage/${pilgrimage.id}`)}
+                    >
+                      {pilgrimage.title}
+                    </h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
                       {pilgrimage.location}
