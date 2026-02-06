@@ -27,7 +27,6 @@ const profileSchema = z.object({
   age: z.coerce.number().min(1, "Vârsta trebuie să fie mai mare de 0").max(150, "Vârstă invalidă"),
   city: z.string().min(1, "Orașul este obligatoriu"),
   parish: z.string().optional(),
-  profilePhoto: z.any().optional(),
 });
 
 interface Profile {
@@ -69,6 +68,7 @@ const Profile = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -203,10 +203,9 @@ const Profile = () => {
     try {
       let avatarUrl = profile?.profilePhoto || null;
 
-      // Handle photo upload if file is provided
-      if (values.profilePhoto && values.profilePhoto[0]) {
-        const file = values.profilePhoto[0];
-        avatarUrl = await uploadAvatar(userId, file);
+      // Handle photo upload if file is provided (use selectedFile state, not form value)
+      if (selectedFile) {
+        avatarUrl = await uploadAvatar(userId, selectedFile);
       }
 
       // Update profile in database
@@ -237,6 +236,7 @@ const Profile = () => {
       });
 
       toast.success("Profilul a fost actualizat cu succes");
+      setSelectedFile(null);
       setEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -538,24 +538,22 @@ const Profile = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="profilePhoto"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Fotografie de profil (opțional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => onChange(e.target.files)}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <div className="space-y-2">
+                <FormLabel>Fotografie de profil (opțional)</FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setSelectedFile(file);
+                  }}
+                />
+                {selectedFile && (
+                  <p className="text-xs text-muted-foreground">
+                    Fișier selectat: {selectedFile.name}
+                  </p>
                 )}
-              />
+              </div>
               <div className="flex gap-2 pt-2">
                 <Button
                   type="button"
