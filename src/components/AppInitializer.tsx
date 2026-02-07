@@ -13,6 +13,7 @@ const PUBLIC_ROUTES = [
   "/",
   "/privacy",
   "/terms",
+  "/child-safety",
   "/user-data-deletion",
   "/account-deleted",
 ];
