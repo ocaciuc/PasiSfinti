@@ -355,6 +355,17 @@
   - Badges: Primul Pelerinaj, 5 Mănăstiri Vizitate, Purtător de Lumină (10+ candles/month), Ajutătorul Comunității
   - Function: evaluate_and_award_badges() for automated badge awarding
   - UI: BadgesSection component on Profile page showing earned/locked badges
+- [x] Google Play Billing Integration for Virtual Candle
+  - Native Android plugin: BillingPlugin.kt with Google Play Billing Library v7
+  - JavaScript bridge: src/lib/play-billing.ts
+  - Server-side verification: verify-purchase Edge Function
+  - Database: added purchase_token + order_id columns to candle_purchases (unique index)
+  - Consumable product ID: light_candle_5ron (5 RON)
+  - Confirmation dialog before purchase, thank-you screen after
+  - Pending transaction handling and purchase restoration on launch
+  - Duplicate purchase prevention via unique purchase_token index
+  - Web fallback for non-native platforms (placeholder flow)
+  - Setup docs: docs/google-play-billing-setup.md
 
 ### Deferred to Post-MVP:
 - [ ] Real-time queue tracker for pilgrimages
@@ -362,9 +373,7 @@
 - [ ] Location-based features and maps
 - [ ] Push notifications (infrastructure now ready with notifications tables)
 - [ ] Direct messaging between pilgrims
-- [ ] Stripe payment integration for candles
 - [ ] Advanced search with more filters
-- [ ] User badges and gamification
 - [ ] Parish partnerships and verified profiles
 - [ ] Offline mode
 - [ ] Global community feed (separate from pilgrimage walls)
@@ -378,7 +387,7 @@
 - Authentication: Email/password + Google OAuth
 - Storage: Supabase Storage for images
 - Calendar: Data stored in Supabase `orthodox_calendar_days` table
-- Payment: Placeholder for MVP, Stripe integration post-MVP
+- Payment: Google Play Billing for Android, placeholder for web
 - Soft Deletes: All user content uses soft deletes with `deleted_at` column
 - Views: Helper views created for clean queries with SECURITY INVOKER
 

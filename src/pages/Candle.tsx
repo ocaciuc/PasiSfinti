@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import AnimatedCandle from "@/components/AnimatedCandle";
@@ -7,12 +7,31 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Clock } from "lucide-react";
+import { Flame, Clock, CheckCircle2 } from "lucide-react";
 import { CandleHistory } from "@/components/CandleHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { ro } from "date-fns/locale";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  isNativeAndroid,
+  connectBilling,
+  getCandleProductDetails,
+  purchaseCandle,
+  consumePurchase,
+  getPendingPurchases,
+  type ProductDetails,
+  type PurchaseResult,
+} from "@/lib/play-billing";
 
 interface Candle {
   id: string;
@@ -21,7 +40,7 @@ interface Candle {
   purpose: string | null;
 }
 
-const Candle = () => {
+const CandlePage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [prayer, setPrayer] = useState("");
@@ -30,9 +49,14 @@ const Candle = () => {
   const [timeRemaining, setTimeRemaining] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [billingReady, setBillingReady] = useState(false);
+  const [productDetails, setProductDetails] = useState<ProductDetails | null>(null);
 
   useEffect(() => {
     fetchCandles();
+    initBilling();
   }, []);
 
   useEffect(() => {
@@ -53,17 +77,41 @@ const Candle = () => {
     }
   }, [activeCandle]);
 
+  const initBilling = async () => {
+    if (!isNativeAndroid()) return;
+    try {
+      const connected = await connectBilling();
+      if (connected) {
+        setBillingReady(true);
+        const details = await getCandleProductDetails();
+        if (details) setProductDetails(details);
+        // Handle any pending purchases from previous sessions
+        await handlePendingPurchases();
+      }
+    } catch (error) {
+      console.error("Billing init error:", error);
+    }
+  };
+
+  const handlePendingPurchases = async () => {
+    try {
+      const pending = await getPendingPurchases();
+      for (const purchase of pending) {
+        await verifyAndRecordPurchase(purchase, "");
+      }
+    } catch (error) {
+      console.error("Pending purchases error:", error);
+    }
+  };
+
   const fetchCandles = async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
       }
 
-      // Fetch active candle
       const { data: activeData, error: activeError } = await supabase
         .from("candle_purchases")
         .select("*")
@@ -79,7 +127,6 @@ const Candle = () => {
         setActiveCandle(activeData);
       }
 
-      // Fetch candle history (expired candles)
       const { data: historyData, error: historyError } = await supabase
         .from("candle_purchases")
         .select("*")
@@ -100,45 +147,89 @@ const Candle = () => {
     }
   };
 
-  const handleLightCandle = async () => {
-    try {
-      setSubmitting(true);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  const verifyAndRecordPurchase = async (purchase: PurchaseResult, purpose: string) => {
+    const { data, error } = await supabase.functions.invoke("verify-purchase", {
+      body: {
+        purchaseToken: purchase.purchaseToken,
+        orderId: purchase.orderId,
+        productId: purchase.productId,
+        purpose: purpose || "Pentru pace și binecuvântare",
+      },
+    });
 
+    if (error) throw error;
+    if (!data?.success && !data?.candle) {
+      throw new Error(data?.error || "Verification failed");
+    }
+
+    // Consume so user can buy again
+    await consumePurchase(purchase.purchaseToken);
+
+    return data.candle;
+  };
+
+  const handleLightCandle = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmPurchase = async () => {
+    setShowConfirmDialog(false);
+    setSubmitting(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
       }
 
-      const now = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      if (isNativeAndroid() && billingReady) {
+        // Native Google Play purchase flow
+        const purchaseResult = await purchaseCandle();
 
-      const { data, error } = await supabase
-        .from("candle_purchases")
-        .insert({
-          user_id: user.id,
-          lit_at: now,
-          expires_at: expiresAt,
-          purpose: prayer || "Pentru pace și binecuvântare",
-          amount: 5,
-          payment_status: "completed",
-        })
-        .select()
-        .single();
+        if (purchaseResult.state === "PENDING") {
+          toast({
+            title: "Tranzacție în așteptare",
+            description: "Plata ta este în curs de procesare. Lumânarea va fi aprinsă după confirmare.",
+          });
+          return;
+        }
 
-      if (error) throw error;
+        // Verify on server and record
+        const candle = await verifyAndRecordPurchase(purchaseResult, prayer);
+        setActiveCandle(candle);
+        setPrayer("");
+        setShowThankYou(true);
+      } else {
+        // Web/fallback placeholder flow
+        const now = new Date().toISOString();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-      setActiveCandle(data);
-      setPrayer("");
+        const { data, error } = await supabase
+          .from("candle_purchases")
+          .insert({
+            user_id: user.id,
+            lit_at: now,
+            expires_at: expiresAt,
+            purpose: prayer || "Pentru pace și binecuvântare",
+            amount: 5,
+            payment_status: "completed",
+          })
+          .select()
+          .single();
 
-      toast({
-        title: "Lumânarea ta arde",
-        description: "Rugăciunea ta a fost primită. Lumânarea va arde 24 de ore.",
-      });
-    } catch (error) {
+        if (error) throw error;
+
+        setActiveCandle(data);
+        setPrayer("");
+        setShowThankYou(true);
+      }
+    } catch (error: any) {
       console.error("Error lighting candle:", error);
+      if (error?.message?.includes("cancelled") || error?.code === "USER_CANCELED") {
+        // User cancelled - not an error
+        return;
+      }
       toast({
         title: "Eroare",
         description: "Nu s-a putut aprinde lumânarea. Încearcă din nou.",
@@ -164,6 +255,8 @@ const Candle = () => {
     );
   }
 
+  const displayPrice = productDetails?.price || "5 RON";
+
   return (
     <div className="min-h-screen bg-background pb-safe">
       {/* Header */}
@@ -173,7 +266,34 @@ const Candle = () => {
       </header>
 
       <div className="max-w-lg mx-auto p-4 space-y-4">
-        {activeCandle ? (
+        {showThankYou ? (
+          <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background overflow-hidden">
+            <CardContent className="pt-8 text-center space-y-6">
+              <div className="relative flex justify-center">
+                <AnimatedCandle size="lg" />
+              </div>
+              <div className="flex justify-center">
+                <CheckCircle2 className="w-12 h-12 text-green-500" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold text-accent">Mulțumim pentru gestul tău!</h2>
+                <p className="text-muted-foreground">
+                  Lumânarea ta arde acum și luminează drumul pelerinilor.
+                </p>
+                <p className="text-sm text-muted-foreground italic mt-4">
+                  "Fiecare lumânare aprinsă este o rugăciune care se înalță către cer"
+                </p>
+              </div>
+              <Button
+                onClick={() => setShowThankYou(false)}
+                variant="outline"
+                className="mt-4"
+              >
+                Vezi lumânarea ta
+              </Button>
+            </CardContent>
+          </Card>
+        ) : activeCandle ? (
           <Card className="glow-candle bg-gradient-to-br from-accent/10 via-background to-background overflow-hidden">
             <CardContent className="pt-8 text-center space-y-6">
               <div className="relative flex justify-center">
@@ -222,7 +342,7 @@ const Candle = () => {
                 <p className="mb-2">
                   Aprinderea unei lumânări virtuale este un gest simbolic de rugăciune și contemplare spirituală.
                 </p>
-                <p className="text-accent font-medium">Donație sugerată: 5 RON</p>
+                <p className="text-accent font-medium">Donație: {displayPrice}</p>
               </div>
 
               <Button onClick={handleLightCandle} disabled={submitting} className="w-full h-12 text-lg">
@@ -259,9 +379,38 @@ const Candle = () => {
         )}
       </div>
 
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Aprinde o Lumânare</AlertDialogTitle>
+            <AlertDialogDescription className="text-center space-y-3">
+              <span className="block">
+                Ești pe cale să aprinzi o lumânare virtuală care va arde 24 de ore.
+              </span>
+              <span className="block text-accent font-semibold text-base">
+                Donație: {displayPrice}
+              </span>
+              {prayer && (
+                <span className="block text-xs italic">
+                  Rugăciunea ta: "{prayer.substring(0, 100)}{prayer.length > 100 ? '...' : ''}"
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Anulează</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmPurchase}>
+              <Flame className="w-4 h-4 mr-2" />
+              Confirmă
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Navigation />
     </div>
   );
 };
 
-export default Candle;
+export default CandlePage;
