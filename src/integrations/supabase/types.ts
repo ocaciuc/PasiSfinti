@@ -52,7 +52,9 @@ export type Database = {
           expires_at: string
           id: string
           lit_at: string
+          order_id: string | null
           payment_status: string | null
+          purchase_token: string | null
           purpose: string | null
           user_id: string
         }
@@ -63,7 +65,9 @@ export type Database = {
           expires_at: string
           id?: string
           lit_at?: string
+          order_id?: string | null
           payment_status?: string | null
+          purchase_token?: string | null
           purpose?: string | null
           user_id: string
         }
@@ -74,7 +78,9 @@ export type Database = {
           expires_at?: string
           id?: string
           lit_at?: string
+          order_id?: string | null
           payment_status?: string | null
+          purchase_token?: string | null
           purpose?: string | null
           user_id?: string
         }

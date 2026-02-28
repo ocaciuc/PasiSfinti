@@ -2,3 +2,6 @@ project_id = "yanjhfqqdcevlzmwsrnj"
 
 [functions.delete-account]
 verify_jwt = true
+
+[functions.verify-purchase]
+verify_jwt = false
