@@ -1,25 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Home, Map, Flame, User, Bell } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useNotifications } from "@/hooks/useNotifications";
+import { Home, Map, Flame, User } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setUserId(user.id);
-    });
-  }, []);
-
-  const { unreadCount } = useNotifications(userId);
 
   const navItems = [
     { icon: Home, label: "Acasă", path: "/dashboard" },
     { icon: Map, label: "Pelerinaje", path: "/pilgrimages" },
-    { icon: Bell, label: "Notificări", path: "/notifications", badge: unreadCount },
     { icon: Flame, label: "Lumânare", path: "/candle" },
     { icon: User, label: "Profil", path: "/profile" },
   ];
