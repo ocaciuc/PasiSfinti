@@ -341,6 +341,9 @@ const Profile = () => {
         {/* Badges Section */}
         {userId && <BadgesSection userId={userId} />}
 
+        {/* Notification Settings */}
+        {userId && <NotificationSettingsCard userId={userId} />}
+
         {/* Past Pilgrimages */}
         <Card className="glow-soft">
           <CardHeader>

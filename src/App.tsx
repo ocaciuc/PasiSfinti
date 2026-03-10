@@ -50,7 +50,6 @@ const App = () => (
             <Route path="/candle" element={<Candle />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/notifications" element={<Notifications />} />
             <Route path="/account-deleted" element={<AccountDeleted />} />
             <Route path="/user-data-deletion" element={<UserDataDeletion />} />
             <Route path="/privacy" element={<Privacy />} />
