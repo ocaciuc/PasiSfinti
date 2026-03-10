@@ -8,6 +8,7 @@
 - ✅ Persistent storage configured
 - ✅ Public landing page (Welcome) as default entry point (/)
 - ✅ Dashboard moved to /dashboard route
+- ✅ Notification system (settings, bell icon, DB triggers, scheduled edge function)
 
 ---
 

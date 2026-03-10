@@ -24,6 +24,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import ChildSafety from "./pages/ChildSafety";
 import ResetPassword from "./pages/ResetPassword";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/candle" element={<Candle />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="/account-deleted" element={<AccountDeleted />} />
             <Route path="/user-data-deletion" element={<UserDataDeletion />} />
             <Route path="/privacy" element={<Privacy />} />

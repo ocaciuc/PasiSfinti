@@ -152,6 +152,7 @@ export type Database = {
         Row: {
           allow_email: boolean | null
           allow_push: boolean | null
+          candle_activity: boolean | null
           comment_replies: boolean | null
           community_updates: boolean | null
           created_at: string | null
@@ -162,6 +163,7 @@ export type Database = {
         Insert: {
           allow_email?: boolean | null
           allow_push?: boolean | null
+          candle_activity?: boolean | null
           comment_replies?: boolean | null
           community_updates?: boolean | null
           created_at?: string | null
@@ -172,6 +174,7 @@ export type Database = {
         Update: {
           allow_email?: boolean | null
           allow_push?: boolean | null
+          candle_activity?: boolean | null
           comment_replies?: boolean | null
           community_updates?: boolean | null
           created_at?: string | null
@@ -932,6 +935,8 @@ export type Database = {
         Args: { _pilgrimage_id: string; _user_id: string }
         Returns: boolean
       }
+      notify_candle_expiry: { Args: never; Returns: undefined }
+      notify_pilgrimage_reminders: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
