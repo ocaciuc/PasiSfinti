@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 import BadgesSection from "@/components/BadgesSection";
+import NotificationSettingsCard from "@/components/NotificationSettingsCard";
 import { clearAuthStorage } from "@/lib/capacitor-storage";
 import { signOutFromGoogle } from "@/lib/native-google-signin";
 import { uploadAvatar } from "@/lib/avatar-upload";
@@ -339,6 +340,9 @@ const Profile = () => {
 
         {/* Badges Section */}
         {userId && <BadgesSection userId={userId} />}
+
+        {/* Notification Settings */}
+        {userId && <NotificationSettingsCard userId={userId} />}
 
         {/* Past Pilgrimages */}
         <Card className="glow-soft">

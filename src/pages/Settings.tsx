@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Trash2, Loader2, LogOut, User, Shield } from "lucide-react";
-import NotificationSettingsCard from "@/components/NotificationSettingsCard";
 import Navigation from "@/components/Navigation";
 
 const Settings = () => {
@@ -145,9 +144,6 @@ const Settings = () => {
             </Button>
           </CardContent>
         </Card>
-
-        {/* Notification Settings */}
-        {user && <NotificationSettingsCard userId={user.id} />}
 
         {/* Privacy & Data Section */}
         <Card>
