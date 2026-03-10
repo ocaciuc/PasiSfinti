@@ -145,9 +145,6 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Notification Settings */}
-        {user && <NotificationSettingsCard userId={user.id} />}
-
         {/* Privacy & Data Section */}
         <Card>
           <CardHeader className="pb-3">
