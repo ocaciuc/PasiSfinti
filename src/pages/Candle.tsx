@@ -116,6 +116,7 @@ const CandlePage = () => {
         .from("candle_purchases")
         .select("*")
         .eq("user_id", user.id)
+        .eq("payment_status", "completed")
         .gt("expires_at", new Date().toISOString())
         .order("lit_at", { ascending: false })
         .limit(1)
@@ -131,6 +132,7 @@ const CandlePage = () => {
         .from("candle_purchases")
         .select("*")
         .eq("user_id", user.id)
+        .eq("payment_status", "completed")
         .lte("expires_at", new Date().toISOString())
         .order("lit_at", { ascending: false })
         .limit(10);
@@ -184,8 +186,56 @@ const CandlePage = () => {
       }
 
       if (isNativeAndroid() && billingReady) {
-        // Native Google Play purchase flow
-        const purchaseResult = await purchaseCandle();
+        // Step 1: Pre-validate by creating a pending candle record BEFORE payment
+        const now = new Date().toISOString();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        const candlePurpose = prayer || "Pentru pace și binecuvântare";
+
+        const { data: pendingCandle, error: pendingError } = await supabase
+          .from("candle_purchases")
+          .insert({
+            user_id: user.id,
+            lit_at: now,
+            expires_at: expiresAt,
+            purpose: candlePurpose,
+            amount: 5,
+            payment_status: "pending",
+          })
+          .select()
+          .single();
+
+        if (pendingError) {
+          console.error("Error creating pending candle:", pendingError);
+          toast({
+            title: "Eroare",
+            description: "Nu s-a putut pregăti lumânarea. Plata nu a fost efectuată.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Step 2: Now initiate Google Play payment
+        let purchaseResult: PurchaseResult;
+        try {
+          purchaseResult = await purchaseCandle();
+        } catch (purchaseError: any) {
+          // Payment failed or cancelled — mark the pending record as failed
+          console.error("Purchase error:", purchaseError);
+          await supabase
+            .from("candle_purchases")
+            .update({ payment_status: "failed", expires_at: new Date().toISOString() })
+            .eq("id", pendingCandle.id);
+
+          if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
+            return;
+          }
+          toast({
+            title: "Plata nu a fost efectuată",
+            description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
+            variant: "destructive",
+          });
+          return;
+        }
 
         if (purchaseResult.state === "PENDING") {
           toast({
@@ -195,13 +245,35 @@ const CandlePage = () => {
           return;
         }
 
-        // Verify on server and record
-        const candle = await verifyAndRecordPurchase(purchaseResult, prayer);
-        setActiveCandle(candle);
+        // Step 3: Verify purchase and update candle record
+        try {
+          await verifyAndRecordPurchase(purchaseResult, candlePurpose);
+        } catch (verifyError) {
+          // Verification failed but payment went through — update existing record
+          console.error("Verification error, updating pending record:", verifyError);
+          await supabase
+            .from("candle_purchases")
+            .update({
+              payment_status: "completed",
+              purchase_token: purchaseResult.purchaseToken,
+              order_id: purchaseResult.orderId,
+            })
+            .eq("id", pendingCandle.id);
+
+          // Still consume so user can buy again
+          await consumePurchase(purchaseResult.purchaseToken);
+        }
+
+        setActiveCandle({
+          id: pendingCandle.id,
+          lit_at: pendingCandle.lit_at,
+          expires_at: pendingCandle.expires_at,
+          purpose: pendingCandle.purpose,
+        });
         setPrayer("");
         setShowThankYou(true);
       } else {
-        // Web/fallback placeholder flow
+        // Web/fallback flow (no real payment)
         const now = new Date().toISOString();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
@@ -227,7 +299,6 @@ const CandlePage = () => {
     } catch (error: any) {
       console.error("Error lighting candle:", error);
       if (error?.message?.includes("cancelled") || error?.code === "USER_CANCELED") {
-        // User cancelled - not an error
         return;
       }
       toast({
