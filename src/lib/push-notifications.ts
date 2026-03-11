@@ -49,9 +49,13 @@ export const initPushNotifications = async (
     });
 
     // Listen for push notification action (user tapped the notification)
-    PushNotifications.addListener("pushNotificationActionPerformed", (notification) => {
-      console.log("Push notification action:", notification);
-      // Could navigate to relevant screen based on notification.notification.data
+    PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+      console.log("Push notification action:", action);
+      const data = action.notification.data;
+      if (data?.route && onNavigate) {
+        console.log("[Push] Navigating to:", data.route);
+        onNavigate(data.route);
+      }
     });
   } catch (error) {
     console.error("Error initializing push notifications:", error);
