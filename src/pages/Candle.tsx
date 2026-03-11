@@ -132,6 +132,7 @@ const CandlePage = () => {
         .from("candle_purchases")
         .select("*")
         .eq("user_id", user.id)
+        .eq("payment_status", "completed")
         .lte("expires_at", new Date().toISOString())
         .order("lit_at", { ascending: false })
         .limit(10);
