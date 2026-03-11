@@ -236,27 +236,56 @@ const CandlePage = () => {
           return;
         }
 
-        // Step 2: Now initiate Google Play payment
+        // Step 2: Consume any unconsumed purchases to prevent "You already own this item"
+        await consumeAllPending();
+
+        // Step 3: Now initiate Google Play payment
         let purchaseResult: PurchaseResult;
         try {
           purchaseResult = await purchaseCandle();
         } catch (purchaseError: any) {
-          // Payment failed or cancelled — mark the pending record as failed
           console.error("Purchase error:", purchaseError);
-          await supabase
-            .from("candle_purchases")
-            .update({ payment_status: "failed", expires_at: new Date().toISOString() })
-            .eq("id", pendingCandle.id);
 
-          if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
+          // Handle "ITEM_ALREADY_OWNED" — consume and retry once
+          if (purchaseError?.code === "ITEM_ALREADY_OWNED" || purchaseError?.message?.includes("already owned")) {
+            console.log("[Candle] Item already owned, consuming and retrying...");
+            await consumeAllPending();
+            try {
+              purchaseResult = await purchaseCandle();
+            } catch (retryError: any) {
+              console.error("Retry purchase error:", retryError);
+              await supabase
+                .from("candle_purchases")
+                .update({ payment_status: "failed", expires_at: new Date().toISOString() })
+                .eq("id", pendingCandle.id);
+
+              if (retryError?.message?.includes("cancelled") || retryError?.code === "USER_CANCELED") {
+                return;
+              }
+              toast({
+                title: "Plata nu a fost efectuată",
+                description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
+                variant: "destructive",
+              });
+              return;
+            }
+          } else {
+            // Payment failed or cancelled — mark the pending record as failed
+            await supabase
+              .from("candle_purchases")
+              .update({ payment_status: "failed", expires_at: new Date().toISOString() })
+              .eq("id", pendingCandle.id);
+
+            if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
+              return;
+            }
+            toast({
+              title: "Plata nu a fost efectuată",
+              description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
+              variant: "destructive",
+            });
             return;
           }
-          toast({
-            title: "Plata nu a fost efectuată",
-            description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
-            variant: "destructive",
-          });
-          return;
         }
 
         if (purchaseResult.state === "PENDING") {
