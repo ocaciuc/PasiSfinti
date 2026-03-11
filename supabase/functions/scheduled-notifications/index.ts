@@ -43,10 +43,21 @@ Deno.serve(async (req) => {
       for (const n of recentNotifs) {
         // Only send the first notification per user to avoid spam
         if (!userNotifs.has(n.user_id)) {
+          // Determine route based on notification type and data
+          const notifData = (n.data || {}) as Record<string, any>;
+          let route = "/dashboard";
+          if (n.type === "pilgrimage_reminder" && notifData.pilgrimage_id) {
+            route = `/pilgrimage/${notifData.pilgrimage_id}`;
+          } else if (n.type === "candle_expiry") {
+            route = "/candle";
+          } else if (n.type === "comment_reply" && notifData.pilgrimage_id) {
+            route = `/pilgrimage/${notifData.pilgrimage_id}`;
+          }
+
           userNotifs.set(n.user_id, {
             title: n.title,
             body: n.message || "",
-            data: { type: n.type },
+            data: { type: n.type, route },
           });
         }
       }
