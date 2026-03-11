@@ -263,8 +263,10 @@ const CandlePage = () => {
         }
 
         setActiveCandle({
-          ...pendingCandle,
-          payment_status: "completed",
+          id: pendingCandle.id,
+          lit_at: pendingCandle.lit_at,
+          expires_at: pendingCandle.expires_at,
+          purpose: pendingCandle.purpose,
         });
         setPrayer("");
         setShowThankYou(true);
