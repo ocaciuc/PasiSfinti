@@ -1,6 +1,11 @@
 import { Capacitor } from "@capacitor/core";
-import { PushNotifications } from "@capacitor/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
+
+// Dynamically import to avoid Rollup resolution errors on web builds
+const getPushNotifications = async () => {
+  const mod = await import("@capacitor/push-notifications");
+  return mod.PushNotifications;
+};
 
 /**
  * Initialize push notifications on native platforms.
