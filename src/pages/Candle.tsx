@@ -217,11 +217,11 @@ const CandlePage = () => {
         try {
           purchaseResult = await purchaseCandle();
         } catch (purchaseError: any) {
-          // Payment failed or cancelled — delete the pending record
+          // Payment failed or cancelled — mark the pending record as failed
           console.error("Purchase error:", purchaseError);
           await supabase
             .from("candle_purchases")
-            .delete()
+            .update({ payment_status: "failed", expires_at: new Date().toISOString() })
             .eq("id", pendingCandle.id);
 
           if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
