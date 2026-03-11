@@ -2,6 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useDeepLinkHandler } from "@/hooks/useDeepLinkHandler";
+import { initPushNotifications } from "@/lib/push-notifications";
 import SplashScreen from "./SplashScreen";
 
 interface AppInitializerProps {
@@ -79,6 +80,9 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
+          // Initialize push notifications for authenticated users
+          initPushNotifications(session.user.id);
+
           // User is authenticated
           const isWelcomeOrAuth = currentPath === "/" || currentPath === "/auth";
           if (isWelcomeOrAuth) {

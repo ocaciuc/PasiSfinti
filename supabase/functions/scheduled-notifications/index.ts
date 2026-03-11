@@ -27,6 +27,47 @@ Deno.serve(async (req) => {
       console.error("Candle expiry error:", candleError);
     }
 
+    // After creating in-app notifications, send push notifications
+    // Get recent unread notifications created in the last 5 minutes
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: recentNotifs } = await supabase
+      .from("notifications")
+      .select("user_id, title, message, type, data")
+      .eq("read", false)
+      .gte("created_at", fiveMinutesAgo)
+      .in("type", ["pilgrimage_reminder", "candle_expiry"]);
+
+    if (recentNotifs && recentNotifs.length > 0) {
+      // Group by user for batch sending
+      const userNotifs = new Map<string, { title: string; body: string; data?: Record<string, string> }>();
+      for (const n of recentNotifs) {
+        // Only send the first notification per user to avoid spam
+        if (!userNotifs.has(n.user_id)) {
+          userNotifs.set(n.user_id, {
+            title: n.title,
+            body: n.message || "",
+            data: { type: n.type },
+          });
+        }
+      }
+
+      // Send push notifications via send-push function
+      for (const [userId, notif] of userNotifs) {
+        try {
+          await supabase.functions.invoke("send-push", {
+            body: {
+              user_ids: [userId],
+              title: notif.title,
+              body: notif.body,
+              data: notif.data,
+            },
+          });
+        } catch (pushErr) {
+          console.error("Push send error for user", userId, pushErr);
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({ success: true, timestamp: new Date().toISOString() }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
