@@ -22,6 +22,8 @@ export const initPushNotifications = async (
   }
 
   try {
+    const PushNotifications = await getPushNotifications();
+
     // Check current permission status
     let permStatus = await PushNotifications.checkPermissions();
 
