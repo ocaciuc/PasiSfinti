@@ -10,6 +10,7 @@
 - ✅ Dashboard moved to /dashboard route
 - ✅ Notification system (settings, bell icon, DB triggers, scheduled edge function)
 - ✅ Push notifications via Firebase Cloud Messaging (FCM V1 API, send-push edge function, push_tokens table, @capacitor/push-notifications)
+- ✅ Push notification deep linking (tap notification → navigate to relevant screen: pilgrimage, candle, dashboard)
 
 ---
 
