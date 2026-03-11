@@ -81,7 +81,10 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
 
         if (session) {
           // Initialize push notifications for authenticated users
-          initPushNotifications(session.user.id);
+          initPushNotifications(session.user.id, (path) => {
+            console.log("[AppInitializer] Push navigation to:", path);
+            navigate(path, { replace: true });
+          });
 
           // User is authenticated
           const isWelcomeOrAuth = currentPath === "/" || currentPath === "/auth";

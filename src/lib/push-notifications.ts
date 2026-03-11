@@ -5,8 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 /**
  * Initialize push notifications on native platforms.
  * Requests permission, registers for push, and stores the FCM token.
+ * @param onNavigate - callback to handle navigation when user taps a notification
  */
-export const initPushNotifications = async (userId: string) => {
+export const initPushNotifications = async (
+  userId: string,
+  onNavigate?: (path: string) => void
+) => {
   if (!Capacitor.isNativePlatform()) {
     console.log("Push notifications only available on native platforms");
     return;
@@ -45,9 +49,13 @@ export const initPushNotifications = async (userId: string) => {
     });
 
     // Listen for push notification action (user tapped the notification)
-    PushNotifications.addListener("pushNotificationActionPerformed", (notification) => {
-      console.log("Push notification action:", notification);
-      // Could navigate to relevant screen based on notification.notification.data
+    PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+      console.log("Push notification action:", action);
+      const data = action.notification.data;
+      if (data?.route && onNavigate) {
+        console.log("[Push] Navigating to:", data.route);
+        onNavigate(data.route);
+      }
     });
   } catch (error) {
     console.error("Error initializing push notifications:", error);
