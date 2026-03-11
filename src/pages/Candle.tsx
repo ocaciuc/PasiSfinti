@@ -97,10 +97,32 @@ const CandlePage = () => {
     try {
       const pending = await getPendingPurchases();
       for (const purchase of pending) {
-        await verifyAndRecordPurchase(purchase, "");
+        try {
+          await verifyAndRecordPurchase(purchase, "");
+        } catch (err) {
+          // If verify fails (e.g. duplicate), still consume to unblock future purchases
+          console.warn("Pending purchase verify failed, consuming anyway:", err);
+          await consumePurchase(purchase.purchaseToken);
+        }
       }
     } catch (error) {
       console.error("Pending purchases error:", error);
+    }
+  };
+
+  /**
+   * Consume all owned items to clear the "You already own this item" state.
+   * This should be called before initiating a new purchase.
+   */
+  const consumeAllPending = async () => {
+    try {
+      const pending = await getPendingPurchases();
+      for (const purchase of pending) {
+        console.log("[Candle] Consuming pending purchase:", purchase.purchaseToken);
+        await consumePurchase(purchase.purchaseToken);
+      }
+    } catch (error) {
+      console.error("Error consuming pending purchases:", error);
     }
   };
 
