@@ -365,10 +365,15 @@
   - Database: added purchase_token + order_id columns to candle_purchases (unique index)
   - Consumable product ID: light_candle_5ron (5 RON)
   - Confirmation dialog before purchase, thank-you screen after
-  - Pending transaction handling and purchase restoration on launch
-  - Duplicate purchase prevention via unique purchase_token index
   - Web fallback for non-native platforms (placeholder flow)
   - Setup docs: docs/google-play-billing-setup.md
+  - **Revised billing flow (acknowledge-then-consume):**
+    - Purchase → acknowledge (not consume) → store purchaseToken in Supabase
+    - One candle at a time: blocks purchase if active candle exists (expires_at > now)
+    - ITEM_ALREADY_OWNED resolved silently: restores candle state or consumes if expired
+    - Consumption only happens after 24h candle expiry (client-side on timer)
+    - Removed consumeAllPending() — no automatic consumption
+    - On app launch: restoreOwnedPurchases() checks owned items and syncs with Supabase
 
 ### Deferred to Post-MVP:
 - [ ] Real-time queue tracker for pilgrimages
