@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import AnimatedCandle from "@/components/AnimatedCandle";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Clock, CheckCircle2 } from "lucide-react";
+import { Flame, CheckCircle2 } from "lucide-react";
 import { CandleHistory } from "@/components/CandleHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
@@ -27,8 +27,9 @@ import {
   connectBilling,
   getCandleProductDetails,
   purchaseCandle,
+  acknowledgePurchase,
   consumePurchase,
-  getPendingPurchases,
+  getOwnedPurchases,
   type ProductDetails,
   type PurchaseResult,
 } from "@/lib/play-billing";
@@ -38,6 +39,7 @@ interface Candle {
   lit_at: string;
   expires_at: string;
   purpose: string | null;
+  purchase_token?: string | null;
 }
 
 const CandlePage = () => {
@@ -66,8 +68,10 @@ const CandlePage = () => {
         const now = new Date();
 
         if (expiresAt > now) {
-          setTimeRemaining("" + formatDistanceToNow(expiresAt, { locale: ro }));
+          setTimeRemaining(formatDistanceToNow(expiresAt, { locale: ro }));
         } else {
+          // Candle expired — consume the Google Play purchase to allow re-purchase
+          consumeExpiredCandle(activeCandle);
           setActiveCandle(null);
           fetchCandles();
         }
@@ -77,6 +81,19 @@ const CandlePage = () => {
     }
   }, [activeCandle]);
 
+  /**
+   * When a candle expires, consume the Google Play purchase so the user can buy again.
+   */
+  const consumeExpiredCandle = async (candle: Candle) => {
+    if (!isNativeAndroid() || !candle.purchase_token) return;
+    try {
+      console.log("[Candle] Consuming expired candle purchase:", candle.purchase_token);
+      await consumePurchase(candle.purchase_token);
+    } catch (error) {
+      console.error("[Candle] Failed to consume expired candle:", error);
+    }
+  };
+
   const initBilling = async () => {
     if (!isNativeAndroid()) return;
     try {
@@ -85,44 +102,67 @@ const CandlePage = () => {
         setBillingReady(true);
         const details = await getCandleProductDetails();
         if (details) setProductDetails(details);
-        // Handle any pending purchases from previous sessions
-        await handlePendingPurchases();
+        // Check for owned purchases and restore state if needed
+        await restoreOwnedPurchases();
       }
     } catch (error) {
       console.error("Billing init error:", error);
     }
   };
 
-  const handlePendingPurchases = async () => {
+  /**
+   * On app launch, check if there are owned (not consumed) purchases.
+   * If so, restore the candle state from Supabase rather than consuming them.
+   * Also consume purchases for expired candles.
+   */
+  const restoreOwnedPurchases = async () => {
     try {
-      const pending = await getPendingPurchases();
-      for (const purchase of pending) {
-        try {
-          await verifyAndRecordPurchase(purchase, "");
-        } catch (err) {
-          // If verify fails (e.g. duplicate), still consume to unblock future purchases
-          console.warn("Pending purchase verify failed, consuming anyway:", err);
-          await consumePurchase(purchase.purchaseToken);
+      const owned = await getOwnedPurchases();
+      for (const purchase of owned) {
+        if (purchase.productId !== "light_candle_5ron") continue;
+
+        // Check if we have an active candle for this token in Supabase
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: candle } = await supabase
+          .from("candle_purchases")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("purchase_token", purchase.purchaseToken)
+          .eq("payment_status", "completed")
+          .maybeSingle();
+
+        if (candle) {
+          const expiresAt = new Date(candle.expires_at);
+          if (expiresAt > new Date()) {
+            // Candle still active — restore it
+            setActiveCandle(candle);
+          } else {
+            // Candle expired — consume the purchase
+            console.log("[Candle] Consuming expired owned purchase");
+            await consumePurchase(purchase.purchaseToken);
+          }
+        } else {
+          // No record in Supabase — this is an unacknowledged purchase, acknowledge & record it
+          if (!purchase.isAcknowledged) {
+            await acknowledgePurchase(purchase.purchaseToken);
+          }
+          // Record in Supabase
+          try {
+            await verifyAndRecordPurchase(
+              { ...purchase, state: 'PURCHASED' as const },
+              ""
+            );
+          } catch (err) {
+            console.warn("[Candle] Failed to restore unrecorded purchase:", err);
+            // If it was a duplicate, just consume it
+            await consumePurchase(purchase.purchaseToken);
+          }
         }
       }
     } catch (error) {
-      console.error("Pending purchases error:", error);
-    }
-  };
-
-  /**
-   * Consume all owned items to clear the "You already own this item" state.
-   * This should be called before initiating a new purchase.
-   */
-  const consumeAllPending = async () => {
-    try {
-      const pending = await getPendingPurchases();
-      for (const purchase of pending) {
-        console.log("[Candle] Consuming pending purchase:", purchase.purchaseToken);
-        await consumePurchase(purchase.purchaseToken);
-      }
-    } catch (error) {
-      console.error("Error consuming pending purchases:", error);
+      console.error("Restore owned purchases error:", error);
     }
   };
 
@@ -176,7 +216,8 @@ const CandlePage = () => {
       body: {
         purchaseToken: purchase.purchaseToken,
         orderId: purchase.orderId,
-        productId: purchase.productId,
+        productId: purchase.productId || "light_candle_5ron",
+        purchaseTime: purchase.purchaseTime,
         purpose: purpose || "Pentru pace și binecuvântare",
       },
     });
@@ -186,13 +227,18 @@ const CandlePage = () => {
       throw new Error(data?.error || "Verification failed");
     }
 
-    // Consume so user can buy again
-    await consumePurchase(purchase.purchaseToken);
-
     return data.candle;
   };
 
   const handleLightCandle = () => {
+    // Block if user already has an active candle
+    if (activeCandle) {
+      toast({
+        title: "Ai deja o lumânare aprinsă",
+        description: "Poți aprinde alta după ce aceasta se stinge.",
+      });
+      return;
+    }
     setShowConfirmDialog(true);
   };
 
@@ -207,8 +253,36 @@ const CandlePage = () => {
         return;
       }
 
+      // Double-check: no active candle in Supabase
+      const { data: existingActive } = await supabase
+        .from("candle_purchases")
+        .select("id, expires_at")
+        .eq("user_id", user.id)
+        .eq("payment_status", "completed")
+        .gt("expires_at", new Date().toISOString())
+        .limit(1)
+        .maybeSingle();
+
+      if (existingActive) {
+        toast({
+          title: "Ai deja o lumânare aprinsă",
+          description: "Poți aprinde alta după ce aceasta se stinge.",
+        });
+        return;
+      }
+
       if (isNativeAndroid() && billingReady) {
-        // Step 1: Pre-validate by creating a pending candle record BEFORE payment
+        // Check if user already owns the item (from a previous unfinished flow)
+        const owned = await getOwnedPurchases();
+        const existingOwned = owned.find(p => p.productId === "light_candle_5ron");
+
+        if (existingOwned) {
+          // Item already owned — restore candle state instead of showing error
+          await handleItemAlreadyOwned(existingOwned.purchaseToken, existingOwned.purchaseTime, user.id);
+          return;
+        }
+
+        // Create pending record BEFORE payment
         const now = new Date().toISOString();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
         const candlePurpose = prayer || "Pentru pace și binecuvântare";
@@ -236,56 +310,40 @@ const CandlePage = () => {
           return;
         }
 
-        // Step 2: Consume any unconsumed purchases to prevent "You already own this item"
-        await consumeAllPending();
-
-        // Step 3: Now initiate Google Play payment
+        // Initiate Google Play payment
         let purchaseResult: PurchaseResult;
         try {
           purchaseResult = await purchaseCandle();
         } catch (purchaseError: any) {
           console.error("Purchase error:", purchaseError);
 
-          // Handle "ITEM_ALREADY_OWNED" — consume and retry once
-          if (purchaseError?.code === "ITEM_ALREADY_OWNED" || purchaseError?.message?.includes("already owned")) {
-            console.log("[Candle] Item already owned, consuming and retrying...");
-            await consumeAllPending();
-            try {
-              purchaseResult = await purchaseCandle();
-            } catch (retryError: any) {
-              console.error("Retry purchase error:", retryError);
-              await supabase
-                .from("candle_purchases")
-                .update({ payment_status: "failed", expires_at: new Date().toISOString() })
-                .eq("id", pendingCandle.id);
+          // Mark pending record as failed
+          await supabase
+            .from("candle_purchases")
+            .update({ payment_status: "failed", expires_at: new Date().toISOString() })
+            .eq("id", pendingCandle.id);
 
-              if (retryError?.message?.includes("cancelled") || retryError?.code === "USER_CANCELED") {
-                return;
-              }
-              toast({
-                title: "Plata nu a fost efectuată",
-                description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
-                variant: "destructive",
-              });
-              return;
-            }
-          } else {
-            // Payment failed or cancelled — mark the pending record as failed
-            await supabase
-              .from("candle_purchases")
-              .update({ payment_status: "failed", expires_at: new Date().toISOString() })
-              .eq("id", pendingCandle.id);
-
-            if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
-              return;
-            }
-            toast({
-              title: "Plata nu a fost efectuată",
-              description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
-              variant: "destructive",
-            });
+          if (purchaseError?.message?.includes("cancelled") || purchaseError?.code === "USER_CANCELED") {
             return;
           }
+          toast({
+            title: "Plata nu a fost efectuată",
+            description: "Lumânarea nu a fost aprinsă. Nu ai fost taxat.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Handle ITEM_ALREADY_OWNED returned as a resolved state
+        if (purchaseResult.state === "ITEM_ALREADY_OWNED") {
+          // Clean up the pending record
+          await supabase
+            .from("candle_purchases")
+            .update({ payment_status: "failed", expires_at: new Date().toISOString() })
+            .eq("id", pendingCandle.id);
+
+          await handleItemAlreadyOwned(purchaseResult.purchaseToken, purchaseResult.purchaseTime, user.id);
+          return;
         }
 
         if (purchaseResult.state === "PENDING") {
@@ -296,12 +354,22 @@ const CandlePage = () => {
           return;
         }
 
-        // Step 3: Verify purchase and update candle record
+        // Acknowledge the purchase (do NOT consume)
+        await acknowledgePurchase(purchaseResult.purchaseToken);
+
+        // Verify and record in Supabase
         try {
-          await verifyAndRecordPurchase(purchaseResult, candlePurpose);
+          const candle = await verifyAndRecordPurchase(purchaseResult, candlePurpose);
+          // Delete the pending record since verify-purchase created a new one
+          await supabase
+            .from("candle_purchases")
+            .update({ payment_status: "superseded", expires_at: new Date().toISOString() })
+            .eq("id", pendingCandle.id);
+
+          setActiveCandle(candle);
         } catch (verifyError) {
-          // Verification failed but payment went through — update existing record
           console.error("Verification error, updating pending record:", verifyError);
+          // Update the pending record directly
           await supabase
             .from("candle_purchases")
             .update({
@@ -311,16 +379,15 @@ const CandlePage = () => {
             })
             .eq("id", pendingCandle.id);
 
-          // Still consume so user can buy again
-          await consumePurchase(purchaseResult.purchaseToken);
+          setActiveCandle({
+            id: pendingCandle.id,
+            lit_at: pendingCandle.lit_at,
+            expires_at: pendingCandle.expires_at,
+            purpose: pendingCandle.purpose,
+            purchase_token: purchaseResult.purchaseToken,
+          });
         }
 
-        setActiveCandle({
-          id: pendingCandle.id,
-          lit_at: pendingCandle.lit_at,
-          expires_at: pendingCandle.expires_at,
-          purpose: pendingCandle.purpose,
-        });
         setPrayer("");
         setShowThankYou(true);
       } else {
@@ -362,6 +429,56 @@ const CandlePage = () => {
     }
   };
 
+  /**
+   * Handle ITEM_ALREADY_OWNED: restore the candle state from Supabase
+   * or consume if the candle has expired.
+   */
+  const handleItemAlreadyOwned = async (purchaseToken: string, purchaseTime: number, userId: string) => {
+    try {
+      // Look up this purchase in Supabase
+      const { data: candle } = await supabase
+        .from("candle_purchases")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("payment_status", "completed")
+        .gt("expires_at", new Date().toISOString())
+        .order("lit_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (candle) {
+        // Active candle found — restore it
+        setActiveCandle(candle);
+        toast({
+          title: "Ai deja o lumânare aprinsă",
+          description: "Poți aprinde alta după ce aceasta se stinge.",
+        });
+      } else {
+        // No active candle — the owned purchase is from an expired candle. Consume it.
+        console.log("[Candle] Consuming stale owned purchase");
+        if (purchaseToken) {
+          await consumePurchase(purchaseToken);
+        } else {
+          // Need to get the token from Google Play
+          const ownedList = await getOwnedPurchases();
+          for (const p of ownedList) {
+            if (p.productId === "light_candle_5ron") {
+              await consumePurchase(p.purchaseToken);
+            }
+          }
+        }
+        toast({
+          title: "Achiziție anterioară eliberată",
+          description: "Poți aprinde acum o lumânare nouă.",
+        });
+        // Refresh to show the purchase form
+        await fetchCandles();
+      }
+    } catch (error) {
+      console.error("[Candle] handleItemAlreadyOwned error:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background pb-safe">
@@ -381,7 +498,6 @@ const CandlePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-safe">
-      {/* Header */}
       <header className="bg-primary text-primary-foreground p-6 glow-soft">
         <h1 className="text-2xl font-bold text-center">Aprinde o Lumânare</h1>
         <p className="text-center text-sm opacity-90 mt-1">Ridică o rugăciune către cer</p>

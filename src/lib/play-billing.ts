@@ -1,6 +1,8 @@
 /**
  * Google Play Billing bridge for Capacitor.
  * Handles in-app purchases for the "Light a Candle" feature.
+ * 
+ * Flow: purchase → acknowledge → (after 24h) consume
  */
 import { Capacitor, registerPlugin } from '@capacitor/core';
 
@@ -10,8 +12,9 @@ interface PlayBillingPlugin {
   connect(): Promise<{ connected: boolean }>;
   getProductDetails(options: { productId: string }): Promise<ProductDetails>;
   purchase(options: { productId: string }): Promise<PurchaseResult>;
+  acknowledgePurchase(options: { purchaseToken: string }): Promise<{ acknowledged: boolean }>;
   consumePurchase(options: { purchaseToken: string }): Promise<{ consumed: boolean }>;
-  getPendingPurchases(): Promise<{ purchases: PurchaseResult[] }>;
+  getOwnedPurchases(): Promise<{ purchases: OwnedPurchase[] }>;
 }
 
 export interface ProductDetails {
@@ -28,21 +31,24 @@ export interface PurchaseResult {
   orderId: string;
   productId: string;
   purchaseTime: number;
-  state: 'PURCHASED' | 'PENDING';
+  state: 'PURCHASED' | 'PENDING' | 'ITEM_ALREADY_OWNED';
+  isAcknowledged?: boolean;
+}
+
+export interface OwnedPurchase {
+  purchaseToken: string;
+  orderId: string;
+  productId: string;
+  purchaseTime: number;
+  isAcknowledged: boolean;
 }
 
 const PlayBilling = registerPlugin<PlayBillingPlugin>('PlayBilling');
 
-/**
- * Check if we're running on a native Android platform.
- */
 export function isNativeAndroid(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 }
 
-/**
- * Initialize the billing client connection.
- */
 export async function connectBilling(): Promise<boolean> {
   if (!isNativeAndroid()) return false;
   try {
@@ -54,9 +60,6 @@ export async function connectBilling(): Promise<boolean> {
   }
 }
 
-/**
- * Get product details for the candle product.
- */
 export async function getCandleProductDetails(): Promise<ProductDetails | null> {
   if (!isNativeAndroid()) return null;
   try {
@@ -67,16 +70,20 @@ export async function getCandleProductDetails(): Promise<ProductDetails | null> 
   }
 }
 
-/**
- * Initiate a purchase for the candle product.
- */
 export async function purchaseCandle(): Promise<PurchaseResult> {
   return await PlayBilling.purchase({ productId: CANDLE_PRODUCT_ID });
 }
 
-/**
- * Consume a purchase so it can be bought again.
- */
+export async function acknowledgePurchase(purchaseToken: string): Promise<boolean> {
+  try {
+    const result = await PlayBilling.acknowledgePurchase({ purchaseToken });
+    return result.acknowledged;
+  } catch (error) {
+    console.error('[PlayBilling] Failed to acknowledge purchase:', error);
+    return false;
+  }
+}
+
 export async function consumePurchase(purchaseToken: string): Promise<boolean> {
   try {
     const result = await PlayBilling.consumePurchase({ purchaseToken });
@@ -88,15 +95,15 @@ export async function consumePurchase(purchaseToken: string): Promise<boolean> {
 }
 
 /**
- * Get any pending/unacknowledged purchases for retry.
+ * Get all owned (purchased but not consumed) items.
  */
-export async function getPendingPurchases(): Promise<PurchaseResult[]> {
+export async function getOwnedPurchases(): Promise<OwnedPurchase[]> {
   if (!isNativeAndroid()) return [];
   try {
-    const result = await PlayBilling.getPendingPurchases();
+    const result = await PlayBilling.getOwnedPurchases();
     return result.purchases || [];
   } catch (error) {
-    console.error('[PlayBilling] Failed to get pending purchases:', error);
+    console.error('[PlayBilling] Failed to get owned purchases:', error);
     return [];
   }
 }
