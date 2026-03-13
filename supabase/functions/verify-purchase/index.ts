@@ -10,9 +10,8 @@ const corsHeaders = {
 /**
  * Edge function to verify Google Play purchases server-side.
  * 
- * For MVP: validates the purchase data and records the candle.
- * For production: integrate Google Play Developer API with service account
- * credentials to verify the purchase token with Google servers.
+ * Stores purchaseToken and purchaseTime. Does NOT consume the purchase.
+ * Consumption happens client-side after the 24h candle expires.
  */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -20,7 +19,6 @@ serve(async (req) => {
   }
 
   try {
-    // Get auth token
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
@@ -32,7 +30,6 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Create authenticated client to get user
     const supabaseAuth = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -45,7 +42,7 @@ serve(async (req) => {
       );
     }
 
-    const { purchaseToken, orderId, productId, purpose } = await req.json();
+    const { purchaseToken, orderId, productId, purchaseTime, purpose } = await req.json();
 
     if (!purchaseToken || !productId) {
       return new Response(
@@ -61,7 +58,6 @@ serve(async (req) => {
       );
     }
 
-    // Use service role to check and insert
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check for duplicate purchase token
@@ -78,25 +74,24 @@ serve(async (req) => {
       );
     }
 
-    // --- Google Play Developer API Verification ---
-    // To enable full server-side verification:
-    // 1. Create a Google Cloud service account with Play Developer API access
-    // 2. Add GOOGLE_SERVICE_ACCOUNT_KEY secret with the JSON key
-    // 3. Uncomment the verification code below
-    //
-    // const serviceAccountKey = JSON.parse(Deno.env.get("GOOGLE_SERVICE_ACCOUNT_KEY") || "{}");
-    // const packageName = "app.lovable.ee3834849f11481bad7f08d619b104bd";
-    // const verifyUrl = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/purchases/products/${productId}/tokens/${purchaseToken}`;
-    // const accessToken = await getAccessToken(serviceAccountKey);
-    // const verifyResponse = await fetch(verifyUrl, {
-    //   headers: { Authorization: `Bearer ${accessToken}` },
-    // });
-    // const verifyData = await verifyResponse.json();
-    // if (verifyData.purchaseState !== 0) {
-    //   return new Response(JSON.stringify({ error: "Purchase not valid" }), { status: 400 });
-    // }
+    // Check that user doesn't already have an active candle
+    const { data: activeCandle } = await supabaseAdmin
+      .from("candle_purchases")
+      .select("id, expires_at")
+      .eq("user_id", user.id)
+      .eq("payment_status", "completed")
+      .gt("expires_at", new Date().toISOString())
+      .limit(1)
+      .maybeSingle();
 
-    // Record the candle purchase
+    if (activeCandle) {
+      return new Response(
+        JSON.stringify({ error: "User already has an active candle", candleId: activeCandle.id }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Record the candle purchase with purchaseToken and purchaseTime
     const now = new Date().toISOString();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 

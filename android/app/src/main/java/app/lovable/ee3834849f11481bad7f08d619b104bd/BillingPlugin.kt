@@ -11,6 +11,8 @@ import com.getcapacitor.annotation.CapacitorPlugin
 /**
  * Capacitor plugin for Google Play Billing Library.
  * Handles consumable in-app purchases for the "Light a Candle" feature.
+ *
+ * Flow: purchase → acknowledge → (after 24h) consume
  */
 @CapacitorPlugin(name = "PlayBilling")
 class BillingPlugin : Plugin(), PurchasesUpdatedListener {
@@ -32,9 +34,6 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
             .build()
     }
 
-    /**
-     * Connect to Google Play Billing service.
-     */
     @PluginMethod
     fun connect(call: PluginCall) {
         Log.d(TAG, "connect called")
@@ -60,9 +59,6 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
         })
     }
 
-    /**
-     * Query product details for a given product ID.
-     */
     @PluginMethod
     fun getProductDetails(call: PluginCall) {
         val productId = call.getString("productId") ?: run {
@@ -101,9 +97,6 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
         }
     }
 
-    /**
-     * Launch the purchase flow for a given product ID.
-     */
     @PluginMethod
     fun purchase(call: PluginCall) {
         val productId = call.getString("productId") ?: run {
@@ -114,7 +107,6 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
         Log.d(TAG, "purchase: $productId")
         pendingPurchaseCall = call
 
-        // First query the product details
         val productList = listOf(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(productId)
@@ -157,7 +149,36 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
     }
 
     /**
+     * Acknowledge a purchase (required within 3 days or Google refunds it).
+     * Does NOT consume — item remains owned until consumed.
+     */
+    @PluginMethod
+    fun acknowledgePurchase(call: PluginCall) {
+        val purchaseToken = call.getString("purchaseToken") ?: run {
+            call.reject("purchaseToken is required")
+            return
+        }
+
+        Log.d(TAG, "acknowledgePurchase")
+
+        val params = AcknowledgePurchaseParams.newBuilder()
+            .setPurchaseToken(purchaseToken)
+            .build()
+
+        billingClient.acknowledgePurchase(params) { billingResult ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Log.d(TAG, "Purchase acknowledged successfully")
+                call.resolve(JSObject().put("acknowledged", true))
+            } else {
+                Log.e(TAG, "Failed to acknowledge purchase: ${billingResult.debugMessage}")
+                call.reject("Failed to acknowledge purchase: ${billingResult.debugMessage}")
+            }
+        }
+    }
+
+    /**
      * Consume a purchase (mark it as consumed so it can be purchased again).
+     * Should only be called after the candle has expired (24h).
      */
     @PluginMethod
     fun consumePurchase(call: PluginCall) {
@@ -184,11 +205,11 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
     }
 
     /**
-     * Query pending/unacknowledged purchases to handle restoring or retrying.
+     * Query all owned (purchased but not consumed) items.
      */
     @PluginMethod
-    fun getPendingPurchases(call: PluginCall) {
-        Log.d(TAG, "getPendingPurchases")
+    fun getOwnedPurchases(call: PluginCall) {
+        Log.d(TAG, "getOwnedPurchases")
 
         billingClient.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder()
@@ -198,13 +219,14 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 val result = JSObject()
                 val purchases = purchaseList
-                    .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
+                    .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
                     .map { purchase ->
                         JSObject().apply {
                             put("purchaseToken", purchase.purchaseToken)
                             put("orderId", purchase.orderId ?: "")
                             put("productId", purchase.products.firstOrNull() ?: "")
                             put("purchaseTime", purchase.purchaseTime)
+                            put("isAcknowledged", purchase.isAcknowledged)
                         }
                     }
                 result.put("purchases", purchases)
@@ -215,9 +237,6 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
         }
     }
 
-    /**
-     * Called by Google Play when a purchase is updated (completed, pending, failed).
-     */
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
         val call = pendingPurchaseCall
         pendingPurchaseCall = null
@@ -235,6 +254,7 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
                             result.put("productId", purchase.products.firstOrNull() ?: "")
                             result.put("purchaseTime", purchase.purchaseTime)
                             result.put("state", "PURCHASED")
+                            result.put("isAcknowledged", purchase.isAcknowledged)
                             call?.resolve(result)
                         }
                         Purchase.PurchaseState.PENDING -> {
@@ -257,8 +277,10 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
                 call?.reject("Purchase cancelled by user", "USER_CANCELED")
             }
             BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                Log.w(TAG, "Item already owned - needs consumption")
-                call?.reject("Item already owned. Please wait.", "ITEM_ALREADY_OWNED")
+                Log.w(TAG, "Item already owned — returning ITEM_ALREADY_OWNED")
+                val result = JSObject()
+                result.put("state", "ITEM_ALREADY_OWNED")
+                call?.resolve(result)
             }
             else -> {
                 Log.e(TAG, "Purchase error: ${billingResult.responseCode} - ${billingResult.debugMessage}")
