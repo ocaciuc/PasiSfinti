@@ -32,6 +32,7 @@ import {
   getOwnedPurchases,
   type ProductDetails,
   type PurchaseResult,
+  type OwnedPurchase,
 } from "@/lib/play-billing";
 
 interface Candle {
