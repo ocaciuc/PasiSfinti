@@ -502,7 +502,7 @@ const CandlePage = () => {
           await consumePurchase(purchaseToken);
         } else {
           // Need to get the token from Google Play
-          const ownedList = await getOwnedPurchases();
+          const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
           for (const p of ownedList) {
             if (p.productId === "light_candle_5ron") {
               await consumePurchase(p.purchaseToken);
