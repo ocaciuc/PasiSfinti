@@ -299,10 +299,24 @@ const CandlePage = () => {
         return;
       }
 
-      if (isNativeAndroid() && billingReady) {
+      if (isNativeAndroid()) {
+        if (!billingReady) {
+          const connectedNow = await connectBilling();
+          setBillingReady(connectedNow);
+
+          if (!connectedNow) {
+            toast({
+              title: "Serviciul Google Play nu este disponibil",
+              description: "Verifică conexiunea și încearcă din nou.",
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+
         // Check if user already owns the item (from a previous unfinished flow)
-        const owned = await getOwnedPurchases();
-        const existingOwned = owned.find(p => p.productId === "light_candle_5ron");
+        const owned = normalizeOwnedPurchases(await getOwnedPurchases());
+        const existingOwned = owned.find((p) => p.productId === "light_candle_5ron");
 
         if (existingOwned) {
           // Item already owned — restore candle state instead of showing error
