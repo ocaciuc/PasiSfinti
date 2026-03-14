@@ -134,7 +134,7 @@ const CandlePage = () => {
    */
   const restoreOwnedPurchases = async () => {
     try {
-      const owned = await getOwnedPurchases();
+      const owned = normalizeOwnedPurchases(await getOwnedPurchases());
       for (const purchase of owned) {
         if (purchase.productId !== "light_candle_5ron") continue;
 
