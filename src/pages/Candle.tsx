@@ -212,6 +212,12 @@ const CandlePage = () => {
   };
 
   const verifyAndRecordPurchase = async (purchase: PurchaseResult, purpose: string) => {
+    console.log("[Candle] Calling verify-purchase with:", {
+      purchaseToken: purchase.purchaseToken?.substring(0, 20) + "...",
+      orderId: purchase.orderId,
+      productId: purchase.productId,
+    });
+
     const { data, error } = await supabase.functions.invoke("verify-purchase", {
       body: {
         purchaseToken: purchase.purchaseToken,
@@ -222,11 +228,16 @@ const CandlePage = () => {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error("[Candle] verify-purchase error:", error);
+      throw error;
+    }
     if (!data?.success && !data?.candle) {
+      console.error("[Candle] verify-purchase unexpected response:", data);
       throw new Error(data?.error || "Verification failed");
     }
 
+    console.log("[Candle] verify-purchase success, candle:", data.candle?.id);
     return data.candle;
   };
 
