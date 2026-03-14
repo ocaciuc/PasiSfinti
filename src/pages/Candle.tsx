@@ -32,6 +32,7 @@ import {
   getOwnedPurchases,
   type ProductDetails,
   type PurchaseResult,
+  type OwnedPurchase,
 } from "@/lib/play-billing";
 
 interface Candle {
@@ -41,6 +42,22 @@ interface Candle {
   purpose: string | null;
   purchase_token?: string | null;
 }
+
+const normalizeOwnedPurchases = (owned: unknown): OwnedPurchase[] => {
+  if (!Array.isArray(owned)) return [];
+
+  return owned.filter((purchase): purchase is OwnedPurchase => {
+    if (!purchase || typeof purchase !== "object") return false;
+
+    const candidate = purchase as Partial<OwnedPurchase>;
+    return (
+      typeof candidate.purchaseToken === "string" &&
+      typeof candidate.productId === "string" &&
+      typeof candidate.purchaseTime === "number" &&
+      typeof candidate.isAcknowledged === "boolean"
+    );
+  });
+};
 
 const CandlePage = () => {
   const { toast } = useToast();
@@ -117,7 +134,7 @@ const CandlePage = () => {
    */
   const restoreOwnedPurchases = async () => {
     try {
-      const owned = await getOwnedPurchases();
+      const owned = normalizeOwnedPurchases(await getOwnedPurchases());
       for (const purchase of owned) {
         if (purchase.productId !== "light_candle_5ron") continue;
 
@@ -282,10 +299,24 @@ const CandlePage = () => {
         return;
       }
 
-      if (isNativeAndroid() && billingReady) {
+      if (isNativeAndroid()) {
+        if (!billingReady) {
+          const connectedNow = await connectBilling();
+          setBillingReady(connectedNow);
+
+          if (!connectedNow) {
+            toast({
+              title: "Serviciul Google Play nu este disponibil",
+              description: "Verifică conexiunea și încearcă din nou.",
+              variant: "destructive",
+            });
+            return;
+          }
+        }
+
         // Check if user already owns the item (from a previous unfinished flow)
-        const owned = await getOwnedPurchases();
-        const existingOwned = owned.find(p => p.productId === "light_candle_5ron");
+        const owned = normalizeOwnedPurchases(await getOwnedPurchases());
+        const existingOwned = owned.find((p) => p.productId === "light_candle_5ron");
 
         if (existingOwned) {
           // Item already owned — restore candle state instead of showing error
@@ -471,7 +502,7 @@ const CandlePage = () => {
           await consumePurchase(purchaseToken);
         } else {
           // Need to get the token from Google Play
-          const ownedList = await getOwnedPurchases();
+          const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
           for (const p of ownedList) {
             if (p.productId === "light_candle_5ron") {
               await consumePurchase(p.purchaseToken);

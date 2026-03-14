@@ -101,7 +101,19 @@ export async function getOwnedPurchases(): Promise<OwnedPurchase[]> {
   if (!isNativeAndroid()) return [];
   try {
     const result = await PlayBilling.getOwnedPurchases();
-    return result.purchases || [];
+    const purchases = Array.isArray(result?.purchases) ? result.purchases : [];
+
+    return purchases.filter((purchase): purchase is OwnedPurchase => {
+      if (!purchase || typeof purchase !== 'object') return false;
+
+      const candidate = purchase as Partial<OwnedPurchase>;
+      return (
+        typeof candidate.purchaseToken === 'string' &&
+        typeof candidate.productId === 'string' &&
+        typeof candidate.purchaseTime === 'number' &&
+        typeof candidate.isAcknowledged === 'boolean'
+      );
+    });
   } catch (error) {
     console.error('[PlayBilling] Failed to get owned purchases:', error);
     return [];
