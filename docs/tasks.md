@@ -374,6 +374,10 @@
     - Consumption only happens after 24h candle expiry (client-side on timer)
     - Removed consumeAllPending() — no automatic consumption
     - On app launch: restoreOwnedPurchases() checks owned items and syncs with Supabase
+  - [x] Hardened Android candle purchase launch flow
+    - Added defensive normalization for owned purchases payload before `.find()` / iteration
+    - Reconnects Google Play Billing at confirm-time if the billing service is temporarily disconnected
+    - Shows specific Google Play availability toast instead of generic "Nu s-a putut aprinde lumânarea" for this case
 
 ### Deferred to Post-MVP:
 - [ ] Real-time queue tracker for pilgrimages
