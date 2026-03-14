@@ -43,6 +43,22 @@ interface Candle {
   purchase_token?: string | null;
 }
 
+const normalizeOwnedPurchases = (owned: unknown): OwnedPurchase[] => {
+  if (!Array.isArray(owned)) return [];
+
+  return owned.filter((purchase): purchase is OwnedPurchase => {
+    if (!purchase || typeof purchase !== "object") return false;
+
+    const candidate = purchase as Partial<OwnedPurchase>;
+    return (
+      typeof candidate.purchaseToken === "string" &&
+      typeof candidate.productId === "string" &&
+      typeof candidate.purchaseTime === "number" &&
+      typeof candidate.isAcknowledged === "boolean"
+    );
+  });
+};
+
 const CandlePage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
