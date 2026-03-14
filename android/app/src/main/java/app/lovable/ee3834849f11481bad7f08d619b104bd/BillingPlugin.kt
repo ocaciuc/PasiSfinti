@@ -34,6 +34,22 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
             .build()
     }
 
+    /**
+     * Recreate the BillingClient to avoid "Service not registered" crashes
+     * when calling startConnection on a stale/disconnected client.
+     */
+    private fun ensureFreshBillingClient() {
+        try {
+            billingClient.endConnection()
+        } catch (e: Exception) {
+            Log.w(TAG, "endConnection cleanup exception (safe to ignore): ${e.message}")
+        }
+        billingClient = BillingClient.newBuilder(context)
+            .setListener(this)
+            .enablePendingPurchases()
+            .build()
+    }
+
     @PluginMethod
     fun connect(call: PluginCall) {
         Log.d(TAG, "connect called")
@@ -41,6 +57,9 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
             call.resolve(JSObject().put("connected", true))
             return
         }
+
+        // Recreate to avoid stale service binding crashes
+        ensureFreshBillingClient()
 
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
