@@ -80,11 +80,11 @@ const AppInitializer = ({ children }: AppInitializerProps) => {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
-          // Initialize push notifications for authenticated users
+          // Initialize push notifications for authenticated users (safe to call multiple times - listeners are guarded)
           initPushNotifications(session.user.id, (path) => {
             console.log("[AppInitializer] Push navigation to:", path);
             navigate(path, { replace: true });
-          });
+          }).catch((err) => console.error("[AppInitializer] Push init failed:", err));
 
           // User is authenticated
           const isWelcomeOrAuth = currentPath === "/" || currentPath === "/auth";
