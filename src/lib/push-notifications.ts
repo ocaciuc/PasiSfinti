@@ -7,6 +7,9 @@ const getPushNotifications = async () => {
   return mod.PushNotifications;
 };
 
+// Track whether listeners have already been attached
+let listenersRegistered = false;
+
 /**
  * Initialize push notifications on native platforms.
  * Requests permission, registers for push, and stores the FCM token.
@@ -17,55 +20,71 @@ export const initPushNotifications = async (
   onNavigate?: (path: string) => void
 ) => {
   if (!Capacitor.isNativePlatform()) {
-    console.log("Push notifications only available on native platforms");
+    console.log("[Push] Skipped — not a native platform");
     return;
   }
+
+  console.log("[Push] Initializing for user:", userId);
 
   try {
     const PushNotifications = await getPushNotifications();
 
     // Check current permission status
     let permStatus = await PushNotifications.checkPermissions();
+    console.log("[Push] Current permission status:", permStatus.receive);
 
     if (permStatus.receive === "prompt") {
+      console.log("[Push] Requesting permissions...");
       permStatus = await PushNotifications.requestPermissions();
+      console.log("[Push] Permission result:", permStatus.receive);
     }
 
     if (permStatus.receive !== "granted") {
-      console.log("Push notification permission not granted");
+      console.warn("[Push] Permission NOT granted:", permStatus.receive);
       return;
     }
 
-    // Register for push notifications
+    // Only attach listeners once to avoid duplicates
+    if (!listenersRegistered) {
+      console.log("[Push] Attaching listeners (first time)");
+
+      // Listen for registration success
+      PushNotifications.addListener("registration", async (token) => {
+        console.log("[Push] ✅ FCM Token received:", token.value.substring(0, 20) + "...");
+        await storePushToken(userId, token.value);
+      });
+
+      // Listen for registration errors
+      PushNotifications.addListener("registrationError", (err) => {
+        console.error("[Push] ❌ Registration error:", JSON.stringify(err));
+      });
+
+      // Listen for push notifications received while app is in foreground
+      PushNotifications.addListener("pushNotificationReceived", (notification) => {
+        console.log("[Push] 📩 Notification received in foreground:", JSON.stringify(notification));
+      });
+
+      // Listen for push notification action (user tapped the notification)
+      PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
+        console.log("[Push] 👆 Notification tapped:", JSON.stringify(action));
+        const data = action.notification.data;
+        if (data?.route && onNavigate) {
+          console.log("[Push] Navigating to:", data.route);
+          onNavigate(data.route);
+        }
+      });
+
+      listenersRegistered = true;
+    } else {
+      console.log("[Push] Listeners already registered, skipping");
+    }
+
+    // Register for push notifications (triggers "registration" event)
+    console.log("[Push] Calling register()...");
     await PushNotifications.register();
-
-    // Listen for registration success
-    PushNotifications.addListener("registration", async (token) => {
-      console.log("FCM Token received:", token.value);
-      await storePushToken(userId, token.value);
-    });
-
-    // Listen for registration errors
-    PushNotifications.addListener("registrationError", (err) => {
-      console.error("Push registration error:", err.error);
-    });
-
-    // Listen for push notifications received while app is in foreground
-    PushNotifications.addListener("pushNotificationReceived", (notification) => {
-      console.log("Push notification received:", notification);
-    });
-
-    // Listen for push notification action (user tapped the notification)
-    PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
-      console.log("Push notification action:", action);
-      const data = action.notification.data;
-      if (data?.route && onNavigate) {
-        console.log("[Push] Navigating to:", data.route);
-        onNavigate(data.route);
-      }
-    });
+    console.log("[Push] register() completed");
   } catch (error) {
-    console.error("Error initializing push notifications:", error);
+    console.error("[Push] ❌ Init error:", error);
   }
 };
 
@@ -73,9 +92,10 @@ export const initPushNotifications = async (
  * Store or update the FCM token in the push_tokens table.
  */
 const storePushToken = async (userId: string, token: string) => {
+  console.log("[Push] Storing token for user:", userId);
   try {
-    const { error } = await supabase
-      .from("push_tokens" as any)
+    const { data, error } = await supabase
+      .from("push_tokens")
       .upsert(
         {
           user_id: userId,
@@ -87,12 +107,12 @@ const storePushToken = async (userId: string, token: string) => {
       );
 
     if (error) {
-      console.error("Error storing push token:", error);
+      console.error("[Push] ❌ Token store error:", JSON.stringify(error));
     } else {
-      console.log("Push token stored successfully");
+      console.log("[Push] ✅ Token stored successfully");
     }
   } catch (err) {
-    console.error("Error in storePushToken:", err);
+    console.error("[Push] ❌ storePushToken exception:", err);
   }
 };
 
@@ -103,11 +123,13 @@ export const removePushToken = async (userId: string) => {
   if (!Capacitor.isNativePlatform()) return;
 
   try {
+    console.log("[Push] Removing tokens for user:", userId);
     await supabase
-      .from("push_tokens" as any)
+      .from("push_tokens")
       .delete()
       .eq("user_id", userId);
+    console.log("[Push] ✅ Tokens removed");
   } catch (err) {
-    console.error("Error removing push token:", err);
+    console.error("[Push] ❌ Remove token error:", err);
   }
 };
