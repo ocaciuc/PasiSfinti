@@ -378,6 +378,14 @@
     - Added defensive normalization for owned purchases payload before `.find()` / iteration
     - Reconnects Google Play Billing at confirm-time if the billing service is temporarily disconnected
     - Shows specific Google Play availability toast instead of generic "Nu s-a putut aprinde lumânarea" for this case
+  - [x] Push notifications debugging & hardening
+    - Fixed duplicate listener registration (listeners now attached only once)
+    - Removed `as any` cast on push_tokens table
+    - Added comprehensive `[Push]` logging for: permission status, token registration, store result, notification received, notification tapped
+    - Created `test-push` Edge Function for manual notification testing
+    - Enhanced `send-push` Edge Function with detailed logging
+    - ROOT CAUSE identified: push_tokens table was empty (device tokens never stored)
+    - Requires on-device testing: google-services.json must be in android/app/, Firebase configured in Gradle
 
 ### Deferred to Post-MVP:
 - [ ] Real-time queue tracker for pilgrimages
