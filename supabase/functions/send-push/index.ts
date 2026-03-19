@@ -32,7 +32,6 @@ async function getAccessToken(serviceAccount: any): Promise<string> {
   const payloadB64 = encode(payload);
   const unsignedToken = `${headerB64}.${payloadB64}`;
 
-  // Import the private key
   const pemContents = serviceAccount.private_key
     .replace(/-----BEGIN PRIVATE KEY-----/, "")
     .replace(/-----END PRIVATE KEY-----/, "")
@@ -60,7 +59,6 @@ async function getAccessToken(serviceAccount: any): Promise<string> {
 
   const jwt = `${unsignedToken}.${signatureB64}`;
 
-  // Exchange JWT for access token
   const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -71,6 +69,7 @@ async function getAccessToken(serviceAccount: any): Promise<string> {
   if (!tokenData.access_token) {
     throw new Error("Failed to get access token: " + JSON.stringify(tokenData));
   }
+  console.log("[send-push] ✅ FCM access token obtained");
   return tokenData.access_token;
 }
 
@@ -105,6 +104,8 @@ async function sendFcmMessage(
     message.message.data = data;
   }
 
+  console.log(`[send-push] Sending to token ${token.substring(0, 15)}... title="${title}"`);
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -116,9 +117,12 @@ async function sendFcmMessage(
 
   if (!res.ok) {
     const err = await res.text();
-    console.error(`FCM send failed for token ${token.substring(0, 10)}...:`, err);
+    console.error(`[send-push] ❌ FCM failed for token ${token.substring(0, 15)}...:`, err);
     return false;
   }
+
+  const result = await res.json();
+  console.log(`[send-push] ✅ FCM success for token ${token.substring(0, 15)}...:`, JSON.stringify(result));
   return true;
 }
 
@@ -130,12 +134,21 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const fcmKeyJson = Deno.env.get("FCM_SERVICE_ACCOUNT_KEY")!;
+    const fcmKeyJson = Deno.env.get("FCM_SERVICE_ACCOUNT_KEY");
+
+    if (!fcmKeyJson) {
+      console.error("[send-push] ❌ FCM_SERVICE_ACCOUNT_KEY secret is not set!");
+      return new Response(
+        JSON.stringify({ error: "FCM_SERVICE_ACCOUNT_KEY not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const serviceAccount = JSON.parse(fcmKeyJson);
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const { user_ids, title, body, data } = await req.json();
+    console.log(`[send-push] Request: user_ids=${JSON.stringify(user_ids)}, title="${title}"`);
 
     if (!user_ids || !title || !body) {
       return new Response(
@@ -151,12 +164,15 @@ Deno.serve(async (req) => {
       .in("user_id", user_ids);
 
     if (tokensError) {
+      console.error("[send-push] ❌ Token fetch error:", tokensError.message);
       throw new Error("Error fetching tokens: " + tokensError.message);
     }
 
+    console.log(`[send-push] Found ${tokens?.length ?? 0} token(s) for ${user_ids.length} user(s)`);
+
     if (!tokens || tokens.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, sent: 0, message: "No push tokens found" }),
+        JSON.stringify({ success: true, sent: 0, message: "No push tokens found for users" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -182,6 +198,7 @@ Deno.serve(async (req) => {
       } else {
         failed++;
         // Remove invalid tokens
+        console.log(`[send-push] Removing invalid token for user ${tokenRecord.user_id}`);
         await supabase
           .from("push_tokens")
           .delete()
@@ -189,12 +206,14 @@ Deno.serve(async (req) => {
       }
     }
 
+    console.log(`[send-push] Done: sent=${sent}, failed=${failed}`);
+
     return new Response(
       JSON.stringify({ success: true, sent, failed }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Send push error:", error);
+    console.error("[send-push] ❌ Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
