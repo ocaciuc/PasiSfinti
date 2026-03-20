@@ -319,9 +319,39 @@ const CandlePage = () => {
         const existingOwned = owned.find((p) => p.productId === "light_candle_5ron");
 
         if (existingOwned) {
-          // Item already owned — restore candle state instead of showing error
-          await handleItemAlreadyOwned(existingOwned.purchaseToken, existingOwned.purchaseTime, user.id);
-          return;
+          // Check if there's an active candle for this purchase
+          const { data: existingCandle } = await supabase
+            .from("candle_purchases")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("payment_status", "completed")
+            .gt("expires_at", new Date().toISOString())
+            .limit(1)
+            .maybeSingle();
+
+          if (existingCandle) {
+            setActiveCandle(existingCandle);
+            toast({
+              title: "Ai deja o lumânare aprinsă",
+              description: "Poți aprinde alta după ce aceasta se stinge.",
+            });
+            return;
+          }
+
+          // No active candle — consume the stale purchase first, then continue with new purchase
+          console.log("[Candle] Consuming stale owned purchase before new purchase");
+          const consumed = await consumePurchase(existingOwned.purchaseToken);
+          if (!consumed) {
+            console.error("[Candle] Failed to consume stale purchase");
+            toast({
+              title: "Eroare",
+              description: "Nu s-a putut elibera achiziția anterioară. Încearcă din nou.",
+              variant: "destructive",
+            });
+            return;
+          }
+          console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
+          // Continue below to create pending record and initiate new purchase
         }
 
         // Create pending record BEFORE payment
@@ -384,7 +414,18 @@ const CandlePage = () => {
             .update({ payment_status: "failed", expires_at: new Date().toISOString() })
             .eq("id", pendingCandle.id);
 
-          await handleItemAlreadyOwned(purchaseResult.purchaseToken, purchaseResult.purchaseTime, user.id);
+          // Consume the stale purchase
+          console.log("[Candle] ITEM_ALREADY_OWNED during purchase, consuming stale item");
+          const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
+          for (const p of ownedList) {
+            if (p.productId === "light_candle_5ron") {
+              await consumePurchase(p.purchaseToken);
+            }
+          }
+          toast({
+            title: "Achiziție anterioară eliberată",
+            description: "Te rugăm să încerci din nou să aprinzi lumânarea.",
+          });
           return;
         }
 
