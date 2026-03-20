@@ -414,7 +414,18 @@ const CandlePage = () => {
             .update({ payment_status: "failed", expires_at: new Date().toISOString() })
             .eq("id", pendingCandle.id);
 
-          await handleItemAlreadyOwned(purchaseResult.purchaseToken, purchaseResult.purchaseTime, user.id);
+          // Consume the stale purchase
+          console.log("[Candle] ITEM_ALREADY_OWNED during purchase, consuming stale item");
+          const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
+          for (const p of ownedList) {
+            if (p.productId === "light_candle_5ron") {
+              await consumePurchase(p.purchaseToken);
+            }
+          }
+          toast({
+            title: "Achiziție anterioară eliberată",
+            description: "Te rugăm să încerci din nou să aprinzi lumânarea.",
+          });
           return;
         }
 
