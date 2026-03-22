@@ -228,6 +228,50 @@ const CandlePage = () => {
     }
   };
 
+  const getLatestCompletedCandleWithToken = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("candle_purchases")
+      .select("id, lit_at, expires_at, purpose, purchase_token")
+      .eq("user_id", userId)
+      .eq("payment_status", "completed")
+      .not("purchase_token", "is", null)
+      .order("lit_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[Candle] Failed to fetch latest completed candle:", error);
+      return null;
+    }
+
+    return data;
+  };
+
+  const releaseExpiredOwnedPurchaseFromDatabase = async (userId: string): Promise<boolean> => {
+    const latestCompletedCandle = await getLatestCompletedCandleWithToken(userId);
+
+    if (!latestCompletedCandle?.purchase_token) {
+      return false;
+    }
+
+    const isStillActive = new Date(latestCompletedCandle.expires_at) > new Date();
+    if (isStillActive) {
+      setActiveCandle(latestCompletedCandle);
+      return false;
+    }
+
+    console.log("[Candle] Releasing expired purchase from stored token:", latestCompletedCandle.purchase_token);
+    const consumed = await consumePurchase(latestCompletedCandle.purchase_token);
+
+    if (!consumed) {
+      console.error("[Candle] Failed to consume stored expired purchase token");
+      return false;
+    }
+
+    await fetchCandles();
+    return true;
+  };
+
   const verifyAndRecordPurchase = async (purchase: PurchaseResult, purpose: string) => {
     console.log("[Candle] Calling verify-purchase with:", {
       purchaseToken: purchase.purchaseToken?.substring(0, 20) + "...",
@@ -352,6 +396,16 @@ const CandlePage = () => {
           }
           console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
           // Continue below to create pending record and initiate new purchase
+        } else {
+          const releasedFromDatabase = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
+
+          if (releasedFromDatabase) {
+            toast({
+              title: "Achiziție anterioară eliberată",
+              description: "Poți aprinde acum o lumânare nouă.",
+            });
+            return;
+          }
         }
 
         // Create pending record BEFORE payment
@@ -417,14 +471,25 @@ const CandlePage = () => {
           // Consume the stale purchase
           console.log("[Candle] ITEM_ALREADY_OWNED during purchase, consuming stale item");
           const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
+          let released = false;
+
           for (const p of ownedList) {
             if (p.productId === "light_candle_5ron") {
-              await consumePurchase(p.purchaseToken);
+              released = await consumePurchase(p.purchaseToken);
+              if (released) break;
             }
           }
+
+          if (!released) {
+            released = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
+          }
+
           toast({
-            title: "Achiziție anterioară eliberată",
-            description: "Te rugăm să încerci din nou să aprinzi lumânarea.",
+            title: released ? "Achiziție anterioară eliberată" : "Achiziția anterioară nu a putut fi eliberată",
+            description: released
+              ? "Poți aprinde acum o lumânare nouă."
+              : "Te rugăm să încerci din nou. Dacă problema persistă, trimite logurile noi.",
+            variant: released ? "default" : "destructive",
           });
           return;
         }
