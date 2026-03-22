@@ -257,7 +257,8 @@
 - [x] Insert candle purchase to database
 - [x] 24-hour countdown timer
 - [x] Candle history display
-- [ ] Hotfix: resolve stale Google Play owned purchase after candle expiry (`ITEM_ALREADY_OWNED` still blocks a new purchase)
+- [x] Hotfix: resolve stale Google Play owned purchase after candle expiry (`ITEM_ALREADY_OWNED` still blocks a new purchase)
+- [x] Hotfix: fallback to consume expired stored `purchase_token` from Supabase when `getOwnedPurchases()` does not return the stale Google Play item
 - [ ] Hotfix: add stricter Android billing logs/validation for `getOwnedPurchases()` and `consumePurchase()` before retrying purchase
 
 ---
