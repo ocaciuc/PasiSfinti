@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
       }
 
       // Send push notifications via send-push function
+      const pushSecret = Deno.env.get("SEND_PUSH_SECRET") || "";
       for (const [userId, notif] of userNotifs) {
         try {
           await supabase.functions.invoke("send-push", {
@@ -71,6 +72,9 @@ Deno.serve(async (req) => {
               title: notif.title,
               body: notif.body,
               data: notif.data,
+            },
+            headers: {
+              "x-send-push-secret": pushSecret,
             },
           });
         } catch (pushErr) {
