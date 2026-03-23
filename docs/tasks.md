@@ -332,6 +332,8 @@
 - [x] Diagnosed empty `push_tokens` issue: `send-push` works, but no device token is ever registered/saved
 - [ ] Add native Firebase Android configuration (`google-services.json` + Gradle Google Services setup) so FCM token registration can succeed
 - [ ] Verify on physical Android device that `[Push] ✅ FCM Token received` appears and `push_tokens` is populated for the authenticated user
+- [ ] Ensure `android/app/google-services.json` exists in the repository used for builds/sync, not only locally in Android Studio
+- [ ] Verify native JS logs after authenticated navigation to `/dashboard` using `adb logcat` or Chrome remote inspect, since Lovable preview logs do not show native-device push registration
 
 ### 8.1 Comprehensive Testing
 - [ ] Test complete user journey
