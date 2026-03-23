@@ -134,7 +134,18 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const sendPushSecret = Deno.env.get("SEND_PUSH_SECRET");
     const fcmKeyJson = Deno.env.get("FCM_SERVICE_ACCOUNT_KEY");
+
+    // Authenticate: require shared secret header
+    const authSecret = req.headers.get("x-send-push-secret");
+    if (!sendPushSecret || authSecret !== sendPushSecret) {
+      console.error("[send-push] ❌ Unauthorized: invalid or missing x-send-push-secret header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!fcmKeyJson) {
       console.error("[send-push] ❌ FCM_SERVICE_ACCOUNT_KEY secret is not set!");
