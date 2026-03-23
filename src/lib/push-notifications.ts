@@ -2,9 +2,13 @@ import { Capacitor } from "@capacitor/core";
 import { supabase } from "@/integrations/supabase/client";
 
 // Dynamically import to avoid Rollup resolution errors on web builds
+// IMPORTANT: We wrap the plugin in an object to avoid the "thenable" trap.
+// Capacitor plugin proxies intercept ALL method calls including .then(),
+// so returning a plugin directly from an async function causes
+// "PushNotifications.then() is not implemented on android" errors.
 const getPushNotifications = async () => {
   const mod = await import("@capacitor/push-notifications");
-  return mod.PushNotifications;
+  return { plugin: mod.PushNotifications };
 };
 
 // Track whether listeners have already been attached
