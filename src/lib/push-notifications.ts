@@ -31,7 +31,7 @@ export const initPushNotifications = async (
   console.log("[Push] Initializing for user:", userId);
 
   try {
-    const PushNotifications = await getPushNotifications();
+    const { plugin: PushNotifications } = await getPushNotifications();
 
     // Check current permission status
     let permStatus = await PushNotifications.checkPermissions();
