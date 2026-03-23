@@ -328,6 +328,11 @@
 ## PHASE 8: TESTING & LAUNCH PREPARATION
 **Priority: HIGH | Status: NOT STARTED**
 
+### Push Notifications Android Hotfix
+- [x] Diagnosed empty `push_tokens` issue: `send-push` works, but no device token is ever registered/saved
+- [ ] Add native Firebase Android configuration (`google-services.json` + Gradle Google Services setup) so FCM token registration can succeed
+- [ ] Verify on physical Android device that `[Push] ✅ FCM Token received` appears and `push_tokens` is populated for the authenticated user
+
 ### 8.1 Comprehensive Testing
 - [ ] Test complete user journey
 - [ ] Test all authentication flows
