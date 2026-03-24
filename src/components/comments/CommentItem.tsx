@@ -344,7 +344,7 @@ CommentItem.displayName = "CommentItem";
 const ReplyItem = memo(({ reply, userId, userBadges, onEdited }: {
   reply: Comment;
   userId: string | null;
-  userBadges: Record<string, Badge | null>;
+  userBadges: Record<string, Badge[]>;
   onEdited: (replyId: string, newContent: string) => void;
 }) => {
   const [editing, setEditing] = useState(false);
