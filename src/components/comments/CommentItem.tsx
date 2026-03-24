@@ -23,7 +23,7 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
 interface CommentItemProps {
   comment: Comment;
   userId: string | null;
-  userBadges: Record<string, Badge | null>;
+  userBadges: Record<string, Badge[]>;
   onReplyAdded: (reply: Comment, parentId: string) => void;
 }
 
