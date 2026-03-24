@@ -397,15 +397,10 @@ const CandlePage = () => {
           console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
           // Continue below to create pending record and initiate new purchase
         } else {
-          const releasedFromDatabase = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
-
-          if (releasedFromDatabase) {
-            toast({
-              title: "Achiziție anterioară eliberată",
-              description: "Poți aprinde acum o lumânare nouă.",
-            });
-            return;
-          }
+          // Try to release any expired purchase stored in database
+          await releaseExpiredOwnedPurchaseFromDatabase(user.id);
+          // If an active candle was restored by the function above, stop here
+          if (activeCandle) return;
         }
 
         // Create pending record BEFORE payment
