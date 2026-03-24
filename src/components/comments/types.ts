@@ -22,7 +22,7 @@
  export interface CommentSectionProps {
    postId: string;
    userId: string | null;
-   userBadges: Record<string, Badge | null>;
+   userBadges: Record<string, Badge[]>;
    onCommentAdded: (comment: Comment, parentCommentId: string | null) => void;
  }
  

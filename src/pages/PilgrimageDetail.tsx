@@ -565,11 +565,11 @@ const PilgrimageDetail = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 flex-wrap">
                               <p className="text-sm font-medium">{post.author_name}</p>
-                              {userBadges[post.user_id] && (
-                                <UserBadge badge={userBadges[post.user_id]!} size="sm" />
-                              )}
+                              {(userBadges[post.user_id] || []).map(badge => (
+                                <UserBadge key={badge.id} badge={badge} size="sm" />
+                              ))}
                             </div>
                             <p className="text-xs text-muted-foreground">{safeFormatDate(post.created_at, "d MMM, HH:mm")}</p>
                           </div>

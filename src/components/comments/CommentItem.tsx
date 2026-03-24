@@ -23,7 +23,7 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
 interface CommentItemProps {
   comment: Comment;
   userId: string | null;
-  userBadges: Record<string, Badge | null>;
+  userBadges: Record<string, Badge[]>;
   onReplyAdded: (reply: Comment, parentId: string) => void;
 }
 
@@ -192,11 +192,11 @@ const CommentItem = memo(({ comment, userId, userBadges, onReplyAdded }: Comment
       <div className="flex items-start gap-2">
         <CommentAvatar src={comment.author_avatar} name={comment.author_name} size="md" />
         <div className="flex-1">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             <p className="text-xs font-medium">{comment.author_name}</p>
-            {userBadges[comment.user_id] && (
-              <UserBadge badge={userBadges[comment.user_id]!} size="sm" />
-            )}
+            {(userBadges[comment.user_id] || []).map(badge => (
+              <UserBadge key={badge.id} badge={badge} size="sm" />
+            ))}
           </div>
           <p className="text-xs text-muted-foreground">
             {safeFormatDate(comment.created_at, "d MMM, HH:mm")}
@@ -344,7 +344,7 @@ CommentItem.displayName = "CommentItem";
 const ReplyItem = memo(({ reply, userId, userBadges, onEdited }: {
   reply: Comment;
   userId: string | null;
-  userBadges: Record<string, Badge | null>;
+  userBadges: Record<string, Badge[]>;
   onEdited: (replyId: string, newContent: string) => void;
 }) => {
   const [editing, setEditing] = useState(false);
@@ -378,11 +378,11 @@ const ReplyItem = memo(({ reply, userId, userBadges, onEdited }: {
     <div className="flex items-start gap-2">
       <CommentAvatar src={reply.author_avatar} name={reply.author_name} size="sm" />
       <div className="flex-1">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           <p className="text-xs font-medium">{reply.author_name}</p>
-          {userBadges[reply.user_id] && (
-            <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
-          )}
+          {(userBadges[reply.user_id] || []).map(badge => (
+            <UserBadge key={badge.id} badge={badge} size="sm" />
+          ))}
         </div>
         <p className="text-xs text-muted-foreground">
           {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
