@@ -28,13 +28,14 @@ Deno.serve(async (req) => {
     }
 
     // After creating in-app notifications, send push notifications
-    // Get recent unread notifications created in the last 5 minutes
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    // Get recent unread notifications created in the last 65 minutes
+    // (cron runs hourly, so we check slightly more than 1 hour to avoid missing any)
+    const windowAgo = new Date(Date.now() - 65 * 60 * 1000).toISOString();
     const { data: recentNotifs } = await supabase
       .from("notifications")
-      .select("user_id, title, message, type, data")
+      .select("id, user_id, title, message, type, data")
       .eq("read", false)
-      .gte("created_at", fiveMinutesAgo)
+      .gte("created_at", windowAgo)
       .in("type", ["pilgrimage_reminder", "candle_expiry"]);
 
     if (recentNotifs && recentNotifs.length > 0) {
