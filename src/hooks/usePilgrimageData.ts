@@ -125,31 +125,29 @@
      };
    });
  
-   // Process badges
-   const badgesMap: Record<string, Badge | null> = {};
-   const userBadgesGroup = new Map<string, any[]>();
- 
-   (allUserBadgesResult.data || []).forEach((ub: any) => {
-     if (!userBadgesGroup.has(ub.user_id)) {
-       userBadgesGroup.set(ub.user_id, []);
-     }
-     if (ub.badges) {
-       userBadgesGroup.get(ub.user_id)!.push(ub.badges);
-     }
-   });
- 
-   userBadgesGroup.forEach((badges, uid) => {
-     if (badges.length > 0) {
-       badges.sort((a, b) => a.priority - b.priority);
-       badgesMap[uid] = badges[0];
-     }
-   });
- 
-   allUserIdsForBadges.forEach((uid) => {
-     if (!badgesMap[uid]) {
-       badgesMap[uid] = null;
-     }
-   });
+  // Process badges - store ALL badges per user
+  const badgesMap: Record<string, Badge[]> = {};
+  const userBadgesGroup = new Map<string, any[]>();
+
+  (allUserBadgesResult.data || []).forEach((ub: any) => {
+    if (!userBadgesGroup.has(ub.user_id)) {
+      userBadgesGroup.set(ub.user_id, []);
+    }
+    if (ub.badges) {
+      userBadgesGroup.get(ub.user_id)!.push(ub.badges);
+    }
+  });
+
+  userBadgesGroup.forEach((badges, uid) => {
+    badges.sort((a, b) => a.priority - b.priority);
+    badgesMap[uid] = badges;
+  });
+
+  allUserIdsForBadges.forEach((uid) => {
+    if (!badgesMap[uid]) {
+      badgesMap[uid] = [];
+    }
+  });
  
    return { posts, isRegistered, userBadges: badgesMap };
  }

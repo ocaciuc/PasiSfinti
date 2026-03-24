@@ -378,11 +378,11 @@ const ReplyItem = memo(({ reply, userId, userBadges, onEdited }: {
     <div className="flex items-start gap-2">
       <CommentAvatar src={reply.author_avatar} name={reply.author_name} size="sm" />
       <div className="flex-1">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-wrap">
           <p className="text-xs font-medium">{reply.author_name}</p>
-          {userBadges[reply.user_id] && (
-            <UserBadge badge={userBadges[reply.user_id]!} size="sm" />
-          )}
+          {(userBadges[reply.user_id] || []).map(badge => (
+            <UserBadge key={badge.id} badge={badge} size="sm" />
+          ))}
         </div>
         <p className="text-xs text-muted-foreground">
           {safeFormatDate(reply.created_at, "d MMM, HH:mm")}
