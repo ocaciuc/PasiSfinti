@@ -123,7 +123,8 @@ const BadgesSection = ({ userId }: BadgesSectionProps) => {
             return (
               <div
                 key={badge.id}
-                className={`relative rounded-xl border p-4 transition-all ${
+                onClick={() => setSelectedBadge(badge)}
+                className={`relative rounded-xl border p-4 transition-all cursor-pointer hover:scale-[1.02] ${
                   earned
                     ? "bg-accent/10 border-accent/30"
                     : "bg-muted/50 border-border opacity-50 grayscale"
