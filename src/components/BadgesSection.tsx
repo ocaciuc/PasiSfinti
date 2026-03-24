@@ -158,9 +158,47 @@ const BadgesSection = ({ userId }: BadgesSectionProps) => {
             );
           })}
         </div>
+
+        <Dialog open={!!selectedBadge} onOpenChange={(open) => !open && setSelectedBadge(null)}>
+          <DialogContent className="max-w-sm">
+            {selectedBadge && (() => {
+              const earned = isEarned(selectedBadge.id);
+              const earnedDate = getEarnedDate(selectedBadge.id);
+              return (
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-center">{selectedBadge.name_ro}</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex flex-col items-center text-center gap-4 py-2">
+                    <div className={`p-4 rounded-full ${earned ? "bg-accent/20" : "bg-muted"}`}>
+                      <BadgeIcon
+                        iconName={selectedBadge.icon_name}
+                        size="lg"
+                        className={earned ? "text-accent" : "text-muted-foreground"}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedBadge.description}
+                    </p>
+                    {earned && earnedDate ? (
+                      <span className="text-xs text-accent font-medium">
+                        Obținută pe {format(new Date(earnedDate), "d MMMM yyyy", { locale: ro })}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic">
+                        Încă nu ai obținut această insignă
+                      </span>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
+};
 };
 
 export default BadgesSection;
