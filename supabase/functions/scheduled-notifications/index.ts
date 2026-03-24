@@ -18,33 +18,44 @@ Deno.serve(async (req) => {
     // Run pilgrimage reminders (3 days before)
     const { error: reminderError } = await supabase.rpc("notify_pilgrimage_reminders");
     if (reminderError) {
-      console.error("Pilgrimage reminders error:", reminderError);
+      console.error("[scheduled-notifications] Pilgrimage reminders error:", reminderError);
+    } else {
+      console.log("[scheduled-notifications] Pilgrimage reminders check completed");
     }
 
     // Run candle expiry notifications
     const { error: candleError } = await supabase.rpc("notify_candle_expiry");
     if (candleError) {
-      console.error("Candle expiry error:", candleError);
+      console.error("[scheduled-notifications] Candle expiry error:", candleError);
+    } else {
+      console.log("[scheduled-notifications] Candle expiry check completed");
     }
 
     // After creating in-app notifications, send push notifications
     // Get recent unread notifications created in the last 65 minutes
     // (cron runs hourly, so we check slightly more than 1 hour to avoid missing any)
     const windowAgo = new Date(Date.now() - 65 * 60 * 1000).toISOString();
-    const { data: recentNotifs } = await supabase
+    const { data: recentNotifs, error: notifError } = await supabase
       .from("notifications")
       .select("id, user_id, title, message, type, data")
       .eq("read", false)
       .gte("created_at", windowAgo)
       .in("type", ["pilgrimage_reminder", "candle_expiry"]);
 
+    if (notifError) {
+      console.error("[scheduled-notifications] Error fetching notifications:", notifError);
+    }
+
     if (recentNotifs && recentNotifs.length > 0) {
+      console.log(`[scheduled-notifications] Found ${recentNotifs.length} notification(s) to push`);
+
       // Group by user for batch sending
       const userNotifs = new Map<string, { title: string; body: string; data?: Record<string, string> }>();
+      const notifIds: string[] = recentNotifs.map((n) => n.id);
+
       for (const n of recentNotifs) {
         // Only send the first notification per user to avoid spam
         if (!userNotifs.has(n.user_id)) {
-          // Determine route based on notification type and data
           const notifData = (n.data || {}) as Record<string, any>;
           let route = "/dashboard";
           if (n.type === "pilgrimage_reminder" && notifData.pilgrimage_id) {
@@ -63,10 +74,21 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Mark these notifications as read so they won't be pushed again on next cron run
+      const { error: markError } = await supabase
+        .from("notifications")
+        .update({ read: true, read_at: new Date().toISOString() })
+        .in("id", notifIds);
+
+      if (markError) {
+        console.error("[scheduled-notifications] Failed to mark notifications as read:", markError);
+      }
+
       // Send push notifications via send-push function
       const pushSecret = Deno.env.get("SEND_PUSH_SECRET") || "";
       for (const [userId, notif] of userNotifs) {
         try {
+          console.log(`[scheduled-notifications] Sending push to user ${userId}: "${notif.title}"`);
           await supabase.functions.invoke("send-push", {
             body: {
               user_ids: [userId],
@@ -79,9 +101,11 @@ Deno.serve(async (req) => {
             },
           });
         } catch (pushErr) {
-          console.error("Push send error for user", userId, pushErr);
+          console.error("[scheduled-notifications] Push send error for user", userId, pushErr);
         }
       }
+    } else {
+      console.log("[scheduled-notifications] No pending notifications to push");
     }
 
     return new Response(
@@ -89,7 +113,7 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Scheduled notifications error:", error);
+    console.error("[scheduled-notifications] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
