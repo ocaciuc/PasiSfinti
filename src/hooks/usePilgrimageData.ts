@@ -60,7 +60,7 @@
  ): Promise<{
    posts: Post[];
    isRegistered: boolean;
-   userBadges: Record<string, Badge | null>;
+   userBadges: Record<string, Badge[]>;
  }> {
     // Fetch enrollment and posts in parallel (profiles fetched after we know user_ids)
     const [userPilgrimagesResult, postsResult] = await Promise.all([
