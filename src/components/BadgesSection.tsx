@@ -199,6 +199,5 @@ const BadgesSection = ({ userId }: BadgesSectionProps) => {
     </Card>
   );
 };
-};
 
 export default BadgesSection;
