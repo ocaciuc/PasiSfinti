@@ -29,6 +29,7 @@ const BadgesSection = ({ userId }: BadgesSectionProps) => {
   const [allBadges, setAllBadges] = useState<Badge[]>([]);
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
   useEffect(() => {
     const fetchBadges = async () => {
