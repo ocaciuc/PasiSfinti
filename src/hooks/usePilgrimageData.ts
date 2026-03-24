@@ -38,7 +38,7 @@
    posts: Post[];
    isRegistered: boolean;
    userId: string | null;
-   userBadges: Record<string, Badge | null>;
+  userBadges: Record<string, Badge[]>;
  }
  
 // No caching — always fetch fresh data for pilgrimage detail pages
