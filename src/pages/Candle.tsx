@@ -264,8 +264,8 @@ const CandlePage = () => {
     const consumed = await consumePurchase(latestCompletedCandle.purchase_token);
 
     if (!consumed) {
-      console.error("[Candle] Failed to consume stored expired purchase token");
-      return false;
+      console.warn("[Candle] Failed to consume stored expired purchase token (may be auto-refunded)");
+      // Don't block the flow — the token may already be invalid/refunded
     }
 
     await fetchCandles();
@@ -382,19 +382,15 @@ const CandlePage = () => {
             return;
           }
 
-          // No active candle — consume the stale purchase first, then continue with new purchase
+          // No active candle — try to consume the stale purchase, but proceed even if it fails
+          // (Google may have auto-refunded it after 3 days without acknowledgement)
           console.log("[Candle] Consuming stale owned purchase before new purchase");
           const consumed = await consumePurchase(existingOwned.purchaseToken);
           if (!consumed) {
-            console.error("[Candle] Failed to consume stale purchase");
-            toast({
-              title: "Eroare",
-              description: "Nu s-a putut elibera achiziția anterioară. Încearcă din nou.",
-              variant: "destructive",
-            });
-            return;
+            console.warn("[Candle] Failed to consume stale purchase (may be auto-refunded), proceeding anyway");
+          } else {
+            console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
           }
-          console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
           // Continue below to create pending record and initiate new purchase
         } else {
           // Try to release any expired purchase stored in database
