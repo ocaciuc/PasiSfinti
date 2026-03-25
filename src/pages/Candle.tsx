@@ -264,8 +264,8 @@ const CandlePage = () => {
     const consumed = await consumePurchase(latestCompletedCandle.purchase_token);
 
     if (!consumed) {
-      console.error("[Candle] Failed to consume stored expired purchase token");
-      return false;
+      console.warn("[Candle] Failed to consume stored expired purchase token (may be auto-refunded)");
+      // Don't block the flow — the token may already be invalid/refunded
     }
 
     await fetchCandles();
