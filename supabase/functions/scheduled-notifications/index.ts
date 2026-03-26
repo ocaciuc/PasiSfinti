@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
         if (!userNotifs.has(n.user_id)) {
           const notifData = (n.data || {}) as Record<string, any>;
           let route = "/dashboard";
-          if (n.type === "pilgrimage_reminder" && notifData.pilgrimage_id) {
+          if ((n.type === "pilgrimage_reminder" || n.type === "pilgrimage_starting_soon") && notifData.pilgrimage_id) {
             route = `/pilgrimage/${notifData.pilgrimage_id}`;
           } else if (n.type === "candle_expiry") {
             route = "/candle";
