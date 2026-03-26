@@ -23,6 +23,14 @@ Deno.serve(async (req) => {
       console.log("[scheduled-notifications] Pilgrimage reminders check completed");
     }
 
+    // Run pilgrimage starting soon (< 24h)
+    const { error: soonError } = await supabase.rpc("notify_pilgrimage_starting_soon");
+    if (soonError) {
+      console.error("[scheduled-notifications] Pilgrimage starting soon error:", soonError);
+    } else {
+      console.log("[scheduled-notifications] Pilgrimage starting soon check completed");
+    }
+
     // Run candle expiry notifications
     const { error: candleError } = await supabase.rpc("notify_candle_expiry");
     if (candleError) {
