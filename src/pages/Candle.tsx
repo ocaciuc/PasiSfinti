@@ -475,13 +475,13 @@ const CandlePage = () => {
             released = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
           }
 
-          toast({
-            title: released ? "Achiziție anterioară eliberată" : "Achiziția anterioară nu a putut fi eliberată",
-            description: released
-              ? "Poți aprinde acum o lumânare nouă."
-              : "Te rugăm să încerci din nou. Dacă problema persistă, trimite logurile noi.",
-            variant: released ? "default" : "destructive",
-          });
+          if (!released) {
+            toast({
+              title: "Achiziția anterioară nu a putut fi eliberată",
+              description: "Te rugăm să încerci din nou. Dacă problema persistă, trimite logurile noi.",
+              variant: "destructive",
+            });
+          }
           return;
         }
 
@@ -606,10 +606,7 @@ const CandlePage = () => {
             }
           }
         }
-        toast({
-          title: "Achiziție anterioară eliberată",
-          description: "Poți aprinde acum o lumânare nouă.",
-        });
+        // Silently released, no toast needed
         // Refresh to show the purchase form
         await fetchCandles();
       }
