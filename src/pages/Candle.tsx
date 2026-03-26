@@ -522,14 +522,16 @@ const CandlePage = () => {
             released = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
           }
 
-          toast({
-            title: released ? "Achiziție anterioară eliberată" : "Achiziția anterioară nu a putut fi eliberată",
-            description: released
-              ? "Poți aprinde acum o lumânare nouă."
-              : "Te rugăm să încerci din nou.",
-            variant: released ? "default" : "destructive",
-          });
-          return;
+          if (!released) {
+            toast({
+              title: "Achiziția anterioară nu a putut fi eliberată",
+              description: "Te rugăm să încerci din nou.",
+              variant: "destructive",
+            });
+            return;
+          }
+          // Silently released — continue without interrupting the flow
+          console.log("[Candle] Previous purchase released silently, user can proceed");
         }
 
         // Handle PENDING state — candle is immediately active with pending payment
