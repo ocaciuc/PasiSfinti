@@ -41,6 +41,7 @@ export interface OwnedPurchase {
   productId: string;
   purchaseTime: number;
   isAcknowledged: boolean;
+  state?: 'PURCHASED' | 'PENDING';
 }
 
 const PlayBilling = registerPlugin<PlayBillingPlugin>('PlayBilling');
