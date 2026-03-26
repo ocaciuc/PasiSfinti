@@ -74,12 +74,12 @@ serve(async (req) => {
       );
     }
 
-    // Check that user doesn't already have an active candle (completed or pending)
+    // Check that user doesn't already have an active candle
     const { data: activeCandle } = await supabaseAdmin
       .from("candle_purchases")
-      .select("id, expires_at, payment_status")
+      .select("id, expires_at")
       .eq("user_id", user.id)
-      .in("payment_status", ["completed", "pending"])
+      .eq("payment_status", "completed")
       .gt("expires_at", new Date().toISOString())
       .limit(1)
       .maybeSingle();

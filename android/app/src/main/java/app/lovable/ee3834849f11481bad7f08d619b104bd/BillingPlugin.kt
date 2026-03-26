@@ -238,23 +238,14 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 val result = JSObject()
                 val purchases = purchaseList
-                    .filter {
-                        it.purchaseState == Purchase.PurchaseState.PURCHASED ||
-                        it.purchaseState == Purchase.PurchaseState.PENDING
-                    }
+                    .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
                     .map { purchase ->
-                        val stateStr = when (purchase.purchaseState) {
-                            Purchase.PurchaseState.PURCHASED -> "PURCHASED"
-                            Purchase.PurchaseState.PENDING -> "PENDING"
-                            else -> "UNKNOWN"
-                        }
                         JSObject().apply {
                             put("purchaseToken", purchase.purchaseToken)
                             put("orderId", purchase.orderId ?: "")
                             put("productId", purchase.products.firstOrNull() ?: "")
                             put("purchaseTime", purchase.purchaseTime)
                             put("isAcknowledged", purchase.isAcknowledged)
-                            put("state", stateStr)
                         }
                     }
                 result.put("purchases", purchases)
