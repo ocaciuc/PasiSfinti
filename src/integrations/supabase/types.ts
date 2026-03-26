@@ -935,6 +935,7 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: undefined
       }
+      fail_stale_pending_candles: { Args: never; Returns: undefined }
       get_co_pilgrim_profiles: {
         Args: { requesting_user_id: string }
         Returns: {

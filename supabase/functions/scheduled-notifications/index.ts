@@ -31,16 +31,23 @@ Deno.serve(async (req) => {
       console.log("[scheduled-notifications] Candle expiry check completed");
     }
 
+    // Fail stale pending candle purchases (>3 days old)
+    const { error: stalePendingError } = await supabase.rpc("fail_stale_pending_candles");
+    if (stalePendingError) {
+      console.error("[scheduled-notifications] Stale pending candles error:", stalePendingError);
+    } else {
+      console.log("[scheduled-notifications] Stale pending candles check completed");
+    }
+
     // After creating in-app notifications, send push notifications
     // Get recent unread notifications created in the last 65 minutes
-    // (cron runs hourly, so we check slightly more than 1 hour to avoid missing any)
     const windowAgo = new Date(Date.now() - 65 * 60 * 1000).toISOString();
     const { data: recentNotifs, error: notifError } = await supabase
       .from("notifications")
       .select("id, user_id, title, message, type, data")
       .eq("read", false)
       .gte("created_at", windowAgo)
-      .in("type", ["pilgrimage_reminder", "candle_expiry"]);
+      .in("type", ["pilgrimage_reminder", "candle_expiry", "candle_payment_failed"]);
 
     if (notifError) {
       console.error("[scheduled-notifications] Error fetching notifications:", notifError);
