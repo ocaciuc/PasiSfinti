@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       .select("id, user_id, title, message, type, data")
       .eq("read", false)
       .gte("created_at", windowAgo)
-      .in("type", ["pilgrimage_reminder", "candle_expiry"]);
+      .in("type", ["pilgrimage_reminder", "pilgrimage_starting_soon", "candle_expiry"]);
 
     if (notifError) {
       console.error("[scheduled-notifications] Error fetching notifications:", notifError);
