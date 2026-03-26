@@ -441,3 +441,19 @@
 - Design: Simple, sacred, thin lines, elegant icons, soft glows
 - All colors must use HSL format and semantic tokens
 - Safe area CSS: `.pb-safe` utility class for consistent bottom padding (8rem + safe-area-inset)
+
+## PENDING PAYMENT STATE HANDLING
+**Priority: HIGH | Status: COMPLETED**
+
+### Changes Completed:
+- [x] PENDING purchases now treated as active candles (UI shows candle immediately)
+- [x] BillingPlugin.kt returns PENDING state purchases in getOwnedPurchases
+- [x] OwnedPurchase interface extended with `state` field
+- [x] Candle.tsx reconciles Google Play state with DB on app launch:
+  - PENDING → PURCHASED: updates DB to completed
+  - PENDING no longer in Google Play: marks as failed, shows toast
+- [x] verify-purchase edge function checks for both pending and completed active candles
+- [x] New DB function `fail_stale_pending_candles()`: fails pending purchases >3 days old with notification
+- [x] scheduled-notifications calls `fail_stale_pending_candles()` hourly
+- [x] New notification type `candle_payment_failed` with push notification support
+- [x] UI shows "Plata este în curs de procesare" indicator when candle is pending
