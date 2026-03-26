@@ -965,6 +965,7 @@ export type Database = {
       }
       notify_candle_expiry: { Args: never; Returns: undefined }
       notify_pilgrimage_reminders: { Args: never; Returns: undefined }
+      notify_pilgrimage_starting_soon: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
