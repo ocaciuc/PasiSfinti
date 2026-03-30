@@ -256,6 +256,113 @@ class BillingPlugin : Plugin(), PurchasesUpdatedListener {
         }
     }
 
+    /**
+     * Release all owned consumable purchases for a given product id.
+     * For each owned purchase: acknowledge (if needed) -> consume.
+     */
+    @PluginMethod
+    fun releaseOwnedPurchases(call: PluginCall) {
+        val productId = call.getString("productId") ?: run {
+            call.reject("productId is required")
+            return
+        }
+
+        Log.d(TAG, "releaseOwnedPurchases: $productId")
+
+        billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+        ) { billingResult, purchaseList ->
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                call.reject("Failed to query purchases: ${billingResult.debugMessage}")
+                return@queryPurchasesAsync
+            }
+
+            val ownedPurchases = purchaseList.filter {
+                it.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                    it.products.contains(productId)
+            }
+
+            val result = JSObject()
+            result.put("found", ownedPurchases.size)
+
+            if (ownedPurchases.isEmpty()) {
+                result.put("released", 0)
+                result.put("failed", 0)
+                call.resolve(result)
+                return@queryPurchasesAsync
+            }
+
+            var released = 0
+            var failed = 0
+
+            fun finish() {
+                val finalResult = JSObject()
+                finalResult.put("found", ownedPurchases.size)
+                finalResult.put("released", released)
+                finalResult.put("failed", failed)
+                call.resolve(finalResult)
+            }
+
+            fun processNext(index: Int) {
+                if (index >= ownedPurchases.size) {
+                    finish()
+                    return
+                }
+
+                val purchase = ownedPurchases[index]
+
+                fun consumeCurrent() {
+                    val consumeParams = ConsumeParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
+
+                    billingClient.consumeAsync(consumeParams) { consumeResult, _ ->
+                        when (consumeResult.responseCode) {
+                            BillingClient.BillingResponseCode.OK -> {
+                                released += 1
+                                Log.d(TAG, "Released purchase token successfully")
+                            }
+                            BillingClient.BillingResponseCode.ITEM_NOT_OWNED -> {
+                                // Idempotent path: token already released.
+                                released += 1
+                                Log.w(TAG, "Token already released (ITEM_NOT_OWNED), treating as success")
+                            }
+                            else -> {
+                                failed += 1
+                                Log.e(TAG, "Failed to consume purchase: ${consumeResult.debugMessage}")
+                            }
+                        }
+
+                        processNext(index + 1)
+                    }
+                }
+
+                if (!purchase.isAcknowledged) {
+                    val acknowledgeParams = AcknowledgePurchaseParams.newBuilder()
+                        .setPurchaseToken(purchase.purchaseToken)
+                        .build()
+
+                    billingClient.acknowledgePurchase(acknowledgeParams) { ackResult ->
+                        if (ackResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            Log.d(TAG, "Acknowledged owned purchase before consume")
+                            consumeCurrent()
+                        } else {
+                            failed += 1
+                            Log.e(TAG, "Failed to acknowledge purchase before consume: ${ackResult.debugMessage}")
+                            processNext(index + 1)
+                        }
+                    }
+                } else {
+                    consumeCurrent()
+                }
+            }
+
+            processNext(0)
+        }
+    }
+
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: MutableList<Purchase>?) {
         val call = pendingPurchaseCall
         pendingPurchaseCall = null
