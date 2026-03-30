@@ -260,6 +260,7 @@
 - [x] Hotfix: resolve stale Google Play owned purchase after candle expiry (`ITEM_ALREADY_OWNED` still blocks a new purchase)
 - [x] Hotfix: fallback to consume expired stored `purchase_token` from Supabase when `getOwnedPurchases()` does not return the stale Google Play item
 - [x] Hotfix: add stricter Android billing logs/validation for `getOwnedPurchases()` and `consumePurchase()` before retrying purchase
+- [x] Hotfix: native `releaseOwnedPurchases(productId)` now does acknowledge-then-consume for each owned candle token and treats `ITEM_NOT_OWNED` as idempotent success (prevents persistent `ITEM_ALREADY_OWNED` loops)
 
 ---
 
