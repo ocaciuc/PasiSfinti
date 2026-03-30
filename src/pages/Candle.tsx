@@ -30,6 +30,7 @@ import {
   acknowledgePurchase,
   consumePurchase,
   getOwnedPurchases,
+  releaseOwnedCandlePurchases,
   type ProductDetails,
   type PurchaseResult,
   type OwnedPurchase,
@@ -272,6 +273,22 @@ const CandlePage = () => {
     return true;
   };
 
+  const releaseStaleOwnedPurchase = async (userId: string): Promise<boolean> => {
+    const storeRelease = await releaseOwnedCandlePurchases();
+
+    if (storeRelease.found > 0) {
+      console.log(
+        `[Candle] Owned purchase release result: found=${storeRelease.found}, released=${storeRelease.released}, failed=${storeRelease.failed}`,
+      );
+    }
+
+    if (storeRelease.released > 0) {
+      return true;
+    }
+
+    return await releaseExpiredOwnedPurchaseFromDatabase(userId);
+  };
+
   const verifyAndRecordPurchase = async (purchase: PurchaseResult, purpose: string) => {
     console.log("[Candle] Calling verify-purchase with:", {
       purchaseToken: purchase.purchaseToken?.substring(0, 20) + "...",
@@ -358,46 +375,8 @@ const CandlePage = () => {
           }
         }
 
-        // Check if user already owns the item (from a previous unfinished flow)
-        const owned = normalizeOwnedPurchases(await getOwnedPurchases());
-        const existingOwned = owned.find((p) => p.productId === "light_candle_5ron");
-
-        if (existingOwned) {
-          // Check if there's an active candle for this purchase
-          const { data: existingCandle } = await supabase
-            .from("candle_purchases")
-            .select("*")
-            .eq("user_id", user.id)
-            .eq("payment_status", "completed")
-            .gt("expires_at", new Date().toISOString())
-            .limit(1)
-            .maybeSingle();
-
-          if (existingCandle) {
-            setActiveCandle(existingCandle);
-            toast({
-              title: "Ai deja o lumânare aprinsă",
-              description: "Poți aprinde alta după ce aceasta se stinge.",
-            });
-            return;
-          }
-
-          // No active candle — try to consume the stale purchase, but proceed even if it fails
-          // (Google may have auto-refunded it after 3 days without acknowledgement)
-          console.log("[Candle] Consuming stale owned purchase before new purchase");
-          const consumed = await consumePurchase(existingOwned.purchaseToken);
-          if (!consumed) {
-            console.warn("[Candle] Failed to consume stale purchase (may be auto-refunded), proceeding anyway");
-          } else {
-            console.log("[Candle] Stale purchase consumed, proceeding with new purchase");
-          }
-          // Continue below to create pending record and initiate new purchase
-        } else {
-          // Try to release any expired purchase stored in database
-          await releaseExpiredOwnedPurchaseFromDatabase(user.id);
-          // If an active candle was restored by the function above, stop here
-          if (activeCandle) return;
-        }
+        // Recovery step: release stale owned Google Play item(s) before starting a new purchase.
+        await releaseStaleOwnedPurchase(user.id);
 
         // Create pending record BEFORE payment
         const now = new Date().toISOString();
@@ -431,6 +410,16 @@ const CandlePage = () => {
         let purchaseResult: PurchaseResult;
         try {
           purchaseResult = await purchaseCandle();
+
+          // Auto-recovery: if Play reports ITEM_ALREADY_OWNED, release stale item(s)
+          // and retry once in the same flow (no second tap from user).
+          if (purchaseResult.state === "ITEM_ALREADY_OWNED") {
+            console.log("[Candle] ITEM_ALREADY_OWNED on first attempt, trying one-time auto-retry");
+            const released = await releaseStaleOwnedPurchase(user.id);
+            if (released) {
+              purchaseResult = await purchaseCandle();
+            }
+          }
         } catch (purchaseError: any) {
           console.error("Purchase error:", purchaseError);
 
@@ -451,7 +440,7 @@ const CandlePage = () => {
           return;
         }
 
-        // Handle ITEM_ALREADY_OWNED returned as a resolved state
+        // Still owned even after one retry -> fail gracefully
         if (purchaseResult.state === "ITEM_ALREADY_OWNED") {
           // Clean up the pending record
           await supabase
@@ -459,29 +448,11 @@ const CandlePage = () => {
             .update({ payment_status: "failed", expires_at: new Date().toISOString() })
             .eq("id", pendingCandle.id);
 
-          // Consume the stale purchase
-          console.log("[Candle] ITEM_ALREADY_OWNED during purchase, consuming stale item");
-          const ownedList = normalizeOwnedPurchases(await getOwnedPurchases());
-          let released = false;
-
-          for (const p of ownedList) {
-            if (p.productId === "light_candle_5ron") {
-              released = await consumePurchase(p.purchaseToken);
-              if (released) break;
-            }
-          }
-
-          if (!released) {
-            released = await releaseExpiredOwnedPurchaseFromDatabase(user.id);
-          }
-
-          if (!released) {
-            toast({
-              title: "Achiziția anterioară nu a putut fi eliberată",
-              description: "Te rugăm să încerci din nou. Dacă problema persistă, trimite logurile noi.",
-              variant: "destructive",
-            });
-          }
+          toast({
+            title: "Achiziția anterioară nu a putut fi eliberată",
+            description: "Închide și redeschide aplicația, apoi încearcă din nou.",
+            variant: "destructive",
+          });
           return;
         }
 
