@@ -43,6 +43,12 @@ export interface OwnedPurchase {
   isAcknowledged: boolean;
 }
 
+export interface ReleaseOwnedPurchasesResult {
+  found: number;
+  released: number;
+  failed: number;
+}
+
 const PlayBilling = registerPlugin<PlayBillingPlugin>('PlayBilling');
 
 export function isNativeAndroid(): boolean {
@@ -89,9 +95,56 @@ export async function consumePurchase(purchaseToken: string): Promise<boolean> {
     const result = await PlayBilling.consumePurchase({ purchaseToken });
     return result.consumed;
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message.toLowerCase()
+        : String(error).toLowerCase();
+
+    // Idempotent behavior: if Play says token is not owned anymore,
+    // the item is effectively already released for repurchase.
+    if (errorMessage.includes("not owned")) {
+      console.warn("[PlayBilling] Token is not owned anymore, treating as released:", purchaseToken);
+      return true;
+    }
+
     console.error('[PlayBilling] Failed to consume purchase:', error);
     return false;
   }
+}
+
+/**
+ * Release all currently owned candle purchases from Google Play.
+ * This is used as a recovery path for ITEM_ALREADY_OWNED loops.
+ */
+export async function releaseOwnedCandlePurchases(): Promise<ReleaseOwnedPurchasesResult> {
+  if (!isNativeAndroid()) {
+    return { found: 0, released: 0, failed: 0 };
+  }
+
+  const owned = await getOwnedPurchases();
+  const candlePurchases = owned.filter((purchase) => purchase.productId === CANDLE_PRODUCT_ID);
+
+  if (candlePurchases.length === 0) {
+    return { found: 0, released: 0, failed: 0 };
+  }
+
+  let released = 0;
+  let failed = 0;
+
+  for (const purchase of candlePurchases) {
+    const consumed = await consumePurchase(purchase.purchaseToken);
+    if (consumed) {
+      released += 1;
+    } else {
+      failed += 1;
+    }
+  }
+
+  return {
+    found: candlePurchases.length,
+    released,
+    failed,
+  };
 }
 
 /**
