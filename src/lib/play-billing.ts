@@ -15,6 +15,7 @@ interface PlayBillingPlugin {
   acknowledgePurchase(options: { purchaseToken: string }): Promise<{ acknowledged: boolean }>;
   consumePurchase(options: { purchaseToken: string }): Promise<{ consumed: boolean }>;
   getOwnedPurchases(): Promise<{ purchases: OwnedPurchase[] }>;
+  releaseOwnedPurchases(options: { productId: string }): Promise<ReleaseOwnedPurchasesResult>;
 }
 
 export interface ProductDetails {
@@ -121,30 +122,17 @@ export async function releaseOwnedCandlePurchases(): Promise<ReleaseOwnedPurchas
     return { found: 0, released: 0, failed: 0 };
   }
 
-  const owned = await getOwnedPurchases();
-  const candlePurchases = owned.filter((purchase) => purchase.productId === CANDLE_PRODUCT_ID);
-
-  if (candlePurchases.length === 0) {
+  try {
+    const result = await PlayBilling.releaseOwnedPurchases({ productId: CANDLE_PRODUCT_ID });
+    return {
+      found: Number(result?.found ?? 0),
+      released: Number(result?.released ?? 0),
+      failed: Number(result?.failed ?? 0),
+    };
+  } catch (error) {
+    console.error('[PlayBilling] Failed to release owned candle purchases:', error);
     return { found: 0, released: 0, failed: 0 };
   }
-
-  let released = 0;
-  let failed = 0;
-
-  for (const purchase of candlePurchases) {
-    const consumed = await consumePurchase(purchase.purchaseToken);
-    if (consumed) {
-      released += 1;
-    } else {
-      failed += 1;
-    }
-  }
-
-  return {
-    found: candlePurchases.length,
-    released,
-    failed,
-  };
 }
 
 /**
