@@ -515,6 +515,7 @@ npx playwright test e2e/auth.spec.ts
 | 7 | **Dashboard** | `e2e/dashboard.spec.ts` | Widget calendar, Lumânare activă, Acțiuni rapide, Navigare | ✅ Implementat |
 | 8 | **Navigare & Rutare** | `e2e/navigation.spec.ts` | Bottom nav, Rute protejate, 404, Pagini publice | ✅ Implementat |
 | 9 | **Ștergere Cont & GDPR** | `e2e/account-deletion-gdpr.spec.ts` | Pagini publice GDPR, Transparență date, Confirmare ștergere (Settings + dedicată), Deconectare | ✅ Implementat |
+| 10 | **Notificări & Setări** | `e2e/notifications.spec.ts` | Toggle-uri categorii, Persistență preferințe, Deep link routing | ✅ Implementat |
 
-**Total E2E: 9 fișiere | ~60 scenarii**
+**Total E2E: 10 fișiere | ~72 scenarii**
 **Framework: Playwright | Necesită rulare locală după export GitHub**
