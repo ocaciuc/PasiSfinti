@@ -472,4 +472,4 @@
 | 21 | ChildSafety | `src/__tests__/child-safety.test.tsx` | 2 | ✅ |
 | 22 | UserDataDeletion | `src/__tests__/user-data-deletion.test.tsx` | 1 | ✅ |
 
-**Total: 22 fișiere test | 88 teste | Toate trec ✅**
+**Total: 22 fișiere test | 111 teste | Toate trec ✅**
