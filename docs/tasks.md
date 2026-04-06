@@ -450,7 +450,7 @@
 | # | Pagina | Fișier test | Teste | Status |
 |---|--------|------------|-------|--------|
 | 1 | Welcome | `src/__tests__/welcome.test.tsx` | 5 | ✅ |
-| 2 | Auth | `src/__tests__/auth.test.tsx` | 4 | ✅ |
+| 2 | Auth | `src/__tests__/auth.test.tsx` | 27 | ✅ |
 | 3 | AuthCallback | `src/__tests__/auth-callback.test.tsx` | 1 | ✅ |
 | 4 | Onboarding | `src/__tests__/onboarding-flow.test.tsx` | 12 | ✅ |
 | 5 | Onboarding (validare) | `src/__tests__/onboarding-validation.test.ts` | 19 | ✅ |
