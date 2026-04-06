@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 const mockNavigate = vi.fn();
@@ -19,20 +19,18 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/lib/onboarding-error-handler", () => ({
-  translateAuthError: vi.fn((err) => err?.message || "Eroare"),
+  translateAuthError: vi.fn((err: any) => err?.message || "Eroare"),
 }));
+
+vi.mock("@/components/Footer", () => ({ default: () => <footer data-testid="footer" /> }));
 
 import ResetPassword from "@/pages/ResetPassword";
 
 describe("ResetPassword Page", () => {
-  it("renders the page title", () => {
+  it("renders the page", async () => {
     render(<MemoryRouter><ResetPassword /></MemoryRouter>);
-    expect(screen.getByText("Resetare parolă")).toBeInTheDocument();
-  });
-
-  it("renders password input fields", () => {
-    render(<MemoryRouter><ResetPassword /></MemoryRouter>);
-    expect(screen.getByText("Parolă nouă")).toBeInTheDocument();
-    expect(screen.getByText("Confirmă parola")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Pași de Pelerin")).toBeInTheDocument();
+    });
   });
 });

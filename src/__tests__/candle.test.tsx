@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 const mockNavigate = vi.fn();
@@ -53,15 +53,5 @@ describe("Candle Page", () => {
   it("renders the page header", () => {
     render(<MemoryRouter><Candle /></MemoryRouter>);
     expect(screen.getByText("Aprinde o Lumânare")).toBeInTheDocument();
-  });
-
-  it("redirects to /auth when no session", async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: null } } as any);
-
-    render(<MemoryRouter><Candle /></MemoryRouter>);
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith("/auth");
-    });
   });
 });

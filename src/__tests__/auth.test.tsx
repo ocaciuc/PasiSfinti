@@ -34,8 +34,10 @@ vi.mock("@/lib/capacitor-auth", () => ({
 }));
 
 vi.mock("@/lib/onboarding-error-handler", () => ({
-  translateAuthError: vi.fn((err) => err?.message || "Eroare"),
+  translateAuthError: vi.fn((err: any) => err?.message || "Eroare"),
 }));
+
+vi.mock("@/components/Footer", () => ({ default: () => <footer data-testid="footer" /> }));
 
 import Auth from "@/pages/Auth";
 
@@ -50,7 +52,7 @@ describe("Auth Page", () => {
     expect(screen.getByText("Pași de Pelerin")).toBeInTheDocument();
   });
 
-  it("renders login form with email and password inputs", () => {
+  it("renders login form", () => {
     render(<MemoryRouter><Auth /></MemoryRouter>);
     expect(screen.getByText("Intră în comunitate")).toBeInTheDocument();
   });
