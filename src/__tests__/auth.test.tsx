@@ -9,23 +9,24 @@ vi.mock("react-router-dom", async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-const mockSignInWithPassword = vi.fn();
-const mockSignUp = vi.fn();
-const mockSignInWithOAuth = vi.fn();
-const mockResetPasswordForEmail = vi.fn();
-
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: {
-    auth: {
-      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
-      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
-      signInWithPassword: mockSignInWithPassword,
-      signUp: mockSignUp,
-      signInWithOAuth: mockSignInWithOAuth,
-      resetPasswordForEmail: mockResetPasswordForEmail,
+vi.mock("@/integrations/supabase/client", () => {
+  const signInWithPassword = vi.fn();
+  const signUp = vi.fn();
+  const signInWithOAuth = vi.fn();
+  const resetPasswordForEmail = vi.fn();
+  return {
+    supabase: {
+      auth: {
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+        getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+        signInWithPassword,
+        signUp,
+        signInWithOAuth,
+        resetPasswordForEmail,
+      },
     },
-  },
-}));
+  };
+});
 
 vi.mock("@/lib/native-google-signin", () => ({
   performNativeGoogleSignIn: vi.fn(),
