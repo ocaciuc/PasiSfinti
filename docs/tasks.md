@@ -442,3 +442,34 @@
 - Design: Simple, sacred, thin lines, elegant icons, soft glows
 - All colors must use HSL format and semantic tokens
 - Safe area CSS: `.pb-safe` utility class for consistent bottom padding (8rem + safe-area-inset)
+
+---
+
+## TEST COVERAGE - Pagini
+
+| # | Pagina | Fișier test | Teste | Status |
+|---|--------|------------|-------|--------|
+| 1 | Welcome | `src/__tests__/welcome.test.tsx` | 5 | ✅ |
+| 2 | Auth | `src/__tests__/auth.test.tsx` | 4 | ✅ |
+| 3 | AuthCallback | `src/__tests__/auth-callback.test.tsx` | 1 | ✅ |
+| 4 | Onboarding | `src/__tests__/onboarding-flow.test.tsx` | 12 | ✅ |
+| 5 | Onboarding (validare) | `src/__tests__/onboarding-validation.test.ts` | 19 | ✅ |
+| 6 | Onboarding (erori) | `src/__tests__/onboarding-error-handler.test.ts` | 15 | ✅ |
+| 7 | Dashboard | `src/__tests__/dashboard.test.tsx` | 1 | ✅ |
+| 8 | Calendar | `src/__tests__/calendar.test.tsx` | 4 | ✅ |
+| 9 | Profile | `src/__tests__/profile.test.tsx` | 2 | ✅ |
+| 10 | Settings | `src/__tests__/settings.test.tsx` | 1 | ✅ |
+| 11 | Pilgrimages | `src/__tests__/pilgrimages.test.tsx` | 1 | ✅ |
+| 12 | PilgrimageDetail | `src/__tests__/pilgrimage-detail.test.tsx` | 1 | ✅ |
+| 13 | SpiritualDiary | `src/__tests__/spiritual-diary.test.tsx` | 1 | ✅ |
+| 14 | Candle | `src/__tests__/candle.test.tsx` | 1 | ✅ |
+| 15 | ResetPassword | `src/__tests__/reset-password.test.tsx` | 1 | ✅ |
+| 16 | ConfirmareCont | `src/__tests__/confirmare-cont.test.tsx` | 2 | ✅ |
+| 17 | AccountDeleted | `src/__tests__/account-deleted.test.tsx` | 3 | ✅ |
+| 18 | NotFound | `src/__tests__/not-found.test.tsx` | 4 | ✅ |
+| 19 | Privacy | `src/__tests__/privacy.test.tsx` | 4 | ✅ |
+| 20 | Terms | `src/__tests__/terms.test.tsx` | 3 | ✅ |
+| 21 | ChildSafety | `src/__tests__/child-safety.test.tsx` | 2 | ✅ |
+| 22 | UserDataDeletion | `src/__tests__/user-data-deletion.test.tsx` | 1 | ✅ |
+
+**Total: 22 fișiere test | 88 teste | Toate trec ✅**
