@@ -472,4 +472,12 @@
 | 21 | ChildSafety | `src/__tests__/child-safety.test.tsx` | 2 | ✅ |
 | 22 | UserDataDeletion | `src/__tests__/user-data-deletion.test.tsx` | 1 | ✅ |
 
-**Total: 22 fișiere test | 111 teste | Toate trec ✅**
+## TEST COVERAGE - Componente Reutilizabile
+
+| # | Componentă | Fișier test | Teste | Status |
+|---|-----------|------------|-------|--------|
+| 1 | Navigation | `src/__tests__/navigation.test.tsx` | 5 | ✅ |
+| 2 | BadgesSection | `src/__tests__/badges-section.test.tsx` | 7 | ✅ |
+| 3 | CommentSection | `src/__tests__/comment-section.test.tsx` | 11 | ✅ |
+
+**Total: 25 fișiere test | 134 teste | Toate trec ✅**
