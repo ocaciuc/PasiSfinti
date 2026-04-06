@@ -481,3 +481,39 @@
 | 3 | CommentSection | `src/__tests__/comment-section.test.tsx` | 11 | ✅ |
 
 **Total: 25 fișiere test | 134 teste | Toate trec ✅**
+
+---
+
+## TESTE END-TO-END (Playwright)
+
+### Instrucțiuni rulare
+```bash
+# Instalare (o singură dată)
+npm install -D @playwright/test
+npx playwright install chromium
+
+# Rulare teste
+npx playwright test
+
+# Rulare cu UI
+npx playwright test --ui
+
+# Rulare un singur fișier
+npx playwright test e2e/auth.spec.ts
+```
+
+### Scenarii E2E identificate
+
+| # | Flow | Fișier test | Scenarii | Status |
+|---|------|-----------|----------|--------|
+| 1 | **Autentificare** | `e2e/auth.spec.ts` | Login cu email/parolă, Signup, Forgot password, Logout | ✅ Implementat |
+| 2 | **Onboarding** | `e2e/onboarding.spec.ts` | Completare profil pas cu pas (4 pași), Validare câmpuri, Redirect la dashboard | ✅ Implementat |
+| 3 | **Pelerinaje** | `e2e/pilgrimages.spec.ts` | Listare, Filtrare, Detalii, Înscriere, Dezabonare, Postare, Comentariu, Like | ✅ Implementat |
+| 4 | **Lumânare Virtuală** | `e2e/candle.spec.ts` | Aprindere lumânare, Vizualizare timer, Istoric | ✅ Implementat |
+| 5 | **Profil** | `e2e/profile.spec.ts` | Vizualizare profil, Editare, Insigne, Pelerinaje anterioare | ✅ Implementat |
+| 6 | **Calendar Ortodox** | `e2e/calendar.spec.ts` | Vizualizare zi curentă, Navigare luni, Detalii sfinți | ✅ Implementat |
+| 7 | **Dashboard** | `e2e/dashboard.spec.ts` | Widget calendar, Lumânare activă, Acțiuni rapide, Navigare | ✅ Implementat |
+| 8 | **Navigare & Rutare** | `e2e/navigation.spec.ts` | Bottom nav, Rute protejate, 404, Pagini publice | ✅ Implementat |
+
+**Total E2E: 8 fișiere | ~45 scenarii**
+**Framework: Playwright | Necesită rulare locală după export GitHub**
