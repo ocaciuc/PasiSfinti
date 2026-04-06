@@ -8,14 +8,11 @@ vi.mock("react-router-dom", async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-const mockOnAuthStateChange = vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }));
-const mockGetSession = vi.fn().mockResolvedValue({ data: { session: null } });
-
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      onAuthStateChange: mockOnAuthStateChange,
-      getSession: mockGetSession,
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
       signInWithOAuth: vi.fn(),
@@ -44,7 +41,6 @@ import Auth from "@/pages/Auth";
 describe("Auth Page", () => {
   beforeEach(() => {
     mockNavigate.mockClear();
-    mockGetSession.mockResolvedValue({ data: { session: null } });
   });
 
   it("renders the app title", () => {
