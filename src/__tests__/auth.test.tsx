@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
-const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
-  return { ...actual, useNavigate: () => mockNavigate };
+  return { ...actual, useNavigate: () => vi.fn() };
 });
 
 vi.mock("@/integrations/supabase/client", () => ({
@@ -13,10 +13,10 @@ vi.mock("@/integrations/supabase/client", () => ({
     auth: {
       onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
       getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
-      signInWithPassword: vi.fn(),
-      signUp: vi.fn(),
-      signInWithOAuth: vi.fn(),
-      resetPasswordForEmail: vi.fn(),
+      signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
+      signUp: vi.fn().mockResolvedValue({ error: null }),
+      signInWithOAuth: vi.fn().mockResolvedValue({ error: null }),
+      resetPasswordForEmail: vi.fn().mockResolvedValue({ error: null }),
     },
   },
 }));
@@ -37,30 +37,283 @@ vi.mock("@/lib/onboarding-error-handler", () => ({
 vi.mock("@/components/Footer", () => ({ default: () => <footer data-testid="footer" /> }));
 
 import Auth from "@/pages/Auth";
+import { supabase } from "@/integrations/supabase/client";
 
-describe("Auth Page", () => {
-  beforeEach(() => {
-    mockNavigate.mockClear();
-  });
+const mockSignIn = supabase.auth.signInWithPassword as ReturnType<typeof vi.fn>;
+const mockSignUp = supabase.auth.signUp as ReturnType<typeof vi.fn>;
+const mockResetPassword = supabase.auth.resetPasswordForEmail as ReturnType<typeof vi.fn>;
+
+const renderAuth = () => render(<MemoryRouter><Auth /></MemoryRouter>);
+
+describe("Auth Page - Rendering", () => {
+  beforeEach(() => vi.clearAllMocks());
 
   it("renders the app title", () => {
-    render(<MemoryRouter><Auth /></MemoryRouter>);
+    renderAuth();
     expect(screen.getByText("Pași de Pelerin")).toBeInTheDocument();
   });
 
-  it("renders login form", () => {
-    render(<MemoryRouter><Auth /></MemoryRouter>);
+  it("renders login form with email and password fields", () => {
+    renderAuth();
     expect(screen.getByText("Intră în comunitate")).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Parola")).toBeInTheDocument();
   });
 
   it("renders Google login button", () => {
-    render(<MemoryRouter><Auth /></MemoryRouter>);
+    renderAuth();
     expect(screen.getByText("Continuă cu Google")).toBeInTheDocument();
   });
 
   it("renders sign-in and sign-up tabs", () => {
-    render(<MemoryRouter><Auth /></MemoryRouter>);
+    renderAuth();
     expect(screen.getByText("Autentificare")).toBeInTheDocument();
     expect(screen.getByText("Înregistrare")).toBeInTheDocument();
+  });
+
+  it("renders forgot password link", () => {
+    renderAuth();
+    expect(screen.getByText("Ai uitat parola?")).toBeInTheDocument();
+  });
+
+  it("renders footer", () => {
+    renderAuth();
+    expect(screen.getByTestId("footer")).toBeInTheDocument();
+  });
+});
+
+describe("Auth Page - Email Validation", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("rejects empty email on sign-in (required attribute)", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.type(screen.getByLabelText("Parola"), "Test1234!");
+    await user.click(screen.getByText("Autentifică-te"));
+    expect(mockSignIn).not.toHaveBeenCalled();
+  });
+});
+
+describe("Auth Page - Password Validation (Sign Up)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const fillSignup = async (user: ReturnType<typeof userEvent.setup>, pass: string, confirm?: string) => {
+    await user.click(screen.getByText("Înregistrare"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.type(screen.getByLabelText("Parola"), pass);
+    await user.type(screen.getByLabelText("Confirmă parola"), confirm ?? pass);
+    await user.click(screen.getByText("Creează cont"));
+  };
+
+  it("rejects password shorter than 8 characters", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "Ab1!");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+
+  it("rejects password without uppercase letter", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "abcdefg1!");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+
+  it("rejects password without lowercase letter", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "ABCDEFG1!");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+
+  it("rejects password without digit", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "Abcdefgh!");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+
+  it("rejects password without special character", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "Abcdefg12");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+
+  it("rejects mismatched passwords", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await fillSignup(user, "Abcdefg1!", "Different1!");
+    await waitFor(() => expect(mockSignUp).not.toHaveBeenCalled());
+  });
+});
+
+describe("Auth Page - Sign Up Flow", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("calls signUp with valid credentials", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Înregistrare"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.type(screen.getByLabelText("Parola"), "StrongPass1!");
+    await user.type(screen.getByLabelText("Confirmă parola"), "StrongPass1!");
+    await user.click(screen.getByText("Creează cont"));
+
+    await waitFor(() => {
+      expect(mockSignUp).toHaveBeenCalledWith({
+        email: "test@email.com",
+        password: "StrongPass1!",
+        options: { emailRedirectTo: expect.stringContaining("/confirmare-cont") },
+      });
+    });
+  });
+
+  it("handles signUp error", async () => {
+    mockSignUp.mockResolvedValueOnce({ error: { message: "User already registered" } });
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Înregistrare"));
+    await user.type(screen.getByLabelText("Email"), "existing@email.com");
+    await user.type(screen.getByLabelText("Parola"), "StrongPass1!");
+    await user.type(screen.getByLabelText("Confirmă parola"), "StrongPass1!");
+    await user.click(screen.getByText("Creează cont"));
+
+    await waitFor(() => expect(mockSignUp).toHaveBeenCalled());
+  });
+});
+
+describe("Auth Page - Sign In Flow", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("calls signInWithPassword with credentials", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.type(screen.getByLabelText("Parola"), "anypassword");
+    await user.click(screen.getByText("Autentifică-te"));
+
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith({
+        email: "test@email.com",
+        password: "anypassword",
+      });
+    });
+  });
+
+  it("does NOT validate password strength on sign-in (allows weak passwords)", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.type(screen.getByLabelText("Parola"), "weak");
+    await user.click(screen.getByText("Autentifică-te"));
+
+    await waitFor(() => expect(mockSignIn).toHaveBeenCalled());
+  });
+
+  it("handles sign-in error", async () => {
+    mockSignIn.mockResolvedValueOnce({ error: { message: "Invalid login credentials" } });
+    const user = userEvent.setup();
+    renderAuth();
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.type(screen.getByLabelText("Parola"), "wrongpass");
+    await user.click(screen.getByText("Autentifică-te"));
+
+    await waitFor(() => expect(mockSignIn).toHaveBeenCalled());
+  });
+});
+
+describe("Auth Page - Forgot Password Flow", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("shows forgot password form when link clicked", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+
+    expect(screen.getByText("Resetează parola")).toBeInTheDocument();
+    expect(screen.getByText("Trimite link de resetare")).toBeInTheDocument();
+  });
+
+  it("shows back to login button", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+    expect(screen.getByText("Înapoi la autentificare")).toBeInTheDocument();
+  });
+
+  it("sends reset email with valid email", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.click(screen.getByText("Trimite link de resetare"));
+
+    await waitFor(() => {
+      expect(mockResetPassword).toHaveBeenCalledWith("test@email.com", {
+        redirectTo: expect.stringContaining("/reset-password"),
+      });
+    });
+  });
+
+  it("shows confirmation after reset email sent", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.click(screen.getByText("Trimite link de resetare"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Verifică-ți emailul")).toBeInTheDocument();
+    });
+  });
+
+  it("returns to login from reset confirmation", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.click(screen.getByText("Trimite link de resetare"));
+
+    await waitFor(() => expect(screen.getByText("Verifică-ți emailul")).toBeInTheDocument());
+
+    await user.click(screen.getByText("Înapoi la autentificare"));
+    expect(screen.getByText("Intră în comunitate")).toBeInTheDocument();
+  });
+
+  it("handles reset error", async () => {
+    mockResetPassword.mockResolvedValueOnce({ error: { message: "Rate limit exceeded" } });
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Ai uitat parola?"));
+    await user.type(screen.getByLabelText("Email"), "test@email.com");
+    await user.click(screen.getByText("Trimite link de resetare"));
+
+    await waitFor(() => expect(mockResetPassword).toHaveBeenCalled());
+  });
+});
+
+describe("Auth Page - Tab Navigation", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("switches to signup tab and shows confirm password", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Înregistrare"));
+    expect(screen.getByLabelText("Confirmă parola")).toBeInTheDocument();
+    expect(screen.getByText("Creează cont")).toBeInTheDocument();
+  });
+
+  it("switches back to signin tab", async () => {
+    const user = userEvent.setup();
+    renderAuth();
+    await user.click(screen.getByText("Înregistrare"));
+    await user.click(screen.getByText("Autentificare"));
+    expect(screen.getByText("Autentifică-te")).toBeInTheDocument();
+  });
+
+  it("has link to create account from signin tab", () => {
+    renderAuth();
+    expect(screen.getByText("Creează unul acum")).toBeInTheDocument();
   });
 });
