@@ -220,6 +220,37 @@ const Auth = () => {
     }
   };
 
+  const handleFacebookLogin = async () => {
+    setFacebookLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        console.error('Facebook OAuth error:', error);
+        toast({
+          title: "Eroare la autentificare",
+          description: translateAuthError(error),
+          variant: "destructive",
+        });
+        setFacebookLoading(false);
+      }
+      // Don't set loading to false - we're redirecting to Facebook
+    } catch (error) {
+      console.error('Facebook login exception:', error);
+      toast({
+        title: "Eroare",
+        description: "A apărut o eroare la autentificarea cu Facebook",
+        variant: "destructive",
+      });
+      setFacebookLoading(false);
+    }
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
