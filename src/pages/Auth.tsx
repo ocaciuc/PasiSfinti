@@ -511,7 +511,7 @@ const Auth = () => {
                     <Button
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={googleLoading || loading}
+                      disabled={googleLoading || loading || facebookLoading}
                       variant="outline"
                       className="w-full bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
                     >
