@@ -30,6 +30,7 @@ const Auth = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [facebookLoading, setFacebookLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -216,6 +217,37 @@ const Auth = () => {
         variant: "destructive",
       });
       setGoogleLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    setFacebookLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        console.error('Facebook OAuth error:', error);
+        toast({
+          title: "Eroare la autentificare",
+          description: translateAuthError(error),
+          variant: "destructive",
+        });
+        setFacebookLoading(false);
+      }
+      // Don't set loading to false - we're redirecting to Facebook
+    } catch (error) {
+      console.error('Facebook login exception:', error);
+      toast({
+        title: "Eroare",
+        description: "A apărut o eroare la autentificarea cu Facebook",
+        variant: "destructive",
+      });
+      setFacebookLoading(false);
     }
   };
 
@@ -479,7 +511,7 @@ const Auth = () => {
                     <Button
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={googleLoading || loading}
+                      disabled={googleLoading || loading || facebookLoading}
                       variant="outline"
                       className="w-full bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
                     >
@@ -489,6 +521,22 @@ const Auth = () => {
                         <GoogleIcon />
                       )}
                       <span className="ml-2">Continuă cu Google</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleFacebookLogin}
+                      disabled={facebookLoading || loading || googleLoading}
+                      variant="outline"
+                      className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white border-[#1877F2]"
+                    >
+                      {facebookLoading ? (
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      ) : (
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                      )}
+                      <span className="ml-2">Continuă cu Facebook</span>
                     </Button>
                   </div>
 
