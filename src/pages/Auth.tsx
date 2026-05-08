@@ -246,7 +246,27 @@ const Auth = () => {
   };
 
   const handleFacebookLogin = async () => {
+    setFacebookError(null);
     setFacebookLoading(true);
+
+    // Watchdog: dacă în FACEBOOK_OAUTH_TIMEOUT_MS nu am fost redirecționați
+    // (ex. popup blocat, browser blocă navigarea, fereastră închisă imediat),
+    // afișăm o eroare prietenoasă în loc să lăsăm utilizatorul cu spinner infinit.
+    const timeoutId = window.setTimeout(() => {
+      setFacebookLoading(false);
+      setFacebookError(
+        classifyFacebookOAuthError({
+          code: "timeout",
+          description: "Facebook OAuth redirect did not start in time",
+        })
+      );
+    }, FACEBOOK_OAUTH_TIMEOUT_MS);
+
+    // La descărcarea paginii (redirect reușit) curățăm watchdog-ul.
+    const clearWatchdog = () => window.clearTimeout(timeoutId);
+    window.addEventListener("beforeunload", clearWatchdog, { once: true });
+    window.addEventListener("pagehide", clearWatchdog, { once: true });
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
@@ -256,20 +276,27 @@ const Auth = () => {
       });
 
       if (error) {
+        clearWatchdog();
         console.error('Facebook OAuth error:', error);
+        const info = classifyFacebookErrorFromException(error);
+        setFacebookError(info);
         toast({
-          title: "Eroare la autentificare",
-          description: translateAuthError(error),
+          title: info.title,
+          description: info.message,
           variant: "destructive",
         });
         setFacebookLoading(false);
       }
-      // Don't set loading to false - we're redirecting to Facebook
+      // Dacă nu este eroare, suntem redirecționați către Facebook → watchdog
+      // se va anula la `beforeunload`/`pagehide`.
     } catch (error) {
+      clearWatchdog();
       console.error('Facebook login exception:', error);
+      const info = classifyFacebookErrorFromException(error);
+      setFacebookError(info);
       toast({
-        title: "Eroare",
-        description: "A apărut o eroare la autentificarea cu Facebook",
+        title: info.title,
+        description: info.message,
         variant: "destructive",
       });
       setFacebookLoading(false);
