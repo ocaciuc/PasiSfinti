@@ -558,6 +558,41 @@ const Auth = () => {
                 )
               ) : (
                 <>
+                  {/* Inline Facebook error message */}
+                  {facebookError && (
+                    <Alert
+                      variant="destructive"
+                      role="alert"
+                      data-testid="facebook-error-alert"
+                      className="relative pr-10"
+                    >
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>{facebookError.title}</AlertTitle>
+                      <AlertDescription className="space-y-2">
+                        <p>{facebookError.message}</p>
+                        {facebookError.canRetry && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={handleFacebookLogin}
+                            disabled={facebookLoading || googleLoading || loading}
+                          >
+                            Încearcă din nou
+                          </Button>
+                        )}
+                      </AlertDescription>
+                      <button
+                        type="button"
+                        aria-label="Închide mesajul"
+                        onClick={() => setFacebookError(null)}
+                        className="absolute top-2 right-2 text-destructive/70 hover:text-destructive transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </Alert>
+                  )}
+
                   {/* Social Login Buttons */}
                   <div className="space-y-3">
                     <Button
