@@ -91,6 +91,17 @@ Deno.serve(async (req) => {
       .or("is_deleted.is.null,is_deleted.eq.false");
 
     if (profErr) throw profErr;
+
+    // Fetch holiday-pref for all targeted users in one go
+    const userIds = (profiles ?? []).map((p) => p.user_id);
+    const { data: settings } = await supabase
+      .from("notification_settings")
+      .select("user_id, holiday_notifications")
+      .in("user_id", userIds);
+    const settingsMap = new Map(
+      (settings ?? []).map((s: any) => [s.user_id, s.holiday_notifications])
+    );
+
     console.log(`[holiday-notifications] Targeting ${profiles?.length ?? 0} users`);
 
     const route = `/holiday/${isoDate}`;
@@ -100,6 +111,10 @@ Deno.serve(async (req) => {
     let pushed = 0;
 
     for (const p of profiles ?? []) {
+      // Respect per-user holiday preference (default true if no row)
+      const wantsHoliday = settingsMap.has(p.user_id) ? settingsMap.get(p.user_id) !== false : true;
+      if (!wantsHoliday) continue;
+
       const message = buildHolidayMessage(p.first_name, holidayName);
 
       // De-dupe via "data->>date" check

@@ -156,7 +156,11 @@ export type Database = {
           comment_replies: boolean | null
           community_updates: boolean | null
           created_at: string | null
+          holiday_notifications: boolean
           pilgrimage_reminders: boolean | null
+          quiet_hours_enabled: boolean
+          quiet_hours_end: string
+          quiet_hours_start: string
           updated_at: string | null
           user_id: string
         }
@@ -167,7 +171,11 @@ export type Database = {
           comment_replies?: boolean | null
           community_updates?: boolean | null
           created_at?: string | null
+          holiday_notifications?: boolean
           pilgrimage_reminders?: boolean | null
+          quiet_hours_enabled?: boolean
+          quiet_hours_end?: string
+          quiet_hours_start?: string
           updated_at?: string | null
           user_id: string
         }
@@ -178,7 +186,11 @@ export type Database = {
           comment_replies?: boolean | null
           community_updates?: boolean | null
           created_at?: string | null
+          holiday_notifications?: boolean
           pilgrimage_reminders?: boolean | null
+          quiet_hours_enabled?: boolean
+          quiet_hours_end?: string
+          quiet_hours_start?: string
           updated_at?: string | null
           user_id?: string
         }
