@@ -7,12 +7,19 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Mail, Loader2, Eye, EyeOff } from "lucide-react";
+import { Flame, Mail, Loader2, Eye, EyeOff, AlertCircle, X } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { z } from "zod";
 import Footer from "@/components/Footer";
 import { translateAuthError } from "@/lib/onboarding-error-handler";
 import { performNativeGoogleSignIn, isNativePlatform } from "@/lib/native-google-signin";
 import { performGoogleOAuth } from "@/lib/capacitor-auth";
+import {
+  classifyFacebookOAuthError,
+  classifyFacebookErrorFromException,
+  FACEBOOK_OAUTH_TIMEOUT_MS,
+  type FacebookErrorInfo,
+} from "@/lib/facebook-auth-errors";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
@@ -40,6 +47,7 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [facebookError, setFacebookError] = useState<FacebookErrorInfo | null>(null);
 
   useEffect(() => {
     // Handle OAuth callback - check URL hash/params for tokens
@@ -56,14 +64,31 @@ const Auth = () => {
         const isTokenError = error.toLowerCase().includes('token') || 
                             errorDescription?.toLowerCase().includes('token') ||
                             errorDescription?.toLowerCase().includes('signature');
-        
+
+        // Detectăm dacă eroarea provine de la flow-ul Facebook (referer / provider hint)
+        const provider = (queryParams.get('provider') || hashParams.get('provider') || '').toLowerCase();
+        const referrerStr = (document.referrer || '').toLowerCase();
+        const isFacebookFlow =
+          provider === 'facebook' ||
+          referrerStr.includes('facebook.com') ||
+          (errorDescription || '').toLowerCase().includes('facebook');
+
         if (!isTokenError) {
           console.error('OAuth error:', error, errorDescription);
-          toast({
-            title: "Eroare la autentificare",
-            description: errorDescription || "A apărut o eroare la autentificare",
-            variant: "destructive",
-          });
+          if (isFacebookFlow || error === 'access_denied') {
+            const info = classifyFacebookOAuthError({
+              code: error,
+              description: errorDescription,
+            });
+            setFacebookError(info);
+            setFacebookLoading(false);
+          } else {
+            toast({
+              title: "Eroare la autentificare",
+              description: errorDescription || "A apărut o eroare la autentificare",
+              variant: "destructive",
+            });
+          }
         }
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -221,7 +246,27 @@ const Auth = () => {
   };
 
   const handleFacebookLogin = async () => {
+    setFacebookError(null);
     setFacebookLoading(true);
+
+    // Watchdog: dacă în FACEBOOK_OAUTH_TIMEOUT_MS nu am fost redirecționați
+    // (ex. popup blocat, browser blocă navigarea, fereastră închisă imediat),
+    // afișăm o eroare prietenoasă în loc să lăsăm utilizatorul cu spinner infinit.
+    const timeoutId = window.setTimeout(() => {
+      setFacebookLoading(false);
+      setFacebookError(
+        classifyFacebookOAuthError({
+          code: "timeout",
+          description: "Facebook OAuth redirect did not start in time",
+        })
+      );
+    }, FACEBOOK_OAUTH_TIMEOUT_MS);
+
+    // La descărcarea paginii (redirect reușit) curățăm watchdog-ul.
+    const clearWatchdog = () => window.clearTimeout(timeoutId);
+    window.addEventListener("beforeunload", clearWatchdog, { once: true });
+    window.addEventListener("pagehide", clearWatchdog, { once: true });
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
@@ -231,20 +276,27 @@ const Auth = () => {
       });
 
       if (error) {
+        clearWatchdog();
         console.error('Facebook OAuth error:', error);
+        const info = classifyFacebookErrorFromException(error);
+        setFacebookError(info);
         toast({
-          title: "Eroare la autentificare",
-          description: translateAuthError(error),
+          title: info.title,
+          description: info.message,
           variant: "destructive",
         });
         setFacebookLoading(false);
       }
-      // Don't set loading to false - we're redirecting to Facebook
+      // Dacă nu este eroare, suntem redirecționați către Facebook → watchdog
+      // se va anula la `beforeunload`/`pagehide`.
     } catch (error) {
+      clearWatchdog();
       console.error('Facebook login exception:', error);
+      const info = classifyFacebookErrorFromException(error);
+      setFacebookError(info);
       toast({
-        title: "Eroare",
-        description: "A apărut o eroare la autentificarea cu Facebook",
+        title: info.title,
+        description: info.message,
         variant: "destructive",
       });
       setFacebookLoading(false);
@@ -506,6 +558,41 @@ const Auth = () => {
                 )
               ) : (
                 <>
+                  {/* Inline Facebook error message */}
+                  {facebookError && (
+                    <Alert
+                      variant="destructive"
+                      role="alert"
+                      data-testid="facebook-error-alert"
+                      className="relative pr-10"
+                    >
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>{facebookError.title}</AlertTitle>
+                      <AlertDescription className="space-y-2">
+                        <p>{facebookError.message}</p>
+                        {facebookError.canRetry && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={handleFacebookLogin}
+                            disabled={facebookLoading || googleLoading || loading}
+                          >
+                            Încearcă din nou
+                          </Button>
+                        )}
+                      </AlertDescription>
+                      <button
+                        type="button"
+                        aria-label="Închide mesajul"
+                        onClick={() => setFacebookError(null)}
+                        className="absolute top-2 right-2 text-destructive/70 hover:text-destructive transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </Alert>
+                  )}
+
                   {/* Social Login Buttons */}
                   <div className="space-y-3">
                     <Button
