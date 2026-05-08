@@ -168,18 +168,48 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get FCM tokens for the target users
+    // Filter out users currently in their quiet-hours window (Europe/Bucharest).
+    const { data: settings } = await supabase
+      .from("notification_settings")
+      .select("user_id, quiet_hours_enabled, quiet_hours_start, quiet_hours_end")
+      .in("user_id", user_ids);
+
+    const nowRo = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Bucharest" }));
+    const nowMin = nowRo.getHours() * 60 + nowRo.getMinutes();
+    const inQuiet = (start: string, end: string) => {
+      const [sh, sm] = start.split(":").map(Number);
+      const [eh, em] = end.split(":").map(Number);
+      const s = sh * 60 + sm;
+      const e = eh * 60 + em;
+      return s <= e ? nowMin >= s && nowMin < e : nowMin >= s || nowMin < e;
+    };
+    const blocked = new Set(
+      (settings ?? [])
+        .filter((s: any) => s.quiet_hours_enabled && inQuiet(s.quiet_hours_start, s.quiet_hours_end))
+        .map((s: any) => s.user_id)
+    );
+    const allowedUserIds = (user_ids as string[]).filter((id) => !blocked.has(id));
+    console.log(`[send-push] quiet-hours blocked ${blocked.size}/${user_ids.length}`);
+
+    if (allowedUserIds.length === 0) {
+      return new Response(
+        JSON.stringify({ success: true, sent: 0, blocked: blocked.size, message: "All users in quiet hours" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Get FCM tokens for the allowed users
     const { data: tokens, error: tokensError } = await supabase
       .from("push_tokens")
       .select("token, user_id")
-      .in("user_id", user_ids);
+      .in("user_id", allowedUserIds);
 
     if (tokensError) {
       console.error("[send-push] ❌ Token fetch error:", tokensError.message);
       throw new Error("Error fetching tokens: " + tokensError.message);
     }
 
-    console.log(`[send-push] Found ${tokens?.length ?? 0} token(s) for ${user_ids.length} user(s)`);
+    console.log(`[send-push] Found ${tokens?.length ?? 0} token(s) for ${allowedUserIds.length} user(s)`);
 
     if (!tokens || tokens.length === 0) {
       return new Response(
