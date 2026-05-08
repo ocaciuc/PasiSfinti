@@ -17,6 +17,3 @@ verify_jwt = false
 
 [functions.holiday-notifications]
 verify_jwt = false
-
-[functions.admin-bulk-update-calendar]
-verify_jwt = false
