@@ -47,6 +47,7 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [facebookError, setFacebookError] = useState<FacebookErrorInfo | null>(null);
 
   useEffect(() => {
     // Handle OAuth callback - check URL hash/params for tokens
