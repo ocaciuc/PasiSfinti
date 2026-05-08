@@ -7,12 +7,19 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Flame, Mail, Loader2, Eye, EyeOff } from "lucide-react";
+import { Flame, Mail, Loader2, Eye, EyeOff, AlertCircle, X } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { z } from "zod";
 import Footer from "@/components/Footer";
 import { translateAuthError } from "@/lib/onboarding-error-handler";
 import { performNativeGoogleSignIn, isNativePlatform } from "@/lib/native-google-signin";
 import { performGoogleOAuth } from "@/lib/capacitor-auth";
+import {
+  classifyFacebookOAuthError,
+  classifyFacebookErrorFromException,
+  FACEBOOK_OAUTH_TIMEOUT_MS,
+  type FacebookErrorInfo,
+} from "@/lib/facebook-auth-errors";
 
 // Validation schemas
 const emailSchema = z.string().trim().email({ message: "Adresa de email nu este validă" });
