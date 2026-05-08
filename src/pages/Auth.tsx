@@ -64,14 +64,31 @@ const Auth = () => {
         const isTokenError = error.toLowerCase().includes('token') || 
                             errorDescription?.toLowerCase().includes('token') ||
                             errorDescription?.toLowerCase().includes('signature');
-        
+
+        // Detectăm dacă eroarea provine de la flow-ul Facebook (referer / provider hint)
+        const provider = (queryParams.get('provider') || hashParams.get('provider') || '').toLowerCase();
+        const referrerStr = (document.referrer || '').toLowerCase();
+        const isFacebookFlow =
+          provider === 'facebook' ||
+          referrerStr.includes('facebook.com') ||
+          (errorDescription || '').toLowerCase().includes('facebook');
+
         if (!isTokenError) {
           console.error('OAuth error:', error, errorDescription);
-          toast({
-            title: "Eroare la autentificare",
-            description: errorDescription || "A apărut o eroare la autentificare",
-            variant: "destructive",
-          });
+          if (isFacebookFlow || error === 'access_denied') {
+            const info = classifyFacebookOAuthError({
+              code: error,
+              description: errorDescription,
+            });
+            setFacebookError(info);
+            setFacebookLoading(false);
+          } else {
+            toast({
+              title: "Eroare la autentificare",
+              description: errorDescription || "A apărut o eroare la autentificare",
+              variant: "destructive",
+            });
+          }
         }
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
