@@ -336,6 +336,12 @@
 - [ ] Ensure `android/app/google-services.json` exists in the repository used for builds/sync, not only locally in Android Studio
 - [ ] Verify native JS logs after authenticated navigation to `/dashboard` using `adb logcat` or Chrome remote inspect, since Lovable preview logs do not show native-device push registration
 
+### Android Resource Linking Hotfix
+- [x] Confirmed `activity_login.xml` and `layout-w936dp-v13/activity_login.xml` are no longer present in the repository resources
+- [x] Confirmed the committed Android layout is only `activity_main.xml`, which uses the Capacitor WebView shell
+- [x] Diagnosed remaining `sourceSetPathMap` / `app-mergeDebugResources` error as stale local Android/Gradle generated resource cache after deleting `activity_login.xml`
+- [ ] On the local machine, clean generated native build folders and resync Capacitor before running again
+
 ### 8.1 Comprehensive Testing
 - [ ] Test complete user journey
 - [ ] Test all authentication flows
